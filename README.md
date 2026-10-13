@@ -31,7 +31,7 @@
 | Dependent (DV) | `fltlnl` | How much of the time during the past week did you feel lonely? (1–4) | 1,382 valid answers; 75% answer "none or almost none of the time" |
 | Independent (IV) | `netustm` | Minutes of internet use on a typical day | 1,212 valid answers; mean ≈ 236 min, median 180 min |
 
-### Candidates we considered but rejected
+### Candidates considered
 
 | Variable | Why rejected |
 |---|---|
