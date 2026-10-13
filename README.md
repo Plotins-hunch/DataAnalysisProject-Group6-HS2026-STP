@@ -2,7 +2,7 @@
 
 **Course:** Data Analysis for Public Policy Research (860-0041-00L), ETH Zurich, HS2026
 **Assignment:** Group Report #1: Operationalisation, Descriptives, and Comparing Two Groups (due 28 October 2026)
-**Group members:** Gabriele Pizzi, Clara Roth, David Wild, Ole Handschug, Joshua Silalahi
+**Group members:** Gabriele Pizzi, Clara Roth, Ole Handschug, Joshua Silalahi
 
 **Research question:** Is people's internet use associated with their feeling of loneliness?
 
