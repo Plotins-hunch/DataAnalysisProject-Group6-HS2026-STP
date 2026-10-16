@@ -18,6 +18,7 @@
 | `ESS11_CH_codebook.html`, `ESS10_CH_codebook.html` | Codebooks: variable names, question wording, answer codes |
 | `ESS11_CH_questionnaire.pdf`, `ESS10_CH_questionnaire.pdf` | Original questionnaires |
 | `Group_Research_Project_Report_1_Assignment_Details.pdf` | Assignment brief and grading rubric |
+| `figures/` | ggplot charts made by Step 3 of the script: DV histogram, IV histogram, group bar chart |
 
 1. **Chose the dataset: ESS Round 11.** The only direct loneliness question (`fltlnl`) exists in Round 11 but not in Round 10. The whole "how much of the time during the past week did you…" block is missing from Round 10.
 2. **Listed all candidate items** for each concept by searching the column names and the codebook.

@@ -259,3 +259,81 @@ sum(ess$net_min == cut_point, na.rm = TRUE)
 # CHECK 4: are both groups reasonably large?
 table(ess$net_group, useNA = "ifany")
 # result: At or below mean 717, Above mean 495, NA 172
+
+
+# ------------------- STEP 3 - ILLUSTRATIONS -------------------------- #
+# one ggplot per variable, as the assignment asks:
+#   DV (lonely)       -> histogram
+#   IV (net_min)      -> histogram
+#   group (net_group) -> bar chart
+# every plot drops NA, so each one shows the valid N only.
+# plots are also saved as png into a "figures" folder for the report.
+
+dir.create("figures", showWarnings = FALSE) # make folder if it is not there yet
+
+# shared look for all plots, so they read as one set
+theme_set(theme_minimal(base_size = 12) +
+            theme(panel.grid.minor = element_blank(),
+                  plot.title.position = "plot"))
+bar_fill <- "#4C72B0" # one colour for all bars
+
+# part 3.a - DV histogram
+# lonely only takes the values 1-4, so binwidth = 1 gives one bar per answer.
+# the x axis keeps the answer labels, so the reader sees what 1-4 mean.
+n_dv <- sum(!is.na(ess$lonely)) # valid N, printed in the subtitle
+
+plot_dv <- ggplot(filter(ess, !is.na(lonely)), aes(x = lonely)) +
+  geom_histogram(binwidth = 1, fill = bar_fill, colour = "white") +
+  geom_vline(xintercept = mean(ess$lonely, na.rm = TRUE),
+             linetype = "dashed") + # dashed line = mean
+  scale_x_continuous(breaks = 1:4,
+                     labels = c("None or\nalmost none", "Some",
+                                "Most", "All or\nalmost all")) +
+  labs(title = "Felt lonely, past week (fltlnl)",
+       subtitle = paste0("Valid N = ", n_dv, "; dashed line = mean"),
+       x = "How much of the time (1-4)", y = "Number of respondents")
+plot_dv
+ggsave("figures/fig1_dv_lonely_hist.png", plot_dv, width = 6, height = 4, dpi = 300)
+# READ: most people sit in the lowest category (floor effect, right-skewed)
+
+# part 3.b - IV histogram
+# binwidth = 30 minutes (half an hour). the dashed line is the mean,
+# which is also the cut point for the grouping variable (step 2.b).
+n_iv <- sum(!is.na(ess$net_min))
+
+plot_iv <- ggplot(filter(ess, !is.na(net_min)), aes(x = net_min)) +
+  geom_histogram(binwidth = 30, boundary = 0, fill = bar_fill, colour = "white") +
+  geom_vline(xintercept = cut_point, linetype = "dashed") +
+  annotate("text", x = cut_point, y = Inf, vjust = 1.5, hjust = -0.05,
+           label = paste0("mean / cut point = ", round(cut_point, 1), " min")) +
+  scale_x_continuous(breaks = seq(0, 1080, by = 120)) + # tick every 2 hours
+  labs(title = "Internet use on a typical day (netustm)",
+       subtitle = paste0("Valid N = ", n_iv,
+                         " (regular internet users only); bins of 30 min"),
+       x = "Minutes per day", y = "Number of respondents")
+plot_iv
+ggsave("figures/fig2_iv_netmin_hist.png", plot_iv, width = 6, height = 4, dpi = 300)
+# READ: right-skewed with a long tail up to 1,080 min; spikes at round
+# numbers (e.g. 60, 120, 180 min) show response heaping
+
+# part 3.c - bar chart of the grouping variable
+# count and share of each group are written on top of the bars
+group_counts <- ess %>%
+  filter(!is.na(net_group)) %>%
+  count(net_group) %>%
+  mutate(share = n / sum(n),
+         label = paste0(n, " (", round(100 * share), "%)"))
+group_counts
+
+plot_group <- ggplot(group_counts, aes(x = net_group, y = n)) +
+  geom_col(fill = bar_fill, width = 0.6) +
+  geom_text(aes(label = label), vjust = -0.5) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) + # room for labels
+  labs(title = "Grouping variable: internet use split at the mean",
+       subtitle = paste0("Valid N = ", sum(group_counts$n),
+                         "; cut point = ", round(cut_point, 1), " min"),
+       x = NULL, y = "Number of respondents")
+plot_group
+ggsave("figures/fig3_group_bar.png", plot_group, width = 6, height = 4, dpi = 300)
+# READ: both groups are reasonably large; the "at or below mean" group is
+# bigger because the right-skewed tail pulls the mean above the median
