@@ -1,9 +1,11 @@
 // Group Report #1 — one page, figures included (lorem ipsum placeholders)
 // Each lorem(n) is that section's word budget. Show the grid: typst compile report.typ --input grid=true
 //
-// Type system: one face (Arial), two sizes, two weights.
-//   9pt  text: title, names, headings, body          bold only for the title and run-in headings
-//   7pt  data: captions, table, text inside plots
+// Type system: one face (Arial), three sizes, two weights, two inks.
+//   14pt bold    title — the only display size
+//   9pt          text: answer (bold), headings (bold), body (regular)
+//   7pt          data: captions, table, text inside plots
+//   grey ink     supporting information: course, names, "Question"/"Answer" labels
 
 // ---------- grid (A4, points) ----------
 // baseline unit u = 12pt · 6 columns of 72pt, 12pt gutters · 59 lines of type area
@@ -38,41 +40,41 @@
   set par(spacing: 0pt); set block(spacing: 0pt); body }))
 #let small(body) = text(size: 7pt, body)
 #let label(id) = text(weight: "bold", id)
+#let meta(body) = text(fill: luma(42%), body)   // grey ink for supporting information
 #let fig(c, l, n, lines, caption, file) = at(c, l, n, {
   block(height: u, small(caption))
   image("figures/" + file, width: span(n), height: lines * u)
 })
 
-// ---------- lines 1–2: header ----------
-// 2 × 2: what | course, who | group — the right pair hangs from column 5, like Figure 4
-#at(1, 1, 4, [*Internet use and loneliness in Switzerland*])
-#at(5, 1, 2, [Data Analysis for Public Policy])
-#at(1, 2, 4, [Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi])
-#at(5, 2, 2, [Report 1 · Group 6 · HS2026])
+// ---------- lines 1–3: header ----------
+// title: 14pt on a 2-line box, baseline on line 2; course hangs from column 5, like Figure 4
+#at(1, 1, 4, text(size: 14pt, weight: "bold", top-edge: 21pt, bottom-edge: -3pt)[Internet use and loneliness in Switzerland])
+#at(5, 1, 2, meta[Data Analysis for Public Policy \ Report 1 · Group 6 · HS2026])
+#at(1, 3, 4, meta[Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi])
 
 // hairline rules sit in the middle of an empty grid line, so they never move a baseline
 #let hairline(l) = place(dx: 0pt, dy: ly(l) + u / 2, line(length: tw, stroke: 0.4pt))
-#hairline(3)     // header | question and answer
+#hairline(4)     // header | question and answer
 #hairline(37)    // text   | data
 
-// Hierarchy by position and space, not by size (still one face, two sizes, two weights):
-//   level 1  question / answer band, read in five seconds
-//   level 2  section heading, bold, on its own line, one empty line above
-//   level 3  run-in bold label inside a section (DV, IV)
-//   level 4  body text
+// Reading order: title → answer → section headings → body → figures.
+//   level 1  title, 14pt
+//   level 2  answer sentence, bold — the result in five seconds
+//   level 3  section headings, bold, on their own line with one empty line above
+//   level 4  body text, regular; everything supporting is grey
 
-// ---------- lines 4–6: question | answer ----------
-#at(1, 4, 3, [*Question* \ Is people's internet use associated with their feeling of loneliness?])
-#at(4, 4, 3, [*Answer* \ #lorem(16)])
+// ---------- lines 5–7: question | answer ----------
+#at(1, 5, 3, [#meta[Question] \ Is people's internet use associated with their feeling of loneliness?])
+#at(4, 5, 3, [#meta[Answer] \ *#lorem(16)*])
 
-// ---------- lines 8–36: text, two columns ----------
+// ---------- lines 9–36: text, two columns ----------
 #show heading: it => block(above: u, below: 0pt, text(size: 9pt, weight: "bold", it.body))
-#at(1, 8, 6, block(height: 29 * u, columns(2, gutter: gut)[
+#at(1, 9, 6, block(height: 28 * u, columns(2, gutter: gut)[
   #set par(spacing: 0pt)          // paragraphs inside a section run on; space only between sections
   = 1 Variables
-  *Dependent: loneliness* (`fltlnl`). #lorem(72)
+  Dependent variable: loneliness (`fltlnl`). #lorem(66)
 
-  *Independent: internet use* (`netustm`). #lorem(72)
+  Independent variable: internet use (`netustm`). #lorem(66)
 
   = 2 Grouping
   #lorem(45)
@@ -85,13 +87,13 @@
   #lorem(40)
 
   = 5 Interpretation
-  #lorem(90)
+  #lorem(85)
 ]))
 
 // ---------- lines 38–48: the two variables ----------
 // one encoding throughout: grey = group 0 (at or below mean), black = group 1 (above mean)
 #fig(1, 38, 2, 10, [#label[Figure 1]  Felt lonely, past week (`fltlnl`), N = 1,382], "f1_dv_hist.png")
-#fig(3, 38, 4, 10, [#label[Figure 2]  Internet use per day, min (`netustm`), N = 1,212. Below: mean loneliness per band, 95% CI], "f2_iv_hist.png")
+#fig(3, 38, 4, 10, [#label[Figure 2]  Internet use per day, minutes (`netustm`), N = 1,212; below, loneliness across its range], "f2_iv_hist.png")
 
 // ---------- lines 50–59: statistics | the two groups, read across ----------
 #let r = table.hline(stroke: 0.4pt)

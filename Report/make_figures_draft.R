@@ -35,13 +35,17 @@ white_grid <- function(at) geom_hline(yintercept = at, colour = "white", linewid
 txt <- function(..., colour = black) annotate("text", family = fam, size = mm(fs), colour = colour, ...)
 save <- function(p, name, w, lines) ggsave(file.path(out, name), p, width = w, height = lines * 12 * pt, dpi = 600)
 
-# F1 DV histogram: one bar per answer, share on top
+# F1 DV histogram: one bar per answer, share and count on top, mean marked under the baseline
 dv <- filter(ess, !is.na(lonely)) %>% count(lonely) %>% mutate(p = n / sum(n))
+m_dv <- mean(ess$lonely, na.rm = TRUE)
 f1 <- ggplot(dv, aes(lonely, n)) +
   geom_col(width = 0.86, fill = black) + white_grid(c(250, 500, 750)) +
-  geom_text(aes(label = paste0(round(100 * p), "%")), vjust = -0.5, family = fam, size = mm(fs)) +
+  geom_text(aes(label = paste0(round(100 * p), "%\n", formatC(n, big.mark = ",", format = "d"))),
+            vjust = -0.25, lineheight = 0.9, family = fam, size = mm(fs)) +
+  annotate("point", x = m_dv, y = -45, shape = 17, size = 1.2) +
+  txt(x = m_dv + 0.12, y = -45, hjust = 0, label = sprintf("mean %.2f", m_dv)) +
   scale_x_continuous(breaks = 1:4, labels = c("None", "Some", "Most", "All")) +
-  scale_y_continuous(limits = c(0, 1200), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(-80, 1280), expand = c(0, 0)) +
   theme_grid() + theme(axis.text.y = element_blank())
 save(f1, "f1_dv_hist.png", w2, 10)
 
@@ -57,6 +61,12 @@ f2 <- ggplot(iv, aes(net_min, fill = net_group)) +
   txt(x = cut_point + 8, y = 180, hjust = 0, label = sprintf("mean = cut point, %.1f min", cut_point)) +
   annotate("segment", x = med_iv, xend = med_iv, y = 0, yend = 128, linewidth = 0.3, linetype = "22") +
   txt(x = med_iv, y = 138, label = "median") +
+  # direct labels in the ink of the bars they name, so no legend is needed
+  txt(x = 255, y = 140, hjust = 0, label = sprintf("1  above mean: %d", sum(iv$net_group == "Above mean"))) +
+  txt(x = 255, y = 118, hjust = 0, colour = grey, label = sprintf("0  at or below: %d", sum(iv$net_group == "At or below mean"))) +
+  txt(x = 1075, y = 100, hjust = 1, colour = grey,
+      label = sprintf("not shown: %d not asked, %d don't know",
+                      sum(ess$netustm == "Not applicable"), sum(ess$netustm == "Don't know"))) +
   x_minutes +
   scale_y_continuous(breaks = c(50, 100, 150), limits = c(0, 192), expand = c(0, 0)) +
   theme_grid() + theme(axis.text.x = element_blank())
@@ -76,6 +86,7 @@ f2b <- ggplot(bands) +
   geom_segment(aes(x = lo + 4, xend = hi - 4, y = m, yend = m, colour = side), linewidth = 0.6) +
   scale_colour_manual(values = c(grey, black)) +
   x_minutes +
+  txt(x = 1075, y = 1.52, hjust = 1, colour = grey, label = "mean loneliness (1-4) per band, 95% CI") +
   scale_y_continuous(breaks = c(1.2, 1.4), limits = c(1.05, 1.6), expand = c(0, 0)) +
   theme_grid()
 save(f2 / f2b + plot_layout(heights = c(6, 4)), "f2_iv_hist.png", w4, 10)
@@ -86,7 +97,7 @@ f3 <- ggplot(gc, aes(n, net_group, fill = net_group)) +
   geom_col(width = 0.62) +
   geom_text(aes(label = sprintf("%d (%.0f%%)", n, 100 * p)), hjust = -0.1, family = fam, size = mm(fs)) +
   scale_fill_manual(values = c(grey, black)) +
-  scale_y_discrete(labels = c("0  At or below", "1  Above")) +
+  scale_y_discrete(labels = c("0  At or below", "1  Above"), expand = expansion(add = c(0.6, 0.75))) +  # same rows as F4
   scale_x_continuous(limits = c(0, 1180), expand = c(0, 0), breaks = 0) +
   theme_grid() + theme(axis.text.x = element_text(colour = "white"))
 save(f3, "f3_group_bar.png", w2, 6)
@@ -95,11 +106,16 @@ save(f3, "f3_group_bar.png", w2, 6)
 gm <- filter(ess, !is.na(net_group), !is.na(lonely)) %>% group_by(net_group) %>%
   summarise(m = mean(lonely), se = sd(lonely) / sqrt(n()), n = n()) %>%
   mutate(lo = m - qt(.975, n - 1) * se, hi = m + qt(.975, n - 1) * se)
+tt <- t.test(lonely ~ net_group, data = ess)   # Welch is R's default
 f4 <- ggplot(gm, aes(m, net_group, colour = net_group)) +
+  annotate("segment", x = m_dv, xend = m_dv, y = 0.55, yend = 2.45, linewidth = 0.25, linetype = "22", colour = grey) +
+  txt(x = m_dv, y = 2.62, colour = grey, label = "all") +
   geom_segment(aes(x = lo, xend = hi, yend = net_group), linewidth = 0.6) +
   geom_point(size = 1.8) +
   geom_text(aes(x = hi, label = sprintf("%.2f", m)), hjust = -0.3, family = fam, size = mm(fs), colour = black) +
   scale_colour_manual(values = c(grey, black)) +
+  txt(x = 1.45, y = 1.5, hjust = 1, label = sprintf("+%.2f, p = %.2f", diff(gm$m), tt$p.value)) +
   scale_x_continuous(limits = c(1.2, 1.45), breaks = c(1.2, 1.3, 1.4)) +
+  scale_y_discrete(expand = expansion(add = c(0.6, 0.75))) +
   theme_grid() + theme(axis.text.y = element_blank())
 save(f4, "f4_group_means.png", w2, 6)
