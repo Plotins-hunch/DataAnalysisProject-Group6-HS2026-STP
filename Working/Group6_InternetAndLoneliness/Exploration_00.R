@@ -1,3 +1,5 @@
+# ---------- STEP 1 -------------- #
+
 # ----- part 0 - Setup ---------
 # install packages
 library(readr)    # read_csv()
@@ -74,6 +76,7 @@ describe_item <- function(x){
 describe_item(ess11$fltlnl)
 describe_item(ess11$netustm)
 describe_item(ess11$netusoft)
+describe_item(ess11$agegroup)
 
 
 # candidates for DV and IV
@@ -190,3 +193,69 @@ View(decision_table)
 # Limitation: only asked of people using the internet most days/every day
 # (see part 3) -> results describe regular internet users only; includes
 # work use; self-reported, heaped at round numbers.
+
+
+
+# ------------------- STEP 2 -------------------------- #
+
+# part 2.a
+# the given csv stores answer as text so we need to convert them manually
+# factor(x, levels = ...) puts the answers in their logical order.
+# use as.integer() to give each answers its position
+# anything not in the levels (refusals, don't know) is automatically N/A
+
+lonely_levels <- c("None or almost none of the time",   # 1
+                   "Some of the time",                  # 2
+                   "Most of the time",                  # 3
+                   "All or almost all of the time")     # 4
+
+
+ess <- ess11 %>%
+  mutate(
+    lonely_f = factor(fltlnl, levels = lonely_levels),  # DV with answer labels
+    lonely   = as.integer(lonely_f),                    # DV as numbers 1-4 (higher = lonelier)
+    net_min  = suppressWarnings(as.numeric(netustm))    # IV in minutes; text codes -> NA
+  )
+
+# CHECK 1: each raw answer should map to exactly one number,
+#  only Refusal / Don't know should become NA
+table(raw = ess$fltlnl, new = ess$lonely, useNA = "ifany")
+# result: each answer maps to one number (None=1: 1040, Some=2: 280,
+# Most=3: 37, All=4: 25); only Refusal (1) and Don't know (1) became NA
+# new
+#raw                                  1    2    3    4 <NA>
+#  All or almost all of the time      0    0    0   25    0
+#  Don't know                         0    0    0    0    1
+#  Most of the time                   0    0   37    0    0
+#  None or almost none of the time 1040    0    0    0    0
+#  Refusal                            0    0    0    0    1
+#  Some of the time                   0  280    0    0    0
+
+# CHECK 2: only the text codes should have become NA in net_min
+table(ess$netustm[is.na(ess$net_min)], useNA = "ifany")
+# result: Don't know 4, Not applicable 168
+
+# part 2.b - grouping variables
+# split net_min at its mean
+# The cut point is stored on its own, so changing the split
+cut_point <- mean(ess$net_min, na.rm = TRUE)
+cut_point   # round up to 235.6 minutes
+
+ess <- ess %>%
+  mutate(
+    # 1 = above the mean, 0 = at or below the mean.
+    # ifelse() keeps NA as NA, so people without a minutes answer
+    # are not put into group 0 by mistake.
+    net_high  = ifelse(net_min > cut_point, 1, 0),
+    net_group = factor(net_high, levels = c(0, 1),
+                       labels = c("At or below mean", "Above mean"))
+  )
+
+# CHECK 3: boundary handling - how many people sit exactly ON the mean?
+sum(ess$net_min == cut_point, na.rm = TRUE)
+# result: 0 (the mean is not a whole number). by the rule that is set,
+# anyone equal to the mean would go into the "at or below mean" group (0)
+
+# CHECK 4: are both groups reasonably large?
+table(ess$net_group, useNA = "ifany")
+# result: At or below mean 717, Above mean 495, NA 172
