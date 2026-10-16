@@ -37,6 +37,7 @@
 #let at(c, l, n, body) = place(dx: cx(c), dy: ly(l), block(width: span(n), {
   set par(spacing: 0pt); set block(spacing: 0pt); body }))
 #let small(body) = text(size: 7pt, body)
+#let label(id) = text(weight: "bold", id)
 #let fig(c, l, n, lines, caption, file) = at(c, l, n, {
   block(height: u, small(caption))
   image("figures/" + file, width: span(n), height: lines * u)
@@ -47,33 +48,48 @@
 #at(5, 1, 2, [Group 6 · HS2026])
 #at(1, 2, 6, [Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi])
 
-// ---------- lines 4–38: text, two columns ----------
-#at(1, 4, 6, block(height: 35 * u, columns(2, gutter: gut)[
-  #set par(spacing: u)   // one empty line between sections
-  *Research question* Is people's internet use associated with their feeling of loneliness? #lorem(10)
+// Hierarchy by position and space, not by size (still one face, two sizes, two weights):
+//   level 1  question / answer band, read in five seconds
+//   level 2  section heading, bold, on its own line, one empty line above
+//   level 3  run-in bold label inside a section (DV, IV)
+//   level 4  body text
 
-  *1 Operationalisation* The dependent variable is `fltlnl`. #lorem(90)
+// ---------- lines 4–6: question | answer ----------
+#at(1, 4, 3, [*Question* \ Is people's internet use associated with their feeling of loneliness?])
+#at(4, 4, 3, [*Answer* \ #lorem(16)])
 
-  The independent variable is `netustm`. #lorem(90)
+// ---------- lines 8–38: text, two columns ----------
+#show heading: it => block(above: u, below: 0pt, text(size: 9pt, weight: "bold", it.body))
+#at(1, 8, 6, block(height: 31 * u, columns(2, gutter: gut)[
+  #set par(spacing: 0pt)          // paragraphs inside a section run on; space only between sections
+  = 1 Variables
+  *Dependent: loneliness* (`fltlnl`). #lorem(80)
 
-  *2 Grouping variable* #lorem(50)
+  *Independent: internet use* (`netustm`). #lorem(80)
 
-  *3 Descriptive statistics* #lorem(70)
+  = 2 Grouping
+  #lorem(45)
 
-  *4 t-test* #lorem(50)
+  #colbreak()   // column 1: what we measured · column 2: what we found
+  = 3 Descriptives
+  #lorem(60)
 
-  *5 Interpretation* #lorem(120)
+  = 4 Test
+  #lorem(40)
+
+  = 5 Interpretation
+  #lorem(100)
 ]))
 
 // ---------- lines 40–48: the two variables ----------
 // one encoding throughout: grey = group 0 (at or below mean), black = group 1 (above mean)
-#fig(1, 40, 2, 8, [Figure 1  Felt lonely, past week (`fltlnl`), N = 1,382], "f1_dv_hist.png")
-#fig(3, 40, 4, 8, [Figure 2  Internet use per day, minutes (`netustm`), N = 1,212; grey = group 0, black = 1], "f2_iv_hist.png")
+#fig(1, 40, 2, 8, [#label[Figure 1]  Felt lonely, past week (`fltlnl`), N = 1,382], "f1_dv_hist.png")
+#fig(3, 40, 4, 8, [#label[Figure 2]  Internet use per day, minutes (`netustm`), N = 1,212; grey = group 0, black = 1], "f2_iv_hist.png")
 
 // ---------- lines 50–59: statistics | the two groups, read across ----------
 #let r = table.hline(stroke: 0.4pt)
 #at(1, 50, 2, small({
-  block(height: u)[Table 1  Descriptive statistics]
+  block(height: u)[#label[Table 1]  Descriptive statistics]
   table(columns: (52pt, 52pt, 52pt), stroke: none, inset: 0pt, align: (left, right, right),
     r,
     [], [Loneliness], [Internet, min],
@@ -89,6 +105,6 @@
     r,
   )
 }))
-#fig(3, 50, 2, 5, [Figure 3  Groups (`net_group`), N = 1,212, mode 0], "f3_group_bar.png")
-#fig(5, 50, 2, 5, [Figure 4  Mean loneliness by group, 95% CI], "f4_group_means.png")
-#at(3, 57, 4, small[Welch two-sample t-test, group 1 minus group 0: difference 0.02 (95% CI −0.05 to 0.09), t~=~0.63, df~=~1004, p~=~0.53.])
+#fig(3, 50, 2, 5, [#label[Figure 3]  Groups (`net_group`), N = 1,212, mode 0], "f3_group_bar.png")
+#fig(5, 50, 2, 5, [#label[Figure 4]  Mean loneliness by group, 95% CI], "f4_group_means.png")
+#at(3, 57, 4, small[#label[Welch t-test]  Group 1 minus group 0: difference 0.02 (95% CI −0.05 to 0.09), t~=~0.63, df~=~1004, p~=~0.53.])
