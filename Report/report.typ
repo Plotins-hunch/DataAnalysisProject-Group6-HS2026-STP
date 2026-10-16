@@ -44,9 +44,16 @@
 })
 
 // ---------- lines 1–2: header ----------
+// 2 × 2: what | course, who | group — the right pair hangs from column 5, like Figure 4
 #at(1, 1, 4, [*Internet use and loneliness in Switzerland*])
-#at(5, 1, 2, [Group 6 · HS2026])
-#at(1, 2, 6, [Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi])
+#at(5, 1, 2, [Data Analysis for Public Policy])
+#at(1, 2, 4, [Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi])
+#at(5, 2, 2, [Report 1 · Group 6 · HS2026])
+
+// hairline rules sit in the middle of an empty grid line, so they never move a baseline
+#let hairline(l) = place(dx: 0pt, dy: ly(l) + u / 2, line(length: tw, stroke: 0.4pt))
+#hairline(3)     // header | question and answer
+#hairline(37)    // text   | data
 
 // Hierarchy by position and space, not by size (still one face, two sizes, two weights):
 //   level 1  question / answer band, read in five seconds
@@ -105,6 +112,6 @@
     r,
   )
 }))
-#fig(3, 50, 2, 5, [#label[Figure 3]  Groups (`net_group`), N = 1,212, mode 0], "f3_group_bar.png")
-#fig(5, 50, 2, 5, [#label[Figure 4]  Mean loneliness by group, 95% CI], "f4_group_means.png")
-#at(3, 57, 4, small[#label[Welch t-test]  Group 1 minus group 0: difference 0.02 (95% CI −0.05 to 0.09), t~=~0.63, df~=~1004, p~=~0.53.])
+#fig(3, 50, 2, 6, [#label[Figure 3]  Groups (`net_group`), N = 1,212, mode 0], "f3_group_bar.png")
+#fig(5, 50, 2, 6, [#label[Figure 4]  Mean loneliness by group, 95% CI], "f4_group_means.png")
+#at(3, 58, 4, small[#label[Welch t-test]  Group 1 minus group 0: difference 0.02 (95% CI −0.05 to 0.09), t~=~0.63, df~=~1004, p~=~0.53.])

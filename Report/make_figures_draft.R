@@ -89,7 +89,7 @@ f3 <- ggplot(gc, aes(n, net_group, fill = net_group)) +
   scale_y_discrete(labels = c("0  At or below", "1  Above")) +
   scale_x_continuous(limits = c(0, 1180), expand = c(0, 0), breaks = 0) +
   theme_grid() + theme(axis.text.x = element_text(colour = "white"))
-save(f3, "f3_group_bar.png", w2, 5)
+save(f3, "f3_group_bar.png", w2, 6)
 
 # F4 mean loneliness by group with 95% CI (rows line up with F3, so no y labels)
 gm <- filter(ess, !is.na(net_group), !is.na(lonely)) %>% group_by(net_group) %>%
@@ -102,4 +102,4 @@ f4 <- ggplot(gm, aes(m, net_group, colour = net_group)) +
   scale_colour_manual(values = c(grey, black)) +
   scale_x_continuous(limits = c(1.2, 1.45), breaks = c(1.2, 1.3, 1.4)) +
   theme_grid() + theme(axis.text.y = element_blank())
-save(f4, "f4_group_means.png", w2, 5)
+save(f4, "f4_group_means.png", w2, 6)
