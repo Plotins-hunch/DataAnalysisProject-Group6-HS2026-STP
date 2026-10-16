@@ -1,7 +1,7 @@
 # Draft plots for the one-page report: monochrome, Arial 7pt, sized to the grid.
 # Run from the repo root:  Rscript Report/make_figures_draft.R Report/figures
 # (draft only; the final plot code moves into the main analysis script)
-suppressMessages({library(readr); library(dplyr); library(ggplot2)})
+suppressMessages({library(readr); library(dplyr); library(ggplot2); library(patchwork)})  # patchwork stacks F2's two panels
 args <- commandArgs(TRUE)
 out  <- if (length(args) > 0) args[1] else "Report/figures"
 fam  <- if (length(args) > 1) args[2] else "Arial"
@@ -43,9 +43,11 @@ f1 <- ggplot(dv, aes(lonely, n)) +
   scale_x_continuous(breaks = 1:4, labels = c("None", "Some", "Most", "All")) +
   scale_y_continuous(limits = c(0, 1200), expand = c(0, 0)) +
   theme_grid() + theme(axis.text.y = element_blank())
-save(f1, "f1_dv_hist.png", w2, 8)
+save(f1, "f1_dv_hist.png", w2, 10)
 
 # F2 IV histogram: 10-minute bins, mean (= cut point) and median marked
+x_minutes <- scale_x_continuous(breaks = seq(0, 1080, 120), labels = c(0, paste0(seq(2, 18, 2), "h")),
+                                limits = c(0, 1080), expand = expansion(add = c(5, 25)))   # shared by both F2 panels
 iv <- filter(ess, !is.na(net_min)); med_iv <- median(iv$net_min)
 f2 <- ggplot(iv, aes(net_min, fill = net_group)) +
   geom_histogram(binwidth = 10, boundary = 0, closed = "left") +   # grey = group 0, black = group 1
@@ -55,11 +57,28 @@ f2 <- ggplot(iv, aes(net_min, fill = net_group)) +
   txt(x = cut_point + 8, y = 180, hjust = 0, label = sprintf("mean = cut point, %.1f min", cut_point)) +
   annotate("segment", x = med_iv, xend = med_iv, y = 0, yend = 128, linewidth = 0.3, linetype = "22") +
   txt(x = med_iv, y = 138, label = "median") +
-  scale_x_continuous(breaks = seq(0, 1080, 120), labels = c(0, paste0(seq(2, 18, 2), "h")),
-                     expand = expansion(add = c(5, 25))) +
+  x_minutes +
   scale_y_continuous(breaks = c(50, 100, 150), limits = c(0, 192), expand = c(0, 0)) +
+  theme_grid() + theme(axis.text.x = element_blank())
+
+# F2 lower strip (task 5, cut-point limitation): mean loneliness within bands of
+# internet time, on the same minutes axis. The split keeps only "left vs right of the line".
+br <- c(0, 60, 120, 180, 240, 360, 480, 1080)
+bands <- filter(iv, !is.na(lonely)) %>%
+  mutate(band = cut(net_min, br, right = FALSE, include.lowest = TRUE)) %>%
+  group_by(band) %>%
+  summarise(m = mean(lonely), se = sd(lonely) / sqrt(n()), n = n()) %>%
+  mutate(lo = head(br, -1), hi = br[-1], mid = (lo + hi) / 2,
+         side = factor(ifelse(hi <= cut_point + 5, "At or below mean", "Above mean"), levels = levels(ess$net_group)))
+f2b <- ggplot(bands) +
+  annotate("segment", x = cut_point, xend = cut_point, y = 1.05, yend = 1.6, linewidth = 0.3) +
+  geom_segment(aes(x = mid, xend = mid, y = m - 1.96 * se, yend = m + 1.96 * se, colour = side), linewidth = 0.3) +
+  geom_segment(aes(x = lo + 4, xend = hi - 4, y = m, yend = m, colour = side), linewidth = 0.6) +
+  scale_colour_manual(values = c(grey, black)) +
+  x_minutes +
+  scale_y_continuous(breaks = c(1.2, 1.4), limits = c(1.05, 1.6), expand = c(0, 0)) +
   theme_grid()
-save(f2, "f2_iv_hist.png", w4, 8)
+save(f2 / f2b + plot_layout(heights = c(6, 4)), "f2_iv_hist.png", w4, 10)
 
 # F3 grouping variable: two bars, count and share
 gc <- filter(ess, !is.na(net_group)) %>% count(net_group) %>% mutate(p = n / sum(n))

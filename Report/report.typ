@@ -58,14 +58,14 @@
 #at(1, 4, 3, [*Question* \ Is people's internet use associated with their feeling of loneliness?])
 #at(4, 4, 3, [*Answer* \ #lorem(16)])
 
-// ---------- lines 8–38: text, two columns ----------
+// ---------- lines 8–36: text, two columns ----------
 #show heading: it => block(above: u, below: 0pt, text(size: 9pt, weight: "bold", it.body))
-#at(1, 8, 6, block(height: 31 * u, columns(2, gutter: gut)[
+#at(1, 8, 6, block(height: 29 * u, columns(2, gutter: gut)[
   #set par(spacing: 0pt)          // paragraphs inside a section run on; space only between sections
   = 1 Variables
-  *Dependent: loneliness* (`fltlnl`). #lorem(80)
+  *Dependent: loneliness* (`fltlnl`). #lorem(72)
 
-  *Independent: internet use* (`netustm`). #lorem(80)
+  *Independent: internet use* (`netustm`). #lorem(72)
 
   = 2 Grouping
   #lorem(45)
@@ -78,13 +78,13 @@
   #lorem(40)
 
   = 5 Interpretation
-  #lorem(100)
+  #lorem(90)
 ]))
 
-// ---------- lines 40–48: the two variables ----------
+// ---------- lines 38–48: the two variables ----------
 // one encoding throughout: grey = group 0 (at or below mean), black = group 1 (above mean)
-#fig(1, 40, 2, 8, [#label[Figure 1]  Felt lonely, past week (`fltlnl`), N = 1,382], "f1_dv_hist.png")
-#fig(3, 40, 4, 8, [#label[Figure 2]  Internet use per day, minutes (`netustm`), N = 1,212; grey = group 0, black = 1], "f2_iv_hist.png")
+#fig(1, 38, 2, 10, [#label[Figure 1]  Felt lonely, past week (`fltlnl`), N = 1,382], "f1_dv_hist.png")
+#fig(3, 38, 4, 10, [#label[Figure 2]  Internet use per day, min (`netustm`), N = 1,212. Below: mean loneliness per band, 95% CI], "f2_iv_hist.png")
 
 // ---------- lines 50–59: statistics | the two groups, read across ----------
 #let r = table.hline(stroke: 0.4pt)
