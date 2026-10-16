@@ -1,11 +1,18 @@
 // Group Report #1 — one page, figures included (lorem ipsum placeholders)
-// Each lorem(n) is that section's word budget. Show the grid: typst compile report.typ --input grid=true
+// Each lorem(n) is that block's word budget. Show the grid: typst compile report.typ --input grid=true
+//
+// Page structure (Swiss, asymmetric):
+//   column 1      label column: report details, Question / Answer labels, section headings
+//   columns 2–4   text, one 240pt measure
+//   columns 5–6   the evidence for that text: each figure sits beside the paragraph that reads it
+// Every section is a row that starts on a fixed grid line. Its height is the taller of its
+// text and its figure; the difference stays white, so white space follows content.
 //
 // Type system: one face (Arial), three sizes, two weights, two inks.
 //   14pt bold    title — the only display size
 //   9pt          text: answer (bold), headings (bold), body (regular)
 //   7pt          data: captions, table, text inside plots
-//   grey ink     supporting information: course, names, "Question"/"Answer" labels
+//   grey ink     supporting information and sub-labels
 
 // ---------- grid (A4, points) ----------
 // baseline unit u = 12pt · 6 columns of 72pt, 12pt gutters · 59 lines of type area
@@ -33,71 +40,51 @@
 // every line box is exactly 1u, so all text sits on the baseline grid
 #set text(font: ("Arial", "Liberation Sans"), size: 9pt, top-edge: 9pt, bottom-edge: -3pt,
           lang: "en", hyphenate: true)
-#set par(justify: false, leading: 0pt, spacing: u)
+#set par(justify: false, leading: 0pt, spacing: 0pt)
 #show raw: set text(font: ("Arial", "Liberation Sans"), size: 1.25em)  // variable names in Arial at body size
 
 #let at(c, l, n, body) = place(dx: cx(c), dy: ly(l), block(width: span(n), {
-  set par(spacing: 0pt); set block(spacing: 0pt); body }))
+  set block(spacing: 0pt); body }))
 #let small(body) = text(size: 7pt, body)
 #let label(id) = text(weight: "bold", id)
 #let meta(body) = text(fill: luma(42%), body)   // grey ink for supporting information
-#let fig(c, l, n, lines, caption, file) = at(c, l, n, {
+#let fig(l, lines, caption, file) = at(5, l, 2, {
   block(height: u, small(caption))
-  image("figures/" + file, width: span(n), height: lines * u)
+  image("figures/" + file, width: span(2), height: lines * u)
 })
+// one section row: heading (and optional grey sub-label) in column 1, text in columns 2–4
+#let row(l, heading: none, sub: none, body) = {
+  if heading != none { at(1, l, 1, text(weight: "bold", heading)) }
+  if sub != none { at(1, if heading != none { l + 1 } else { l }, 1, meta(sub)) }
+  at(2, l, 3, body)
+}
 
 // ---------- lines 1–3: header ----------
-// title: 14pt on a 2-line box, baseline on line 2; course hangs from column 5, like Figure 4
-#at(1, 1, 4, text(size: 14pt, weight: "bold", top-edge: 21pt, bottom-edge: -3pt)[Internet use and loneliness in Switzerland])
-#at(5, 1, 2, meta[Data Analysis for Public Policy \ Report 1 · Group 6 · HS2026])
-#at(1, 3, 4, meta[Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi])
+#at(1, 1, 1, meta[Report 1 \ Group 6 \ HS2026])
+#at(2, 1, 5, text(size: 14pt, weight: "bold", top-edge: 21pt, bottom-edge: -3pt)[Internet use and loneliness in Switzerland])
+#at(2, 3, 5, meta[Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi])
 
-// hairline rules sit in the middle of an empty grid line, so they never move a baseline
-#let hairline(l) = place(dx: 0pt, dy: ly(l) + u / 2, line(length: tw, stroke: 0.4pt))
-#hairline(4)     // header | question and answer
-#hairline(37)    // text   | data
+// ---------- lines 5–7: question and answer, full measure ----------
+#at(1, 5, 1, meta[Question])
+#at(2, 5, 5, [Is people's internet use associated with their feeling of loneliness?])
+#at(1, 6, 1, meta[Answer])
+#at(2, 6, 5, [*#lorem(26)*])
 
-// Reading order: title → answer → section headings → body → figures.
-//   level 1  title, 14pt
-//   level 2  answer sentence, bold — the result in five seconds
-//   level 3  section headings, bold, on their own line with one empty line above
-//   level 4  body text, regular; everything supporting is grey
+// ---------- lines 9–24: 1 Variables (two rows) ----------
+#row(9, heading: [1 Variables], sub: [Dependent])[#lorem(54)]
+#fig(9, 6, [#label[Figure 1]  Felt lonely, past week (`fltlnl`), N = 1,382], "f1_dv_hist.png")
 
-// ---------- lines 5–7: question | answer ----------
-#at(1, 5, 3, [#meta[Question] \ Is people's internet use associated with their feeling of loneliness?])
-#at(4, 5, 3, [#meta[Answer] \ *#lorem(16)*])
+#row(17, sub: [Independent])[#lorem(62)]
+#fig(17, 7, [#label[Figure 2]  Internet use (`netustm`), N = 1,212], "f2_iv_hist.png")
 
-// ---------- lines 9–36: text, two columns ----------
-#show heading: it => block(above: u, below: 0pt, text(size: 9pt, weight: "bold", it.body))
-#at(1, 9, 6, block(height: 28 * u, columns(2, gutter: gut)[
-  #set par(spacing: 0pt)          // paragraphs inside a section run on; space only between sections
-  = 1 Variables
-  Dependent variable: loneliness (`fltlnl`). #lorem(66)
+// ---------- lines 26–31: 2 Grouping ----------
+#row(26, heading: [2 Grouping])[#lorem(46)]
+#fig(26, 4, [#label[Figure 3]  Groups (`net_group`), N = 1,212, mode 0], "f3_group_bar.png")
 
-  Independent variable: internet use (`netustm`). #lorem(66)
-
-  = 2 Grouping
-  #lorem(45)
-
-  #colbreak()   // column 1: what we measured · column 2: what we found
-  = 3 Descriptives
-  #lorem(60)
-
-  = 4 Test
-  #lorem(40)
-
-  = 5 Interpretation
-  #lorem(85)
-]))
-
-// ---------- lines 38–48: the two variables ----------
-// one encoding throughout: grey = group 0 (at or below mean), black = group 1 (above mean)
-#fig(1, 38, 2, 10, [#label[Figure 1]  Felt lonely, past week (`fltlnl`), N = 1,382], "f1_dv_hist.png")
-#fig(3, 38, 4, 10, [#label[Figure 2]  Internet use per day, minutes (`netustm`), N = 1,212; below, loneliness across its range], "f2_iv_hist.png")
-
-// ---------- lines 50–59: statistics | the two groups, read across ----------
+// ---------- lines 33–42: 3 Descriptives ----------
+#row(33, heading: [3 Descriptives])[#lorem(66)]
 #let r = table.hline(stroke: 0.4pt)
-#at(1, 50, 2, small({
+#at(5, 33, 2, small({
   block(height: u)[#label[Table 1]  Descriptive statistics]
   table(columns: (52pt, 52pt, 52pt), stroke: none, inset: 0pt, align: (left, right, right),
     r,
@@ -114,6 +101,11 @@
     r,
   )
 }))
-#fig(3, 50, 2, 6, [#label[Figure 3]  Groups (`net_group`), N = 1,212, mode 0], "f3_group_bar.png")
-#fig(5, 50, 2, 6, [#label[Figure 4]  Mean loneliness by group, 95% CI], "f4_group_means.png")
-#at(3, 58, 4, small[#label[Welch t-test]  Group 1 minus group 0: difference 0.02 (95% CI −0.05 to 0.09), t~=~0.63, df~=~1004, p~=~0.53.])
+
+// ---------- lines 44–48: 4 Test ----------
+#row(44, heading: [4 Test])[#lorem(38)]
+#fig(44, 4, [#label[Figure 4]  Mean loneliness by group, 95% CI], "f4_group_means.png")
+
+// ---------- lines 50–59: 5 Interpretation ----------
+#row(50, heading: [5 Interpretation])[#lorem(76)]
+#fig(50, 5, [#label[Figure 5]  Loneliness across internet time, 95% CI], "f5_bands.png")
