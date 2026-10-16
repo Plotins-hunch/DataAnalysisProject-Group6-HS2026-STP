@@ -15,14 +15,19 @@ cut_point <- mean(ess$net_min, na.rm = TRUE)
 ess <- ess %>% mutate(net_group = factor(ifelse(net_min > cut_point, 1, 0), levels = 0:1,
                                          labels = c("At or below mean", "Above mean")))
 
-# ---- grid geometry in points: must match report.typ ----
-# margin figures sit in columns 5-6 (156pt); Figure 2 breaks out across columns 2-6 (408pt);
-# heights are whole 12pt lines
-pt <- 1 / 72
-w  <- 156 * pt
-w_wide <- 408 * pt
-# ---- one size, two inks: grey = group 0 (at or below mean), black = group 1 (above) ----
-fs <- 7; black <- "#000000"; grey <- "#8c8c8c"
+# ---- one unit, as in report.typ: X = x-height of the body text = 4.5pt ----
+# line = 3X, column = 16X, gutter = 3X; plot text has x-height 3/4 X; lines are X/10
+pt   <- 1 / 72
+X    <- 4.5
+xh   <- 0.5186                                  # Arial x-height / em
+line <- 3 * X
+span <- function(n) n * 16 * X + (n - 1) * 3 * X
+w      <- span(2) * pt                          # margin figures: columns 5-6
+w_wide <- span(5) * pt                          # Figure 2: columns 2-6
+fs   <- 0.75 * X / xh                           # 6.51pt
+lw   <- (X / 10) / ggplot2::.pt * 72.27 / 72    # X/10 in ggplot linewidth units (mm)
+# ---- two inks: grey = group 0 (at or below mean), black = group 1 (above) ----
+black <- "#000000"; grey <- "#8c8c8c"
 mm <- function(x) x / ggplot2::.pt
 
 theme_grid <- function() theme_void(base_size = fs, base_family = fam) +
@@ -33,9 +38,9 @@ theme_grid <- function() theme_void(base_size = fs, base_family = fam) +
         legend.position = "none",
         plot.margin = margin(2, 2, 0, 0),
         plot.background = element_rect(fill = "white", colour = NA))
-white_grid <- function(at) geom_hline(yintercept = at, colour = "white", linewidth = 0.4)
+white_grid <- function(at) geom_hline(yintercept = at, colour = "white", linewidth = 2 * lw)
 txt <- function(..., colour = black) annotate("text", family = fam, size = mm(fs), colour = colour, ...)
-save <- function(p, name, lines, width = w) ggsave(file.path(out, name), p, width = width, height = lines * 12 * pt, dpi = 600)
+save <- function(p, name, lines, width = w) ggsave(file.path(out, name), p, width = width, height = lines * line * pt, dpi = 600)
 # minutes axis shared by Figures 2 and 5, which sit in the same columns, so their axes line up
 x_minutes <- scale_x_continuous(breaks = seq(0, 1080, 120), labels = c(0, paste0(seq(2, 18, 2), "h")),
                                 limits = c(0, 1080), expand = expansion(add = c(5, 10)))
@@ -60,11 +65,11 @@ f2 <- ggplot(iv, aes(net_min, fill = net_group)) +
   geom_histogram(binwidth = 10, boundary = 0, closed = "left") +
   scale_fill_manual(values = c(grey, black)) +
   white_grid(c(50, 100, 150)) +
-  annotate("segment", x = cut_point, xend = cut_point, y = 0, yend = 195, linewidth = 0.3) +
+  annotate("segment", x = cut_point, xend = cut_point, y = 0, yend = 195, linewidth = 1.5 * lw) +
   txt(x = cut_point + 25, y = 190, hjust = 0, label = sprintf("mean = cut point, %.1f min", cut_point)) +
   # direct labels in the ink of the bars they name, so no legend is needed
-  txt(x = cut_point + 25, y = 160, hjust = 0, label = sprintf("1  above mean: %d", sum(iv$net_group == "Above mean"))) +
-  txt(x = cut_point + 25, y = 138, hjust = 0, colour = grey, label = sprintf("0  at or below: %d", sum(iv$net_group == "At or below mean"))) +
+  txt(x = 1075, y = 185, hjust = 1, label = sprintf("1  above mean: %d", sum(iv$net_group == "Above mean"))) +
+  txt(x = 1075, y = 140, hjust = 1, colour = grey, label = sprintf("0  at or below: %d", sum(iv$net_group == "At or below mean"))) +
   x_minutes +
   scale_y_continuous(breaks = c(50, 100, 150), limits = c(0, 205), expand = c(0, 0)) +
   theme_grid() + theme(axis.text.x = element_blank())
@@ -78,7 +83,7 @@ f3 <- ggplot(gc, aes(n, net_group, fill = net_group)) +
   scale_y_discrete(labels = c("0  At or below", "1  Above")) +
   scale_x_continuous(limits = c(0, 1180), expand = c(0, 0)) +
   theme_grid() + theme(axis.text.x = element_blank())
-save(f3, "f3_group_bar.png", 3)
+save(f3, "f3_group_bar.png", 2)
 
 # F4 mean loneliness by group with 95% CI; overall mean dashed (the test result sits beside it as a margin note)
 gm <- filter(ess, !is.na(net_group), !is.na(lonely)) %>% group_by(net_group) %>%
@@ -86,15 +91,15 @@ gm <- filter(ess, !is.na(net_group), !is.na(lonely)) %>% group_by(net_group) %>%
   mutate(lo = m - qt(.975, n - 1) * se, hi = m + qt(.975, n - 1) * se)
 tt <- t.test(lonely ~ net_group, data = ess)   # Welch is R's default
 f4 <- ggplot(gm, aes(m, net_group, colour = net_group)) +
-  annotate("segment", x = m_dv, xend = m_dv, y = 0.6, yend = 2.4, linewidth = 0.25, linetype = "22", colour = grey) +
-  geom_segment(aes(x = lo, xend = hi, yend = net_group), linewidth = 0.6) +
+  annotate("segment", x = m_dv, xend = m_dv, y = 0.6, yend = 2.4, linewidth = lw, linetype = "22", colour = grey) +
+  geom_segment(aes(x = lo, xend = hi, yend = net_group), linewidth = 3 * lw) +
   geom_point(size = 1.8) +
   geom_text(aes(x = hi, label = sprintf("%.2f", m)), hjust = -0.3, family = fam, size = mm(fs), colour = black) +
   scale_colour_manual(values = c(grey, black)) +
   scale_y_discrete(labels = c("0", "1")) +
   scale_x_continuous(limits = c(1.2, 1.45), breaks = c(1.2, 1.3, 1.4)) +
   theme_grid()
-save(f4, "f4_group_means.png", 3)
+save(f4, "f4_group_means.png", 2)
 
 # F2 lower panel, the cut-point limitation (task 5): mean loneliness within bands of
 # internet time, on the same minutes axis. The split keeps only "left vs right of the line".
@@ -106,12 +111,12 @@ bands <- filter(iv, !is.na(lonely)) %>%
   mutate(lo = head(br, -1), hi = br[-1], mid = (lo + hi) / 2,
          side = factor(ifelse(hi <= cut_point + 5, "At or below mean", "Above mean"), levels = levels(ess$net_group)))
 f5 <- ggplot(bands) +
-  annotate("segment", x = cut_point, xend = cut_point, y = 1.05, yend = 1.6, linewidth = 0.3) +
-  annotate("segment", x = 0, xend = 1080, y = m_dv, yend = m_dv, linewidth = 0.25, linetype = "22", colour = grey) +
-  geom_segment(aes(x = mid, xend = mid, y = m - 1.96 * se, yend = m + 1.96 * se, colour = side), linewidth = 0.3) +
-  geom_segment(aes(x = lo + 4, xend = hi - 4, y = m, yend = m, colour = side), linewidth = 0.6) +
+  annotate("segment", x = cut_point, xend = cut_point, y = 1.05, yend = 1.6, linewidth = 1.5 * lw) +
+  annotate("segment", x = 0, xend = 1080, y = m_dv, yend = m_dv, linewidth = lw, linetype = "22", colour = grey) +
+  geom_segment(aes(x = mid, xend = mid, y = m - 1.96 * se, yend = m + 1.96 * se, colour = side), linewidth = 1.5 * lw) +
+  geom_segment(aes(x = lo + 4, xend = hi - 4, y = m, yend = m, colour = side), linewidth = 3 * lw) +
   scale_colour_manual(values = c(grey, black)) +
   x_minutes +
   scale_y_continuous(breaks = c(1.2, 1.4), limits = c(1.05, 1.6), expand = c(0, 0)) +
   theme_grid()
-save(f2 / f5 + plot_layout(heights = c(6, 4)), "f2_iv_hist.png", 10, width = w_wide)
+save(f2 / f5 + plot_layout(heights = c(4, 2)), "f2_iv_hist.png", 6, width = w_wide)
