@@ -1,7 +1,7 @@
 # Draft plots for the one-page report: monochrome, Arial 7pt, sized to the grid.
 # Run from the repo root:  Rscript Report/make_figures_draft.R Report/figures
 # (draft only; the final plot code moves into the main analysis script)
-suppressMessages({library(readr); library(dplyr); library(ggplot2)})
+suppressMessages({library(readr); library(dplyr); library(ggplot2); library(patchwork)})  # patchwork stacks Figure 2's two panels
 args <- commandArgs(TRUE)
 out  <- if (length(args) > 0) args[1] else "Report/figures"
 fam  <- if (length(args) > 1) args[2] else "Arial"
@@ -16,9 +16,11 @@ ess <- ess %>% mutate(net_group = factor(ifelse(net_min > cut_point, 1, 0), leve
                                          labels = c("At or below mean", "Above mean")))
 
 # ---- grid geometry in points: must match report.typ ----
-# every figure sits in columns 5-6 (156pt wide); heights are whole 12pt lines
+# margin figures sit in columns 5-6 (156pt); Figure 2 breaks out across columns 2-6 (408pt);
+# heights are whole 12pt lines
 pt <- 1 / 72
 w  <- 156 * pt
+w_wide <- 408 * pt
 # ---- one size, two inks: grey = group 0 (at or below mean), black = group 1 (above) ----
 fs <- 7; black <- "#000000"; grey <- "#8c8c8c"
 mm <- function(x) x / ggplot2::.pt
@@ -33,9 +35,9 @@ theme_grid <- function() theme_void(base_size = fs, base_family = fam) +
         plot.background = element_rect(fill = "white", colour = NA))
 white_grid <- function(at) geom_hline(yintercept = at, colour = "white", linewidth = 0.4)
 txt <- function(..., colour = black) annotate("text", family = fam, size = mm(fs), colour = colour, ...)
-save <- function(p, name, lines) ggsave(file.path(out, name), p, width = w, height = lines * 12 * pt, dpi = 600)
+save <- function(p, name, lines, width = w) ggsave(file.path(out, name), p, width = width, height = lines * 12 * pt, dpi = 600)
 # minutes axis shared by Figures 2 and 5, which sit in the same columns, so their axes line up
-x_minutes <- scale_x_continuous(breaks = seq(0, 960, 240), labels = c(0, paste0(seq(4, 16, 4), "h")),
+x_minutes <- scale_x_continuous(breaks = seq(0, 1080, 120), labels = c(0, paste0(seq(2, 18, 2), "h")),
                                 limits = c(0, 1080), expand = expansion(add = c(5, 10)))
 
 # F1 DV histogram: one bar per answer, share and count on top, mean marked under the baseline
@@ -45,10 +47,10 @@ f1 <- ggplot(dv, aes(lonely, n)) +
   geom_col(width = 0.86, fill = black) + white_grid(c(250, 500, 750)) +
   geom_text(aes(label = paste0(round(100 * p), "%\n", formatC(n, big.mark = ",", format = "d"))),
             vjust = -0.25, lineheight = 0.9, family = fam, size = mm(fs)) +
-  annotate("point", x = m_dv, y = -95, shape = 17, size = 1.2) +
-  txt(x = m_dv + 0.12, y = -95, hjust = 0, label = sprintf("mean %.2f", m_dv)) +
+  annotate("point", x = m_dv, y = -140, shape = 17, size = 1.2) +
+  txt(x = m_dv + 0.12, y = -140, hjust = 0, label = sprintf("mean %.2f", m_dv)) +
   scale_x_continuous(breaks = 1:4, labels = c("None", "Some", "Most", "All")) +
-  scale_y_continuous(limits = c(-170, 1480), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(-230, 1480), expand = c(0, 0)) +
   theme_grid() + theme(axis.text.y = element_blank())
 save(f1, "f1_dv_hist.png", 6)
 
@@ -65,8 +67,7 @@ f2 <- ggplot(iv, aes(net_min, fill = net_group)) +
   txt(x = cut_point + 25, y = 138, hjust = 0, colour = grey, label = sprintf("0  at or below: %d", sum(iv$net_group == "At or below mean"))) +
   x_minutes +
   scale_y_continuous(breaks = c(50, 100, 150), limits = c(0, 205), expand = c(0, 0)) +
-  theme_grid()
-save(f2, "f2_iv_hist.png", 7)
+  theme_grid() + theme(axis.text.x = element_blank())
 
 # F3 grouping variable: two bars, count and share
 gc <- filter(ess, !is.na(net_group)) %>% count(net_group) %>% mutate(p = n / sum(n))
@@ -77,9 +78,9 @@ f3 <- ggplot(gc, aes(n, net_group, fill = net_group)) +
   scale_y_discrete(labels = c("0  At or below", "1  Above")) +
   scale_x_continuous(limits = c(0, 1180), expand = c(0, 0)) +
   theme_grid() + theme(axis.text.x = element_blank())
-save(f3, "f3_group_bar.png", 4)
+save(f3, "f3_group_bar.png", 3)
 
-# F4 mean loneliness by group with 95% CI; overall mean dashed; difference and p beside the dots
+# F4 mean loneliness by group with 95% CI; overall mean dashed (the test result sits beside it as a margin note)
 gm <- filter(ess, !is.na(net_group), !is.na(lonely)) %>% group_by(net_group) %>%
   summarise(m = mean(lonely), se = sd(lonely) / sqrt(n()), n = n()) %>%
   mutate(lo = m - qt(.975, n - 1) * se, hi = m + qt(.975, n - 1) * se)
@@ -89,15 +90,14 @@ f4 <- ggplot(gm, aes(m, net_group, colour = net_group)) +
   geom_segment(aes(x = lo, xend = hi, yend = net_group), linewidth = 0.6) +
   geom_point(size = 1.8) +
   geom_text(aes(x = hi, label = sprintf("%.2f", m)), hjust = -0.3, family = fam, size = mm(fs), colour = black) +
-  txt(x = 1.2, y = 1.5, hjust = 0, label = sprintf("+%.2f, p = %.2f", diff(gm$m), tt$p.value)) +
   scale_colour_manual(values = c(grey, black)) +
   scale_y_discrete(labels = c("0", "1")) +
   scale_x_continuous(limits = c(1.2, 1.45), breaks = c(1.2, 1.3, 1.4)) +
   theme_grid()
-save(f4, "f4_group_means.png", 4)
+save(f4, "f4_group_means.png", 3)
 
-# F5 the cut-point limitation (task 5): mean loneliness within bands of internet time,
-# on the same minutes axis as F2. The split keeps only "left vs right of the line".
+# F2 lower panel, the cut-point limitation (task 5): mean loneliness within bands of
+# internet time, on the same minutes axis. The split keeps only "left vs right of the line".
 br <- c(0, 60, 120, 180, 240, 360, 480, 1080)
 bands <- filter(iv, !is.na(lonely)) %>%
   mutate(band = cut(net_min, br, right = FALSE, include.lowest = TRUE)) %>%
@@ -114,4 +114,4 @@ f5 <- ggplot(bands) +
   x_minutes +
   scale_y_continuous(breaks = c(1.2, 1.4), limits = c(1.05, 1.6), expand = c(0, 0)) +
   theme_grid()
-save(f5, "f5_bands.png", 5)
+save(f2 / f5 + plot_layout(heights = c(6, 4)), "f2_iv_hist.png", 10, width = w_wide)

@@ -1,12 +1,13 @@
 // Group Report #1 — one page, figures included (lorem ipsum placeholders)
 // Each lorem(n) is that block's word budget. Show the grid: typst compile report.typ --input grid=true
 //
-// Page structure (Swiss, asymmetric):
-//   column 1      label column: report details, Question / Answer labels, section headings
-//   columns 2–4   text, one 240pt measure
-//   columns 5–6   the evidence for that text: each figure sits beside the paragraph that reads it
-// Every section is a row that starts on a fixed grid line. Its height is the taller of its
-// text and its figure; the difference stays white, so white space follows content.
+// Page structure (Swiss grid, Tufte layout):
+//   column 1      label column: report details, Question / Answer, section headings, side captions
+//   columns 2–4   main text, one 240pt measure
+//   columns 5–6   margin: small figures and side notes beside the paragraph they belong to
+//   columns 2–6   breakouts, only where the content needs the width (Figure 2, Table 1)
+// Each element takes the width its content needs; rows start on fixed grid lines and the
+// leftover stays white, so white space follows content.
 //
 // Type system: one face (Arial), three sizes, two weights, two inks.
 //   14pt bold    title — the only display size
@@ -70,42 +71,43 @@
 #at(1, 6, 1, meta[Answer])
 #at(2, 6, 5, [*#lorem(26)*])
 
-// ---------- lines 9–24: 1 Variables (two rows) ----------
+#let side(l, body) = at(5, l, 2, small(meta(body)))   // margin note, 7pt grey
+
+// ---------- 1 Variables: lines 9–21, text with margin figure / note ----------
 #row(9, heading: [1 Variables], sub: [Dependent])[#lorem(54)]
 #fig(9, 6, [#label[Figure 1]  Felt lonely, past week (`fltlnl`), N = 1,382], "f1_dv_hist.png")
 
-#row(17, sub: [Independent])[#lorem(62)]
-#fig(17, 7, [#label[Figure 2]  Internet use (`netustm`), N = 1,212], "f2_iv_hist.png")
+#row(17, sub: [Independent])[#lorem(38)]
+#side(17)[Asked only of people online most days or every day: 168 others were not asked and 4 said “don't know”. They stay missing rather than 0 minutes.]
 
-// ---------- lines 26–31: 2 Grouping ----------
-#row(26, heading: [2 Grouping])[#lorem(46)]
-#fig(26, 4, [#label[Figure 3]  Groups (`net_group`), N = 1,212, mode 0], "f3_group_bar.png")
+// ---------- lines 23–32: Figure 2 breaks out to full width, caption in the label column ----------
+#at(1, 23, 1, small[#label[Figure 2] \ Internet use per day, minutes (`netustm`), 10-min bins, N~=~1,212. Grey: group 0, black: group 1. \ #meta[Lower panel: mean loneliness per band, 95% CI; dashed: all.]])
+#at(2, 23, 5, image("figures/f2_iv_hist.png", width: span(5), height: 10 * u))
 
-// ---------- lines 33–42: 3 Descriptives ----------
-#row(33, heading: [3 Descriptives])[#lorem(66)]
+// ---------- 2 Grouping: lines 34–37 ----------
+#row(34, heading: [2 Grouping])[#lorem(30)]
+#fig(34, 3, [#label[Figure 3]  Groups (`net_group`), N = 1,212, mode 0], "f3_group_bar.png")
+
+// ---------- 3 Descriptives: lines 39–46, wide short table, one empty line, then its reading ----------
+#at(1, 39, 1, text(weight: "bold")[3 Descriptives])
 #let r = table.hline(stroke: 0.4pt)
-#at(5, 33, 2, small({
+#at(2, 39, 5, small({
   block(height: u)[#label[Table 1]  Descriptive statistics]
-  table(columns: (52pt, 52pt, 52pt), stroke: none, inset: 0pt, align: (left, right, right),
+  table(columns: (84pt,) + (40.5pt,) * 8, stroke: none, inset: 0pt, align: (left,) + (right,) * 8,
     r,
-    [], [Loneliness], [Internet, min],
+    [], [Valid N], [Mean], [Median], [Mode], [Variance], [SD], [Range], [IQR],
     r,
-    [Valid N],  [1,382], [1,212],
-    [Mean],     [1.31],  [235.6],
-    [Median],   [1],     [180],
-    [Mode],     [1],     [120],
-    [Variance], [0.38],  [39,098],
-    [SD],       [0.61],  [197.7],
-    [Range],    [1–4],   [4–1,080],
-    [IQR],      [0],     [270],
+    [Loneliness (1–4)],   [1,382], [1.31],  [1],   [1],   [0.38],   [0.61],  [1–4],     [0],
+    [Internet, min/day],  [1,212], [235.6], [180], [120], [39,098], [197.7], [4–1,080], [270],
     r,
   )
 }))
+#at(2, 44, 3)[#lorem(24)]
 
-// ---------- lines 44–48: 4 Test ----------
-#row(44, heading: [4 Test])[#lorem(38)]
-#fig(44, 4, [#label[Figure 4]  Mean loneliness by group, 95% CI], "f4_group_means.png")
+// ---------- 4 Test: lines 48–51 ----------
+#row(48, heading: [4 Test])[#lorem(28)]
+#fig(48, 3, [#label[Figure 4]  Mean loneliness by group, 95% CI], "f4_group_means.png")
 
-// ---------- lines 50–59: 5 Interpretation ----------
-#row(50, heading: [5 Interpretation])[#lorem(76)]
-#fig(50, 5, [#label[Figure 5]  Loneliness across internet time, 95% CI], "f5_bands.png")
+// ---------- 5 Interpretation: lines 53–59, t-test numbers as a margin note ----------
+#row(53, heading: [5 Interpretation])[#lorem(52)]
+#side(53)[#label[Welch t-test] \ group 1 minus group 0: +0.02 \ 95% CI −0.05 to 0.09 \ t~=~0.63, df~=~1004, p~=~0.53]
