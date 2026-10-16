@@ -47,42 +47,48 @@
 #at(5, 1, 2, [Group 6 · HS2026])
 #at(1, 2, 6, [Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi])
 
-// ---------- lines 4–42: text, two columns ----------
-#at(1, 4, 6, block(height: 39 * u, columns(2, gutter: gut)[
+// ---------- lines 4–38: text, two columns ----------
+#at(1, 4, 6, block(height: 35 * u, columns(2, gutter: gut)[
   #set par(spacing: u)   // one empty line between sections
   *Research question* Is people's internet use associated with their feeling of loneliness? #lorem(10)
 
-  *1 Operationalisation* The dependent variable is `fltlnl`. #lorem(95)
+  *1 Operationalisation* The dependent variable is `fltlnl`. #lorem(90)
 
-  The independent variable is `netustm`. #lorem(95)
+  The independent variable is `netustm`. #lorem(90)
 
-  *2 Grouping variable* #lorem(55)
+  *2 Grouping variable* #lorem(50)
 
-  *3 Descriptive statistics* #lorem(75)
+  *3 Descriptive statistics* #lorem(70)
 
-  *4 t-test* #lorem(55)
+  *4 t-test* #lorem(50)
 
-  *5 Interpretation* #lorem(130)
+  *5 Interpretation* #lorem(120)
 ]))
 
-// ---------- lines 44–51: F1 and F2 ----------
-#fig(1, 44, 2, 7, [Figure 1  Felt lonely, past week (`fltlnl`), N = 1,382], "f1_dv_hist.png")
-#fig(3, 44, 4, 7, [Figure 2  Internet use per day in minutes (`netustm`), 10-min bins, N = 1,212], "f2_iv_hist.png")
+// ---------- lines 40–48: the two variables ----------
+// one encoding throughout: grey = group 0 (at or below mean), black = group 1 (above mean)
+#fig(1, 40, 2, 8, [Figure 1  Felt lonely, past week (`fltlnl`), N = 1,382], "f1_dv_hist.png")
+#fig(3, 40, 4, 8, [Figure 2  Internet use per day, minutes (`netustm`), N = 1,212; grey = group 0, black = 1], "f2_iv_hist.png")
 
-// ---------- lines 53–59: F3 and Table 1 ----------
-#fig(1, 53, 2, 3, [Figure 3  Groups, split at the mean, N = 1,212], "f3_group_bar.png")
+// ---------- lines 50–59: statistics | the two groups, read across ----------
 #let r = table.hline(stroke: 0.4pt)
-#at(3, 53, 4, small({
-  block(height: u)[Table 1  Descriptive statistics. Welch t = −0.63, df = 1004, p = 0.53]
-  table(columns: (72pt,) + (31.5pt,) * 8, stroke: none, inset: 0pt, align: (left,) + (right,) * 8,
+#at(1, 50, 2, small({
+  block(height: u)[Table 1  Descriptive statistics]
+  table(columns: (52pt, 52pt, 52pt), stroke: none, inset: 0pt, align: (left, right, right),
     r,
-    [], [N], [Mean], [Median], [Mode], [Var.], [SD], [Range], [IQR],
+    [], [Loneliness], [Internet, min],
     r,
-    [Loneliness (1–4)],   [1,382], [1.31],  [1],   [1],   [0.38],   [0.61],  [1–4],     [0],
-    [Internet (min/day)], [1,212], [235.6], [180], [120], [39,098], [197.7], [4–1,080], [270],
-    [Group (0/1)],        [1,212], table.cell(colspan: 7, align: left)[#h(6pt)0: 717 (59%) · 1: 495 (41%) · mode 0],
-    [Loneliness, group 0], [715],  [1.30],  [], [], [], [0.59], [], [],
-    [Loneliness, group 1], [495],  [1.33],  [], [], [], [0.65], [], [],
+    [Valid N],  [1,382], [1,212],
+    [Mean],     [1.31],  [235.6],
+    [Median],   [1],     [180],
+    [Mode],     [1],     [120],
+    [Variance], [0.38],  [39,098],
+    [SD],       [0.61],  [197.7],
+    [Range],    [1–4],   [4–1,080],
+    [IQR],      [0],     [270],
     r,
   )
 }))
+#fig(3, 50, 2, 5, [Figure 3  Groups (`net_group`), N = 1,212, mode 0], "f3_group_bar.png")
+#fig(5, 50, 2, 5, [Figure 4  Mean loneliness by group, 95% CI], "f4_group_means.png")
+#at(3, 57, 4, small[Welch two-sample t-test, group 1 minus group 0: difference 0.02 (95% CI −0.05 to 0.09), t~=~0.63, df~=~1004, p~=~0.53.])
