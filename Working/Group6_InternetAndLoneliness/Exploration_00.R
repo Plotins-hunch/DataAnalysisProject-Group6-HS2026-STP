@@ -299,7 +299,7 @@ group_mode
 # part 3.c - one style for every figure
 # the report is built on one unit, X = A4 width / 135 = 4.41pt (the x-height of its text), and one grid:
 # base grid of 6 columns (16X, gutters 3X): labels 1 | text 3 | evidence 2. figures sit in the evidence zone (2 columns)
-# and is a whole number of lines tall (one line = 3X). plot text uses the report's small size.
+# and is a whole number of lines tall (one line = 2.5X). plot text uses the report's small size.
 # alignment rule: the plot panel fills the column, so its left edge IS the column edge;
 # there are no y-axes, values are labelled directly on the data.
 # clearance: nothing comes closer than X to anything else (labels sit X away from marks).
@@ -310,7 +310,7 @@ X     <- 595.28 / 135              # points: A4 width / 135, the report's unit
 span   <- function(n) (n * 16 * X + (n - 1) * 3 * X) / 72   # width of n columns, inches
 col_c  <- span(2)                  # evidence zone: 2 columns
 col_bc <- span(5)                  # text + evidence: 5 columns, the one breakout (Figure 2)
-line  <- 3 * X / 72                # one line, inches
+line  <- 2.5 * X / 72              # one line (11pt), inches
 fs    <- (5 / 6) * X / 0.519       # small text: x-height 5/6 X (font x-height = 0.519 em), 7.2pt
 lw    <- (X / 10) / .pt            # hairline, X/10
 # one colour, one meaning: red = group 1 (above the mean) and the cut point; grey = group 0;
@@ -354,7 +354,7 @@ fig1 <- ggplot(filter(ess, !is.na(lonely)), aes(lonely)) +
   scale_y_continuous(limits = c(0, 1300), expand = c(0, 0)) +
   theme_report
 fig1
-save_fig(fig1, "fig1_lonely.svg", lines = 5)
+save_fig(fig1, "fig1_lonely.svg", lines = 6)
 
 # part 3.e - Figure 2: IV histogram in 10-minute bins, bars coloured by group, the mean
 # (= cut point) marked; the group sizes are in Figure 3, so they are not repeated here.
@@ -369,7 +369,7 @@ fig2 <- ggplot(filter(ess, !is.na(net_min)), aes(net_min, fill = net_group)) +
   scale_y_continuous(limits = c(0, 220), expand = c(0, 0)) +
   theme_report
 fig2
-save_fig(fig2, "fig2_internet.svg", lines = 4)
+save_fig(fig2, "fig2_internet.svg", lines = 5)
 
 # part 3.f - Figure 3: bar chart of the grouping variable, count and share
 fig3 <- ggplot(group_counts, aes(n, net_group, fill = net_group)) +
@@ -381,7 +381,7 @@ fig3 <- ggplot(group_counts, aes(n, net_group, fill = net_group)) +
   scale_x_continuous(limits = c(0, 2200), expand = c(0, 0)) +
   theme_report + theme(axis.text.x = element_blank())
 fig3
-save_fig(fig3, "fig3_groups.svg", lines = 2)
+save_fig(fig3, "fig3_groups.svg", lines = 3)
 
 
 # ------------------- STEP 4 -------------------------- #
@@ -442,7 +442,7 @@ fig4 <- ggplot(group_means, aes(m, net_group, colour = net_group)) +
   scale_x_continuous(limits = c(1.2, 1.45), breaks = c(1.25, 1.3, 1.35, 1.4), expand = c(0, 0)) +
   theme_report
 fig4
-save_fig(fig4, "fig4_means.svg", lines = 3)
+save_fig(fig4, "fig4_means.svg", lines = 4)
 
 
 # ------------------- STEP 5 -------------------------- #
@@ -466,7 +466,7 @@ fig5 <- ggplot(points, aes(net_min, lonely, colour = net_group)) +
   scale_y_continuous(limits = c(0.6, 4.4), expand = c(0, 0)) +
   theme_report
 fig5
-save_fig(fig5, "fig5_scatter.svg", lines = 5)
+save_fig(fig5, "fig5_scatter.svg", lines = 6)
 # result: loneliness is spread the same way on both sides of the cut point; the two
 # group means are almost the same height. the split hides how minutes vary inside each
 # group, which Report 2 uses in full.

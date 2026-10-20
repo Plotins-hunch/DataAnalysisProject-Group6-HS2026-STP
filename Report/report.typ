@@ -3,7 +3,7 @@
 // Show the grid:               add  --input grid=true
 //
 // ONE UNIT   X = A4 width / 135 = 4.41pt, the x-height of the text (ABC Areal: 0.519 em).
-// ONE GRID   a baseline every 3X; 6 columns of 16X, gutters 3X, margins 12X (page = 135X).
+// ONE GRID   a baseline every 2.5X (11pt, 130%); 6 columns of 16X, gutters 3X, margins 12X (page = 135X).
 //            Three zones, each a whole number of columns, the same on every row:
 //              A  labels    1 column    16X
 //              B  text      3 columns   54X
@@ -18,11 +18,12 @@
 //      Every piece of evidence sits in C beside the paragraph that reads it.
 //   3  A row's elements hang from one line: the cap height of every first line, whatever its
 //      size (title, text, small), sits on the same hang line.
-//   4  Rows are separated by one empty line; a row is as tall as its tallest element, in whole lines.
+//   4  A row is as tall as its tallest element, in whole lines.
 //   5  Clearance: nothing comes closer than X to anything else: caption to plot, label to mark.
-//   6  Zones: white space is the structure. Rows inside a zone are one empty line apart;
-//      zones are two apart: statement (title, fact sheet) | description (sections 1–3) |
-//      inference (sections 4–5). No rules, no boxes.
+//   6  Spacing scale, all in lines: 0 inside a block · 1 between rows · 2 between zones
+//      (statement | description 1–3 | inference 4–5). As in the CV grid: every entry sits on
+//      the baseline grid, groups are parted by empty lines, never by rules.
+// VOICES  sans for content; grey ABC Areal Mono for metadata (labels, keys, credits).
 // FOOT    the credits sit at the foot of the page on the same three zones.
 //      Figures are vector (SVG), so every line and letter stays sharp.
 // MINIMUM VIABLE VISUALISATION   each figure shows only what its job needs; anything the
@@ -44,7 +45,7 @@
 // X is taken from the page: A4 width = 135X, so margins and columns divide it exactly
 #let X      = 595.28pt / 135                      // 4.41pt
 #let xh     = 0.519
-#let u      = 3 * X                               // one line
+#let u      = 2.5 * X                             // one line, 11pt
 #let gut    = 3 * X
 // BASE GRID: 6 equal columns of 16X with gutters of 3X (one line), margins 12X:
 // 12 + 6·16 + 5·3 + 12 = 135X = the page width. Labels 1 column, text 3, evidence 2,
@@ -57,17 +58,17 @@
 #let col-b  = span(3)                             // 54X  238.1pt
 #let col-c  = span(2)                             // 35X  154.3pt
 #let tw     = span(ncol)                          // 111X 489.5pt
-#let nlin   = 55
+#let nlin   = 66
 #let th     = nlin * u
 #let text-size  = X / xh                          // 8.67pt
 #let small-size = 5 / 6 * X / xh                  // 7.23pt
-#let title-size = 3 * X / xh                      // 26.0pt
+#let cap    = 0.716                               // ABC Areal cap height / em
+#let title-size = 2 * u / cap                      // cap height = 2 lines (5X), 30.8pt; leading 3 lines
 #let hair   = X / 10
-#let base-drop = 0.78 * X                         // text baseline sits 0.78X above each line's bottom
+#let base-drop = 0.6 * X                          // text baseline sits 0.6X above each line's bottom
 // HANG LINE (rule 3): every size hangs its capitals from the same line, `hang` below the top of
 // a grid line. Text sits exactly on the baseline grid; small text and the title take the
 // baseline offset that puts their cap height on the same hang line.
-#let cap    = 0.716                               // ABC Areal cap height / em
 #let hang   = u - base-drop - cap * text-size
 #let hung(size, lines: 1) = (top-edge: hang + cap * size, bottom-edge: -(lines * u - hang - cap * size))
 #let show-grid = sys.inputs.at("grid", default: "false") == "true"
@@ -94,7 +95,7 @@
 #set page(
   footer-descent: 0pt,
   footer: context {
-    set text(size: small-size, fill: grey, number-width: "tabular")
+    set text(size: small-size, fill: grey, number-width: "tabular", font: ("ABC Areal Mono", "Courier New"))
     grid(columns: (col-a, col-b, col-c), column-gutter: gut, ..credits)
   },
 )
@@ -115,6 +116,8 @@
 }
 
 #let meta(body) = text(fill: grey, body)
+// metadata voice (after the CV grid): grey mono for labels, keys and credits; sans for content
+#let tag(body) = text(font: ("ABC Areal Mono", "Courier New"), fill: grey, body)
 #let g1(body) = text(fill: red, body)
 // column C: everything at the small size, tabular figures
 #let evidence(body) = text(size: small-size, number-width: "tabular", ..hung(small-size), body)
@@ -126,7 +129,7 @@
 // one row of the page: A | B | C, all starting on the same line
 #let row(a, b, c) = (a, b, c)
 
-#let keys(..lines) = meta(lines.pos().join(linebreak()))   // grey key facts, one per line
+#let keys(..lines) = tag(lines.pos().join(linebreak()))    // grey mono key facts, one per line
 #let small-table(..cells) = evidence(table(columns: (1.6fr, 1fr, 1fr), stroke: none, inset: 0pt,
   align: (left, right, right), ..cells))
 #let rule = table.hline(stroke: hair)
@@ -135,41 +138,41 @@
   columns: (col-a, col-b, col-c),
   column-gutter: gut,
   //           title  facts→DV  DV   IV   grp  desc→test  test
-  row-gutter: (u,     2 * u,    u,   u,   u,   2 * u,     u),
+  row-gutter: (2 * u, 2 * u,    u,   u,   u,   2 * u,     u),
 
   // ---- header: the title is the one large thing on the page (rule 1) ----
-  meta[Report 1 \ Group 6],
-  grid.cell(colspan: 2, text(size: title-size, ..hung(title-size, lines: 2))[Internet use and loneliness \ in Switzerland]),
+  tag[Report 1 \ Group 6],
+  grid.cell(colspan: 2, { set par(leading: 3 * u - title-size); text(size: title-size, top-edge: hang + cap * title-size, bottom-edge: -(3 * u - hang - cap * title-size))[Internet use and loneliness \ in Switzerland] }),
 
   // ---- fact sheet: question, context, answer; the result's evidence beside it ----
   grid.cell(colspan: 2, grid(columns: (col-a, col-b), column-gutter: gut,
-    meta[Question], [Is people's internet use associated with their feeling of loneliness?],
-    meta[Data],     meta[European Social Survey Round 11, Switzerland, N #n.n_total],
-    meta[Method],   meta[Split at mean internet use (#n.cut min); Welch t-test],
-    meta[Answer],   [#lorem(6) #g1[above the mean] #lorem(6)],
+    tag[Question], [Is people's internet use associated with their feeling of loneliness?],
+    tag[Data],     meta[European Social Survey Round 11, Switzerland, N #n.n_total],
+    tag[Method],   meta[Split at mean internet use (#n.cut min); Welch t-test],
+    tag[Answer],   [#lorem(8) #g1[above the mean] #lorem(8)],
   )),
-  fig([Figure 4 Mean loneliness by group, 95% CI \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 3),
+  fig([Figure 4 Mean loneliness by group, 95% CI \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 4),
 
   // ---- 1 Variables ----
   ..row([1 Variables \ #keys([Dependent], `fltlnl`, [scale 1–4], [N #n.lonely_n])],
-        [#lorem(47)],
-        fig([Figure 1 Felt lonely in the past week], "fig1_lonely.svg", 5)),
-  ..row(keys([Independent], `netustm`, [minutes per day], [N #n.net_n], [#n.net_missing missing]),
-        [#lorem(46)],
-        fig([Figure 2 Minutes online, #g1[above the mean]], "fig2_internet.svg", 4)),
+        [#lorem(56)],
+        fig([Figure 1 Felt lonely in the past week], "fig1_lonely.svg", 6)),
+  ..row(keys([Independent], `netustm`, [min per day], [N #n.net_n], [#n.net_missing missing]),
+        [#lorem(58)],
+        fig([Figure 2 Minutes online, #g1[above the mean]], "fig2_internet.svg", 5)),
 
   // ---- 2 Grouping: the group bar chart and the boundary note ----
   ..row([2 Grouping \ #keys(`net_group`, [cut #n.cut min])],
-        [#lorem(12) #g1[above the mean (1)] #lorem(18)],
+        [#lorem(12) #g1[above the mean (1)] #lorem(20)],
         evidence({
           [Figure 3 Groups, N #n.group_n, mode #n.group_mode]
-          image(out + "fig3_groups.svg", width: col-c, height: 2 * u)
+          image(out + "fig3_groups.svg", width: col-c, height: 3 * u)
           meta[#n.on_cut on the mean (would go to 0) \ #n.net_missing without an answer: in neither group]
         })),
 
   // ---- 3 Descriptives: Table 1 beside its reading ----
   ..row([3 Descriptives \ #keys([Table 1], [Figures 1–3])],
-        [#lorem(68)],
+        [#lorem(64)],
         small-table(
           [Table 1], [Loneliness], [Minutes], rule,
           [Mean],     n.lonely_mean,   n.net_mean,
@@ -183,7 +186,7 @@
 
   // ---- 4 Test ----
   ..row([4 Test \ #keys([Welch], [p #n.p])],
-        [#lorem(21)],
+        [#lorem(26)],
         small-table(
           [Loneliness], [N], [Mean · SD], rule,
           [0 at or below],   n.n0, [#n.m0 · #n.sd0],
@@ -192,6 +195,6 @@
 
   // ---- 5 Interpretation ----
   ..row([5 Interpretation \ #keys([Figure 5])],
-        [#lorem(44)],
-        fig([Figure 5 Respondents and group means], "fig5_scatter.svg", 5)),
+        [#lorem(86)],
+        fig([Figure 5 Respondents and group means], "fig5_scatter.svg", 6)),
 )
