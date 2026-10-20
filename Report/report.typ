@@ -8,8 +8,10 @@
 //              B  text      54X   243pt
 //              C  evidence  35X   157.5pt      gutters 3X
 // FOUR RULES
-//   1  Size follows column. A and B are set at the text size (x-height X, 8.67pt); C, and the
-//      text inside every plot, at the small size (x-height ⅚X, 7.23pt). Two sizes, nothing else.
+//   1  Size follows role. Three sizes, all from X:
+//        title  x-height 3X (26pt), two lines on a leading of two grid lines, the one large thing
+//        text   x-height X  (8.67pt): columns A and B
+//        small  x-height ⅚X (7.23pt): column C and the text inside every plot
 //   2  Every left edge sits on A, B or C. Plot panels fill their column: no y-axes, values are
 //      labelled on the data, so the data starts on the column edge.
 //   2b Breakout: a figure whose data needs width spans B+C in a row of its own, label in A.
@@ -46,6 +48,7 @@
 #let th     = nlin * u
 #let text-size  = X / xh                          // 8.67pt
 #let small-size = 5 / 6 * X / xh                  // 7.23pt
+#let title-size = 3 * X / xh                      // 26.0pt
 #let hair   = X / 10
 #let base-drop = 3.5pt                            // baseline sits 3.5pt above each line's bottom
 #let show-grid = sys.inputs.at("grid", default: "false") == "true"
@@ -100,10 +103,13 @@
   column-gutter: gut,
   row-gutter: u,
 
-  // ---- header: what, for whom, by whom ----
-  ..row(meta[Report 1 \ Group 6, HS2026],
-        [Internet use and loneliness in Switzerland \ #meta[Data Analysis for Public Policy, ETH Zürich]],
-        evidence(meta[Gabriele Pizzi, Marlo (Clara) Roth \ Ole Handschug, Joshua Silalahi])),
+  // ---- header: the title is the one large thing on the page (rule 1) ----
+  meta[Report 1 \ Group 6 \ ETH Zürich \ HS2026],
+  grid.cell(colspan: 2, {
+    text(size: title-size, top-edge: 2 * u - base-drop, bottom-edge: -base-drop)[Internet use and loneliness \ in Switzerland]
+    linebreak()
+    meta[Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi]
+  }),
 
   // ---- fact sheet: question, context, answer; the result's evidence beside it ----
   grid.cell(colspan: 2, grid(columns: (col-a, col-b), column-gutter: gut,
@@ -119,7 +125,7 @@
         [#lorem(50)],
         fig([Figure 1 Felt lonely in the past week], "fig1_lonely.svg", 5)),
   ..row(keys([Independent], `netustm`, [minutes per day], [N #n.net_n], [#n.net_missing missing]),
-        [#lorem(66)],
+        [#lorem(58)],
         small-table(
           [Table 1], [Loneliness], [Minutes], rule,
           [Mean],     n.lonely_mean,   n.net_mean,
@@ -141,12 +147,12 @@
 
   // ---- 3 Descriptives ----
   ..row([3 Descriptives \ #keys([Table 1], [Figures 1–3])],
-        [#lorem(30)],
+        [#lorem(22)],
         fig([Figure 3 Groups, N #n.group_n, mode #n.group_mode], "fig3_groups.svg", 2)),
 
   // ---- 4 Test ----
   ..row([4 Test \ #keys([Welch], [p #n.p])],
-        [#lorem(30)],
+        [#lorem(22)],
         small-table(
           [Loneliness], [N], [Mean · SD], rule,
           [0 at or below],   n.n0, [#n.m0 · #n.sd0],
@@ -155,6 +161,6 @@
 
   // ---- 5 Interpretation ----
   ..row([5 Interpretation \ #keys([Figure 5])],
-        [#lorem(58)],
-        fig([Figure 5 Every respondent, loneliness (1–4, jittered) by minutes online; lines: group means], "fig5_scatter.svg", 6)),
+        [#lorem(46)],
+        fig([Figure 5 Every respondent; lines: group means], "fig5_scatter.svg", 5)),
 )
