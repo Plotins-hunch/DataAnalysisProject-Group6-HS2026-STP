@@ -4,7 +4,10 @@ How to write the body text of `report.typ` so it works with the figures.
 
 ## Ground rules
 
-- **Never restate a number that the evidence column (figures, Table 1, side notes) already shows.**
+- **Column A is only an index** (section and variable names). Facts like the scale, the missing count
+  or the cut value are stated in the text; insert script numbers with `#n.name` (e.g. `#n.cut`,
+  `#n.net_missing`, `#n.on_cut`), never by typing them.
+- **Never restate a number that the evidence column (figures, Table 1, the group N and SD note) already shows.**
   The text says *why* and *what it means*; the evidence column shows *how much*.
   Write "most respondents sit in the lowest category (Figure 1)", not "75% answered none".
 - **Captions only describe what is drawn** (variable, unit, colour). Findings belong in the text.
@@ -21,8 +24,8 @@ How to write the body text of `report.typ` so it works with the figures.
 |---|---|---|
 | Findings | ~34 | the data (ESS 11, N) |
 | 1 Variables, dependent | ~56 | Figure 1 |
-| 1 Variables, independent | ~58 | Figure 2, missing-answers note |
-| 2 Grouping | ~30 | Figure 3, boundary note |
+| 1 Variables, independent | ~58 | Figure 2 |
+| 2 Grouping | ~30 | Figure 3 |
 | 3 Descriptives | ~56 | Table 1 |
 | 4 Test | ~26 | group N and SD |
 | 5 Interpretation | ~60 | Figure 4 (and Figure 5 above it) |
@@ -49,7 +52,7 @@ The brief requires: why this item, why it captures loneliness, at least one limi
   between groups will be small on this scale.
 - **Limitations:** a single item, past week only, four coarse categories, self-reported.
 
-### 1 Variables: independent, `netustm` (Figure 2, missing note)
+### 1 Variables: independent, `netustm` (Figure 2)
 - **Why:** minutes per day is continuous and widely spread; `netusoft` (how often) is useless because
   80% answer "every day".
 - **Figure 2 shows:** a right-skewed distribution with a long tail, and spikes at whole hours (1h, 2h, 3h):
@@ -58,7 +61,7 @@ The brief requires: why this item, why it captures loneliness, at least one limi
 - **Limitations:** includes work use; self-reported and heaped; asked only of people online most days,
   so the results describe regular internet users (the 168 not asked stay missing, not 0 minutes).
 
-### 2 Grouping (Figure 3, boundary note)
+### 2 Grouping (Figure 3)
 - How the variable was made: split at the mean, 1 = above (`#g1[...]`), 0 = at or below; the original
   `netustm` is kept unchanged; the cut point is one line in the script.
 - **Boundary handling** (graded): a value exactly equal to the mean would go to group 0; nobody sits

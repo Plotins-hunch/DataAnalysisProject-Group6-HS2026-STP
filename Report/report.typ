@@ -38,10 +38,11 @@
 //   2  the findings, two sentences                  under it, ink; the data beside them in C
 // TRANSPARENCY   both measures are self-reports and are named so everywhere: in keys,
 //   captions, the title and the text ("self-reported loneliness", "self-reported minutes").
-// ZERO REDUNDANCY   every fact is printed once, where it is used: the cut point in Grouping,
-//   the missing count with the IV, the test result under Figure 4, nothing as a pointer.
+// ZERO REDUNDANCY   every fact is printed once, where it is used: valid N in Table 1, the test
+//   result under Figure 4; the cut value, missing count and boundary rule in the text.
 //   3  section headings 1–5 (the rubric's parts)    column A, ink
-//   3b key facts under each heading                  column A, grey (name, scale, N, cut, p)
+//   3b the variable's name under its heading         column A, grey mono; column A is an index,
+//                                                    every fact is stated in the text or shown in C
 //   4  body text: the reasoning                     column B, ink
 //   5  evidence: figures, Table 1, notes            column C, small size
 //   6  context: data, method, names, course         grey
@@ -161,20 +162,19 @@
         evidence(meta[European Social Survey Round 11 \ Switzerland, 2023 \ N #n.n_total respondents])),
 
   // ---- 1 Variables ----
-  ..row([1 Variables \ #keys([Dependent], `fltlnl`, [self-reported], [scale 1–4], [N #n.lonely_n])],
+  ..row([1 Variables \ #keys([Dependent], `fltlnl`)],
         [#lorem(56)],
         fig([Figure 1 Self-reported loneliness, past week], "fig1_lonely.svg", 5)),
-  ..row(keys([Independent], `netustm`, [self-reported], [min per day], [N #n.net_n], [#n.net_missing missing]),
+  ..row(keys([Independent], `netustm`),
         [#lorem(58)],
         fig([Figure 2 Self-reported minutes online per day], "fig2_internet.svg", 5)),
 
   // ---- 2 Grouping: the group bar chart and the boundary note ----
-  ..row([2 Grouping \ #keys(`net_group`, [cut #n.cut min])],
+  ..row([2 Grouping \ #keys(`net_group`)],
         [#lorem(12) #g1[above the mean (1)] #lorem(20)],
         evidence({
           [Figure 3 Groups, N #n.group_n, mode #n.group_mode]
           image(out + "fig3_groups.svg", width: col-c, height: 3 * u)
-          meta[#n.on_cut on the mean; missing in neither group]
         })),
 
   // ---- 3 Descriptives: Table 1 beside its reading ----
@@ -182,6 +182,7 @@
         [#lorem(56)],
         small-table(
           [Table 1], `fltlnl`, `netustm`, rule,
+          [Valid N],  n.lonely_n,      n.net_n,
           [Mean],     n.lonely_mean,   n.net_mean,
           [Median],   n.lonely_median, n.net_median,
           [Mode],     n.lonely_mode,   n.net_mode,
