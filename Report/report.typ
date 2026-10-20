@@ -1,13 +1,14 @@
-// Group Report 1, Group 6: one page, figures included.
+// THE LAYOUT of the report: one page, figures beside the text that reads them.
+// The text lives in content.typ (edit that file to write); the numbers come from numbers.typ.
 //
 // Build: run Working/Group6_InternetAndLoneliness/Exploration_00.R first (it writes the figures and
-// every number used here to its figures/ folder), then from the repo root:
+// the numbers to its figures/ folder), then from the repo root:
 //   typst compile --root . --font-path Report/fonts Report/report.typ
 // Fonts: ABC Areal for text, ABC Areal Mono for variable names and labels, read from Report/fonts.
-// If that folder is empty Typst falls back to Arial and Courier New. Report/report.pdf is the
-// compiled result as of the last commit.
-// Text: each #lorem(n) is a placeholder. Replace it with about n words so the row keeps its height
-// (about 9 words per line). What each section must say: Report/WRITING_NOTES.md.
+// If that folder is empty Typst falls back to Arial and Courier New.
+
+#import "numbers.typ": out, n, g1, red
+#import "content.typ": *
 
 // grid: unit X = page width / 135, which is the x-height of the text. one line = 2.5X.
 // 6 columns of 16X with 3X gutters and 12X margins; labels take 1 column, text 3, figures 2.
@@ -16,7 +17,7 @@
 #let gut = 3 * X
 #let col = 16 * X
 #let margin = 12 * X
-#let span(n) = n * col + (n - 1) * gut
+#let span(k) = k * col + (k - 1) * gut
 #let col-a = span(1)
 #let col-b = span(3)
 #let col-c = span(2)
@@ -28,7 +29,6 @@
 
 #let ink = rgb("#1a1a1a")
 #let grey = luma(42%)
-#let red = rgb("#b2182b")              // one meaning everywhere: group 1 (above the mean) and the cut point
 #let sans = ("ABC Areal", "Arial")
 #let mono = ("ABC Areal Mono", "Courier New")
 
@@ -37,26 +37,13 @@
   footer-descent: 0pt,
   footer: text(size: small-size, fill: grey, font: mono,
     grid(columns: (col-a, col-b, col-c), column-gutter: gut,
-      [Authors], [Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi],
-      [Data Analysis for Public Policy \ ETH Zürich, HS2026])))
+      [Authors], authors, [Data Analysis for Public Policy \ ETH Zürich, HS2026])))
 #set text(font: sans, size: text-size, fill: ink, top-edge: u - drop, bottom-edge: -drop, lang: "en")
 #set par(leading: 0pt, spacing: 0pt)
 #set block(spacing: 0pt)
 #show raw: set text(font: mono, size: 1.25em)
 
-// the script's output; n.name gives a number from report_numbers.csv
-#let out = "/Working/Group6_InternetAndLoneliness/figures/"
-#let n = {
-  let d = (:)
-  for row in csv(out + "report_numbers.csv").slice(1) {
-    let v = row.at(1)
-    d.insert(row.at(0), if v.starts-with("-") { "−" + v.slice(1) } else { v })   // real minus sign
-  }
-  d
-}
-
 #let tag(body) = text(font: mono, fill: grey, body)          // labels in the left column
-#let g1(body) = text(fill: red, body)                        // names group 1 in the text
 #let small(body) = text(size: small-size, number-width: "tabular", body)
 #let fig(caption, file, height, width: col-c) = small({      // height in lines
   block(width: width, caption)
@@ -73,30 +60,30 @@
 
   // title
   tag[Report 1 \ Group 6],
-  grid.cell(colspan: 2, text(size: title-size, top-edge: 3 * u - drop, bottom-edge: -drop)[Is internet use linked \ to self-reported loneliness?]),
+  grid.cell(colspan: 2, text(size: title-size, top-edge: 3 * u - drop, bottom-edge: -drop, title)),
 
-  // findings: the result in plain language, then its meaning and main caveat
+  // findings
   tag[Findings],
-  [#lorem(10) #g1[above the mean] #lorem(12)],
+  findings,
   small(text(fill: grey)[European Social Survey Round 11 \ Switzerland, 2023 \ N #n.n_total respondents]),
 
   // 1 variables
   [1 Variables \ #tag[Dependent \ `fltlnl`]],
-  [#lorem(58)],
+  dependent,
   fig([Figure 1 Self-reported loneliness, past week], "fig1_lonely.svg", 6),
 
   tag[Independent \ `netustm`],
-  [#lorem(58)],
+  independent,
   fig([Figure 2 Self-reported minutes online per day], "fig2_internet.svg", 6),
 
   // 2 grouping
   [2 Grouping \ #tag[`net_group`]],
-  [#lorem(12) #g1[above the mean (1)] #lorem(16)],
+  grouping,
   fig([Figure 3 Groups, N #n.group_n, mode #n.group_mode], "fig3_groups.svg", 3),
 
   // 3 descriptives
   [3 Descriptives],
-  [#lorem(78)],
+  descriptives,
   tbl(
     [Table 1], `fltlnl`, `netustm`, rule,
     [Valid N],  n.lonely_n,      n.net_n,
@@ -111,7 +98,7 @@
 
   // 4 test
   [4 Test],
-  [#lorem(26)],
+  test,
   tbl(
     [Group], [N], [SD], rule,
     [0 at or below], n.n0, n.sd0,
@@ -124,6 +111,6 @@
 
   // 5 interpretation
   [5 Interpretation],
-  [#lorem(69)],
+  interpretation,
   fig([Figure 4 Mean self-reported loneliness, 95% CI \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 5),
 )

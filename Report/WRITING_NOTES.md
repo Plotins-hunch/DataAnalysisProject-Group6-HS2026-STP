@@ -1,6 +1,7 @@
 # Writing notes for the report text
 
-How to write the body text of `report.typ` so it works with the figures.
+How to write the body text in `content.typ` so it works with the figures. Each section there has
+its line budget and a short version of these notes as a comment above it.
 
 ## Ground rules
 

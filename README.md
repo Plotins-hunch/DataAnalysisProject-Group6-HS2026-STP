@@ -71,8 +71,16 @@ step 5 draws Figure 5 (the cut-point limitation), and step 6 writes every number
 
 ## Building the report
 
-The one-page report is `Report/report.typ` ([Typst](https://typst.app)). It reads the figures and
-numbers straight from the script's `figures/` folder, so run the script first, then from the repo root:
+The one-page report is written in [Typst](https://typst.app) and split into three files in `Report/`:
+
+| File | What it is |
+|---|---|
+| `content.typ` | **The text. The only file to edit when writing.** One block per section, with the guidance and line budget as a comment above each |
+| `report.typ` | The layout: the grid, and where each section, figure and table goes |
+| `numbers.typ` | Reads the script's numbers so the text can insert them with `#n.name` instead of typing them |
+
+The report reads the figures and numbers straight from the script's `figures/` folder, so run the
+script first, then from the repo root:
 
 ```sh
 typst compile --root . --font-path Report/fonts Report/report.typ
