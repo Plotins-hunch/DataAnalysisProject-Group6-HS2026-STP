@@ -29,10 +29,13 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHwxNTQuMzN8NC4zOXw0Ni41Nw==)'>
-<rect x='0.00' y='12.83' width='38.58' height='33.74' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #1A1A1A;' />
-<rect x='38.58' y='37.48' width='38.58' height='9.08' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #1A1A1A;' />
-<rect x='77.17' y='45.37' width='38.58' height='1.20' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #1A1A1A;' />
-<rect x='115.75' y='45.76' width='38.58' height='0.81' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #1A1A1A;' />
+<rect x='0.00' y='12.83' width='38.58' height='33.74' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #5C5C5C;' />
+<rect x='38.58' y='37.48' width='38.58' height='9.08' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #5C5C5C;' />
+<rect x='77.17' y='45.37' width='38.58' height='1.20' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #5C5C5C;' />
+<rect x='115.75' y='45.76' width='38.58' height='0.81' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #5C5C5C;' />
+<line x1='38.58' y1='46.57' x2='38.58' y2='4.39' style='stroke-width: 3.31; stroke: #FFFFFF; stroke-linecap: butt;' />
+<line x1='77.17' y1='46.57' x2='77.17' y2='4.39' style='stroke-width: 3.31; stroke: #FFFFFF; stroke-linecap: butt;' />
+<line x1='115.75' y1='46.57' x2='115.75' y2='4.39' style='stroke-width: 3.31; stroke: #FFFFFF; stroke-linecap: butt;' />
 <text x='19.29' y='9.28' text-anchor='middle' style='font-size: 7.08px;fill: #1A1A1A; font-family: "ABC Areal";' textLength='13.28px' lengthAdjust='spacingAndGlyphs'>75%</text>
 <text x='57.87' y='33.94' text-anchor='middle' style='font-size: 7.08px;fill: #1A1A1A; font-family: "ABC Areal";' textLength='13.88px' lengthAdjust='spacingAndGlyphs'>20%</text>
 <text x='96.46' y='41.82' text-anchor='middle' style='font-size: 7.08px;fill: #1A1A1A; font-family: "ABC Areal";' textLength='9.83px' lengthAdjust='spacingAndGlyphs'>3%</text>

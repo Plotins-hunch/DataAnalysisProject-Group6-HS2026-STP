@@ -346,7 +346,10 @@ x_minutes <- scale_x_continuous(breaks = c(240, 480, 720, 960), labels = c("4h",
 # part 3.d - Figure 1: DV histogram, one bar per answer (binwidth 1), share on top
 # (the mean is in Table 1, so it is not repeated here)
 fig1 <- ggplot(filter(ess, !is.na(lonely)), aes(lonely)) +
-  geom_histogram(binwidth = 1, boundary = 0.5, fill = ink) +
+  # dark grey, not ink, and a white gap of about X between bars, so the largest mass on the
+  # page stays quiet (light grey is reserved for group 0)
+  geom_histogram(binwidth = 1, boundary = 0.5, fill = "#5c5c5c") +
+  geom_vline(xintercept = c(1.5, 2.5, 3.5), colour = "white", linewidth = 10 * lw) +   # gaps, tops intact
   geom_text(stat = "bin", binwidth = 1, boundary = 0.5, vjust = -0.7, family = fam, size = fs / .pt,
             colour = ink, aes(label = after_stat(paste0(round(100 * count / sum(count)), "%")))) +
   scale_x_continuous(breaks = 1:4, labels = c("None", "Some", "Most", "All"),
