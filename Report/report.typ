@@ -1,210 +1,128 @@
-// Group Report #1 — one page, figures included (lorem ipsum placeholders)
-// Compile from the repo root:  typst compile --root . --font-path <ABC Areal folder> Report/report.typ
-// Show the grid:               add  --input grid=true
+// Group Report 1, Group 6: one page, figures included.
 //
-// ONE UNIT   X = A4 width / 135 = 4.41pt, the x-height of the text (ABC Areal: 0.519 em).
-// ONE GRID   a baseline every 2.5X (11pt, 130%); 6 columns of 16X, gutters 3X, margins 12X (page = 135X).
-//            Three zones, each a whole number of columns, the same on every row:
-//              A  labels    1 column    16X
-//              B  text      3 columns   54X
-//              C  evidence  2 columns   35X
-// FOUR RULES
-//   1  Size follows role. Three sizes, all from X:
-//        title  x-height 3X (26pt), two lines on a leading of two grid lines, the one large thing
-//        text   x-height X  (8.67pt): columns A and B
-//        small  x-height ⅚X (7.23pt): column C and the text inside every plot
-//   2  Every left edge sits on A, B or C. Plot panels fill their column: no y-axes, values are
-//      labelled on the data, so the data starts on the column edge.
-//      Every piece of evidence sits in C beside the paragraph that reads it.
-//   2b One breakout: the figure that shows the question itself (Figure 5, every respondent)
-//      spans B+C in a row of its own, label in A.
-//   7  Text and evidence never repeat each other. Captions say only what is drawn (variable,
-//      unit, encoding), never a finding; the text never restates a number shown in C, it
-//      says why and what it means.
-//   3  Every line of every size sits on the baseline grid (title lines take three grid lines);
-//      a row's elements share their first baseline.
-//   4  Rows are rectangles: text and evidence start on the same line and end on the same line.
-//      Each text budget is measured to fill exactly the lines its evidence takes.
-//   5  Clearance: nothing comes closer than X to anything else: caption to plot, label to mark.
-//   6  Spacing scale, all in lines: 0 inside a block · 1 between rows · 2 between zones
-//      (statement | description 1–3 | inference 4–5). As in the CV grid: every entry sits on
-//      the baseline grid, groups are parted by empty lines, never by rules.
-// VOICES  sans for content; grey ABC Areal Mono for metadata (labels, keys, credits).
-// FOOT    the credits sit at the foot of the page on the same three zones.
-//      Figures are vector (SVG), so every line and letter stays sharp.
-// MINIMUM VIABLE VISUALISATION   each figure shows only what its job needs; anything the
-//   table, a caption or another figure already carries is left out of the plot.
-// HIERARCHY of information, expressed only by position, ink and size:
-//   1  the question, as the title                   top of the page, display size
-//   2  the findings, two sentences                  under it, ink; the data beside them in C
-// TRANSPARENCY   both measures are self-reports and are named so everywhere: in keys,
-//   captions, the title and the text ("self-reported loneliness", "self-reported minutes").
-// ZERO REDUNDANCY   every fact is printed once, where it is used: valid N in Table 1, the test
-//   result under Figure 4; the cut value, missing count and boundary rule in the text.
-//   3  section headings 1–5 (the rubric's parts)    column A, ink
-//   3b the variable's name under its heading         column A, grey mono; column A is an index,
-//                                                    every fact is stated in the text or shown in C
-//   4  body text: the reasoning                     column B, ink
-//   5  evidence: figures, Table 1, notes            column C, small size
-//   6  context: data, method, names, course         grey
-// ONE FAMILY, ONE WEIGHT   ABC Areal regular throughout. ABC Areal Mono only for variable names.
-// THREE INKS   ink for content; grey for supporting information; red for one meaning only:
-//              group 1 (above the mean) and the cut point, in figures and text alike.
-// TEXT   how to write the body text against the figures: Report/WRITING_NOTES.md
-// DATA   every figure and number comes from Working/Group6_InternetAndLoneliness/Exploration_00.R.
-//        The licensed fonts stay out of the repo; without them Typst falls back to Arial.
+// Build: run Working/Group6_InternetAndLoneliness/Exploration_00.R first (it writes the figures and
+// every number used here to its figures/ folder), then from the repo root:
+//   typst compile --root . --font-path <folder with the ABC Areal fonts> Report/report.typ
+// Fonts: ABC Areal for text, ABC Areal Mono for variable names and labels. They are licensed and not
+// in the repo; without them Typst falls back to Arial and Courier New.
+// Text: each #lorem(n) is a placeholder. Replace it with about n words so the row keeps its height
+// (about 9 words per line). What each section must say: Report/WRITING_NOTES.md.
 
-// X is taken from the page: A4 width = 135X, so margins and columns divide it exactly
-#let X      = 595.28pt / 135                      // 4.41pt
-#let xh     = 0.519
-#let u      = 2.5 * X                             // one line, 11pt
-#let gut    = 3 * X
-// BASE GRID: 6 equal columns of 16X with gutters of 3X (one line), margins 12X:
-// 12 + 6·16 + 5·3 + 12 = 135X = the page width. Labels 1 column, text 3, evidence 2,
-// the Figure 2 breakout 5.
-#let ncol   = 6
-#let col    = 16 * X
+// grid: unit X = page width / 135, which is the x-height of the text. one line = 2.5X.
+// 6 columns of 16X with 3X gutters and 12X margins; labels take 1 column, text 3, figures 2.
+#let X = 595.28pt / 135
+#let u = 2.5 * X
+#let gut = 3 * X
+#let col = 16 * X
 #let margin = 12 * X
 #let span(n) = n * col + (n - 1) * gut
-#let col-a  = span(1)                             // 16X  70.6pt
-#let col-b  = span(3)                             // 54X  238.1pt
-#let col-c  = span(2)                             // 35X  154.3pt
-#let tw     = span(ncol)                          // 111X 489.5pt
-#let nlin   = 66
-#let th     = nlin * u
-#let text-size  = X / xh                          // 8.67pt
-#let small-size = 5 / 6 * X / xh                  // 7.23pt
-#let cap    = 0.716                               // ABC Areal cap height / em
-#let title-size = 2 * u / cap                      // cap height = 2 lines (5X), 30.8pt; leading 3 lines
-#let hair   = X / 10
-#let base-drop = 0.6 * X                          // text baseline sits 0.6X above each line's bottom
-#let show-grid = sys.inputs.at("grid", default: "false") == "true"
+#let col-a = span(1)
+#let col-b = span(3)
+#let col-c = span(2)
+#let lines = 66
+#let text-size = X / 0.519             // ABC Areal's x-height is 0.519 em
+#let small-size = 5 / 6 * text-size
+#let title-size = 2 * u / 0.716        // capitals two lines tall
+#let drop = 0.6 * X                    // the baseline sits this far above the bottom of its line
 
-#let ink  = rgb("#1a1a1a")
+#let ink = rgb("#1a1a1a")
 #let grey = luma(42%)
-#let red  = rgb("#b2182b")
+#let red = rgb("#b2182b")              // one meaning everywhere: group 1 (above the mean) and the cut point
+#let sans = ("ABC Areal", "Arial")
+#let mono = ("ABC Areal Mono", "Courier New")
 
-// vertical: top margin 12X, 55 lines of 3X; the rest of A4 (13.9X) is the bottom margin,
-// which holds the credits
-#set page(paper: "a4", margin: (left: margin, right: margin, top: margin, bottom: 841.89pt - margin - th),
-  background: if show-grid { place(dx: margin, dy: margin, {
-    for i in range(ncol) { place(dx: i * (col + gut), rect(width: col, height: th, fill: luma(94%), stroke: none)) }
-    for i in range(nlin) { place(dy: i * u + u - base-drop, line(length: tw, stroke: 0.25pt + rgb(0, 120, 255, 50%))) }
-  }) })
-
-// each piece of information appears once: report and group top left, course up the margin,
-// authors in the footer
-#let credits = (
-  [Authors],
-  [Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi],
-  [Data Analysis for Public Policy \ ETH Zürich, HS2026],
-)
-#set page(
+#set page(paper: "a4",
+  margin: (left: margin, right: margin, top: margin, bottom: 841.89pt - margin - lines * u),
   footer-descent: 0pt,
-  footer: context {
-    set text(size: small-size, fill: grey, number-width: "tabular", font: ("ABC Areal Mono", "Courier New"))
-    grid(columns: (col-a, col-b, col-c), column-gutter: gut, ..credits)
-  },
-)
-#set text(font: ("ABC Areal", "Arial"), size: text-size, fill: ink,
-          top-edge: u - base-drop, bottom-edge: -base-drop, lang: "en", hyphenate: true)
-#set par(justify: false, leading: 0pt, spacing: 0pt)
+  footer: text(size: small-size, fill: grey, font: mono,
+    grid(columns: (col-a, col-b, col-c), column-gutter: gut,
+      [Authors], [Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi],
+      [Data Analysis for Public Policy \ ETH Zürich, HS2026])))
+#set text(font: sans, size: text-size, fill: ink, top-edge: u - drop, bottom-edge: -drop, lang: "en")
+#set par(leading: 0pt, spacing: 0pt)
 #set block(spacing: 0pt)
-#show raw: set text(font: ("ABC Areal Mono", "Courier New"), size: 1.25em)   // variable names only
+#show raw: set text(font: mono, size: 1.25em)
 
+// the script's output; n.name gives a number from report_numbers.csv
 #let out = "/Working/Group6_InternetAndLoneliness/figures/"
 #let n = {
   let d = (:)
   for row in csv(out + "report_numbers.csv").slice(1) {
     let v = row.at(1)
-    d.insert(row.at(0), if v.starts-with("-") { "−" + v.slice(1) } else { v })   // true minus sign
+    d.insert(row.at(0), if v.starts-with("-") { "−" + v.slice(1) } else { v })   // real minus sign
   }
   d
 }
 
-#let meta(body) = text(fill: grey, body)
-// metadata voice (after the CV grid): grey mono for labels, keys and credits; sans for content
-#let tag(body) = text(font: ("ABC Areal Mono", "Courier New"), fill: grey, body)
-#let g1(body) = text(fill: red, body)
-// column C: everything at the small size, tabular figures
-#let evidence(body) = text(size: small-size, number-width: "tabular", body)   // same line box: baselines on the grid
-// caption and image as separate blocks: the caption's line box is one grid line, the image a
-// whole number of lines, so nothing shifts off the baseline grid
-#let fig(caption, file, lines, width: col-c) = evidence({
+#let tag(body) = text(font: mono, fill: grey, body)          // labels in the left column
+#let g1(body) = text(fill: red, body)                        // names group 1 in the text
+#let small(body) = text(size: small-size, number-width: "tabular", body)
+#let fig(caption, file, height, width: col-c) = small({      // height in lines
   block(width: width, caption)
-  block(image(out + file, width: width, height: lines * u))
+  block(image(out + file, width: width, height: height * u))
 })
-
-// one row of the page: A | B | C, all starting on the same line
-#let row(a, b, c) = (a, b, c)
-
-#let keys(..lines) = tag(lines.pos().join(linebreak()))    // grey mono key facts, one per line
-#let small-table(..cells) = evidence(table(columns: (1.6fr, 1fr, 1fr), stroke: none, inset: 0pt,
+#let tbl(..cells) = small(table(columns: (1.6fr, 1fr, 1fr), stroke: none, inset: 0pt,
   align: (left, right, right), ..cells))
-#let rule = table.hline(stroke: hair)
+#let rule = table.hline(stroke: 0.4pt)
 
 #grid(
   columns: (col-a, col-b, col-c),
   column-gutter: gut,
-  //           title  facts→DV  DV   IV   grp  desc→test  test  fig5
-  row-gutter: (2 * u, 2 * u,    u,   u,   u,   2 * u,     u,    u),
+  row-gutter: (2 * u, 2 * u, u, u, u, 2 * u, u, u),   // one empty line between rows, two between parts
 
-  // ---- header: the title is the one large thing on the page (rule 1) ----
+  // title
   tag[Report 1 \ Group 6],
-  grid.cell(colspan: 2, { text(size: title-size, top-edge: 3 * u - base-drop, bottom-edge: -base-drop)[Is internet use linked \ to self-reported loneliness?] }),
+  grid.cell(colspan: 2, text(size: title-size, top-edge: 3 * u - drop, bottom-edge: -drop)[Is internet use linked \ to self-reported loneliness?]),
 
-  // ---- findings: the first row, built like every other row (label | text | evidence) ----
-  // two sentences: the result in plain language, then its meaning and main caveat
-  ..row(tag[Findings],
-        [#lorem(10) #g1[above the mean] #lorem(12)],
-        evidence(meta[European Social Survey Round 11 \ Switzerland, 2023 \ N #n.n_total respondents])),
+  // findings: the result in plain language, then its meaning and main caveat
+  tag[Findings],
+  [#lorem(10) #g1[above the mean] #lorem(12)],
+  small(text(fill: grey)[European Social Survey Round 11 \ Switzerland, 2023 \ N #n.n_total respondents]),
 
-  // ---- 1 Variables ----
-  ..row([1 Variables \ #keys([Dependent], `fltlnl`)],
-        [#lorem(58)],
-        fig([Figure 1 Self-reported loneliness, past week], "fig1_lonely.svg", 6)),
-  ..row(keys([Independent], `netustm`),
-        [#lorem(58)],
-        fig([Figure 2 Self-reported minutes online per day], "fig2_internet.svg", 6)),
+  // 1 variables
+  [1 Variables \ #tag[Dependent \ `fltlnl`]],
+  [#lorem(58)],
+  fig([Figure 1 Self-reported loneliness, past week], "fig1_lonely.svg", 6),
 
-  // ---- 2 Grouping: the group bar chart and the boundary note ----
-  ..row([2 Grouping \ #keys(`net_group`)],
-        [#lorem(12) #g1[above the mean (1)] #lorem(16)],
-        evidence({
-          block[Figure 3 Groups, N #n.group_n, mode #n.group_mode]
-          block(image(out + "fig3_groups.svg", width: col-c, height: 3 * u))
-        })),
+  tag[Independent \ `netustm`],
+  [#lorem(58)],
+  fig([Figure 2 Self-reported minutes online per day], "fig2_internet.svg", 6),
 
-  // ---- 3 Descriptives: Table 1 beside its reading ----
-  ..row([3 Descriptives],
-        [#lorem(78)],
-        small-table(
-          [Table 1], `fltlnl`, `netustm`, rule,
-          [Valid N],  n.lonely_n,      n.net_n,
-          [Mean],     n.lonely_mean,   n.net_mean,
-          [Median],   n.lonely_median, n.net_median,
-          [Mode],     n.lonely_mode,   n.net_mode,
-          [Variance], n.lonely_var,    n.net_var,
-          [SD],       n.lonely_sd,     n.net_sd,
-          [Range],    n.lonely_range,  n.net_range,
-          [IQR],      n.lonely_iqr,    n.net_iqr, rule,
-        )),
+  // 2 grouping
+  [2 Grouping \ #tag[`net_group`]],
+  [#lorem(12) #g1[above the mean (1)] #lorem(16)],
+  fig([Figure 3 Groups, N #n.group_n, mode #n.group_mode], "fig3_groups.svg", 3),
 
-  // ---- 4 Test: the case for Welch beside the text ----
-  ..row([4 Test],
-        [#lorem(26)],
-        small-table(
-          [Group], [N], [SD], rule,
-          [0 at or below], n.n0, n.sd0,
-          g1[1 above], g1(n.n1), g1(n.sd1),
-        )),
+  // 3 descriptives
+  [3 Descriptives],
+  [#lorem(78)],
+  tbl(
+    [Table 1], `fltlnl`, `netustm`, rule,
+    [Valid N],  n.lonely_n,      n.net_n,
+    [Mean],     n.lonely_mean,   n.net_mean,
+    [Median],   n.lonely_median, n.net_median,
+    [Mode],     n.lonely_mode,   n.net_mode,
+    [Variance], n.lonely_var,    n.net_var,
+    [SD],       n.lonely_sd,     n.net_sd,
+    [Range],    n.lonely_range,  n.net_range,
+    [IQR],      n.lonely_iqr,    n.net_iqr, rule,
+  ),
 
-  // ---- the one breakout (rule 2b): Figure 5, the question itself, across B and C ----
+  // 4 test
+  [4 Test],
+  [#lorem(26)],
+  tbl(
+    [Group], [N], [SD], rule,
+    [0 at or below], n.n0, n.sd0,
+    g1[1 above], g1(n.n1), g1(n.sd1),
+  ),
+
+  // figure 5 across the text and figure columns
   tag[Figure 5],
   grid.cell(colspan: 2, fig([Every respondent, self-reported loneliness (1–4, jittered) by self-reported minutes online, #g1[red above the mean]], "fig5_scatter.svg", 5, width: col-b + gut + col-c)),
 
-  // ---- 5 Interpretation: the result beside its reading ----
-  ..row([5 Interpretation],
-        [#lorem(69)],
-        fig([Figure 4 Mean self-reported loneliness, 95% CI \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 5)),
+  // 5 interpretation
+  [5 Interpretation],
+  [#lorem(69)],
+  fig([Figure 4 Mean self-reported loneliness, 95% CI \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 5),
 )

@@ -24,27 +24,27 @@
 <rect x='0.00' y='0.00' width='154.33' height='66.14' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF;' />
 </g>
 <defs>
-  <clipPath id='cpMC4wMHwxNTQuMzN8NC4zOXw1Ny41OQ=='>
-    <rect x='0.00' y='4.39' width='154.33' height='53.20' />
+  <clipPath id='cpMC4wMHwxNTQuMzN8NC4zOXw1Ny41OA=='>
+    <rect x='0.00' y='4.39' width='154.33' height='53.18' />
   </clipPath>
 </defs>
-<g clip-path='url(#cpMC4wMHwxNTQuMzN8NC4zOXw1Ny41OQ==)'>
-<rect x='0.00' y='15.03' width='38.58' height='42.56' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #5C5C5C;' />
-<rect x='38.58' y='46.13' width='38.58' height='11.46' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #5C5C5C;' />
-<rect x='77.17' y='56.08' width='38.58' height='1.51' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #5C5C5C;' />
-<rect x='115.75' y='56.57' width='38.58' height='1.02' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #5C5C5C;' />
-<line x1='38.58' y1='57.59' x2='38.58' y2='4.39' style='stroke-width: 3.31; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='77.17' y1='57.59' x2='77.17' y2='4.39' style='stroke-width: 3.31; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='115.75' y1='57.59' x2='115.75' y2='4.39' style='stroke-width: 3.31; stroke: #FFFFFF; stroke-linecap: butt;' />
-<text x='19.29' y='11.48' text-anchor='middle' style='font-size: 7.08px;fill: #1A1A1A; font-family: "ABC Areal";' textLength='13.28px' lengthAdjust='spacingAndGlyphs'>75%</text>
-<text x='57.87' y='42.58' text-anchor='middle' style='font-size: 7.08px;fill: #1A1A1A; font-family: "ABC Areal";' textLength='13.88px' lengthAdjust='spacingAndGlyphs'>20%</text>
-<text x='96.46' y='52.53' text-anchor='middle' style='font-size: 7.08px;fill: #1A1A1A; font-family: "ABC Areal";' textLength='9.83px' lengthAdjust='spacingAndGlyphs'>3%</text>
-<text x='135.04' y='53.02' text-anchor='middle' style='font-size: 7.08px;fill: #1A1A1A; font-family: "ABC Areal";' textLength='9.73px' lengthAdjust='spacingAndGlyphs'>2%</text>
+<g clip-path='url(#cpMC4wMHwxNTQuMzN8NC4zOXw1Ny41OA==)'>
+<rect x='0.00' y='15.03' width='38.58' height='42.55' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #5C5C5C;' />
+<rect x='38.58' y='46.12' width='38.58' height='11.45' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #5C5C5C;' />
+<rect x='77.17' y='56.06' width='38.58' height='1.51' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #5C5C5C;' />
+<rect x='115.75' y='56.55' width='38.58' height='1.02' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #5C5C5C;' />
+<line x1='38.58' y1='57.58' x2='38.58' y2='4.39' style='stroke-width: 3.20; stroke: #FFFFFF; stroke-linecap: butt;' />
+<line x1='77.17' y1='57.58' x2='77.17' y2='4.39' style='stroke-width: 3.20; stroke: #FFFFFF; stroke-linecap: butt;' />
+<line x1='115.75' y1='57.58' x2='115.75' y2='4.39' style='stroke-width: 3.20; stroke: #FFFFFF; stroke-linecap: butt;' />
+<text x='19.29' y='11.48' text-anchor='middle' style='font-size: 7.10px; font-family: "ABC Areal";' textLength='13.32px' lengthAdjust='spacingAndGlyphs'>75%</text>
+<text x='57.87' y='42.57' text-anchor='middle' style='font-size: 7.10px; font-family: "ABC Areal";' textLength='13.92px' lengthAdjust='spacingAndGlyphs'>20%</text>
+<text x='96.46' y='52.51' text-anchor='middle' style='font-size: 7.10px; font-family: "ABC Areal";' textLength='9.85px' lengthAdjust='spacingAndGlyphs'>3%</text>
+<text x='135.04' y='53.00' text-anchor='middle' style='font-size: 7.10px; font-family: "ABC Areal";' textLength='9.76px' lengthAdjust='spacingAndGlyphs'>2%</text>
 </g>
 <g clip-path='url(#cpMC4wMHwxNTQuMzN8MC4wMHw2Ni4xNA==)'>
-<text x='19.29' y='65.40' text-anchor='middle' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='17.23px' lengthAdjust='spacingAndGlyphs'>None</text>
-<text x='57.87' y='65.40' text-anchor='middle' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='18.58px' lengthAdjust='spacingAndGlyphs'>Some</text>
-<text x='96.46' y='65.40' text-anchor='middle' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='15.84px' lengthAdjust='spacingAndGlyphs'>Most</text>
-<text x='135.04' y='65.40' text-anchor='middle' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='8.18px' lengthAdjust='spacingAndGlyphs'>All</text>
+<text x='19.29' y='65.39' text-anchor='middle' style='font-size: 7.10px;fill: #666666; font-family: "ABC Areal";' textLength='17.27px' lengthAdjust='spacingAndGlyphs'>None</text>
+<text x='57.87' y='65.39' text-anchor='middle' style='font-size: 7.10px;fill: #666666; font-family: "ABC Areal";' textLength='18.61px' lengthAdjust='spacingAndGlyphs'>Some</text>
+<text x='96.46' y='65.39' text-anchor='middle' style='font-size: 7.10px;fill: #666666; font-family: "ABC Areal";' textLength='15.87px' lengthAdjust='spacingAndGlyphs'>Most</text>
+<text x='135.04' y='65.39' text-anchor='middle' style='font-size: 7.10px;fill: #666666; font-family: "ABC Areal";' textLength='8.19px' lengthAdjust='spacingAndGlyphs'>All</text>
 </g>
 </svg>

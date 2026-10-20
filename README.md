@@ -64,9 +64,10 @@
 The script reads all columns as text, because the CSV stores answers as labels (e.g. "Some of the time"). It then converts the variables we use into numbers itself.
 
 The script runs from the raw CSV through every recode, statistic, test and figure in the report:
-step 3 computes the descriptives and Figures 1–3, step 4 runs the Welch t-test and draws Figure 4,
+step 3 computes the descriptives and Figures 1–3, step 4 runs the t-test and draws Figure 4,
 step 5 draws Figure 5 (the cut-point limitation), and step 6 writes every number the report prints to
-`figures/report_numbers.csv`. All figures go to `figures/`.
+`figures/report_numbers.csv`. All figures go to `figures/` as SVG, which needs one more package:
+`install.packages("svglite")`.
 
 ## Building the report
 

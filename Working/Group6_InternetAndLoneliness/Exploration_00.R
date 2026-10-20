@@ -262,7 +262,7 @@ table(ess$net_group, useNA = "ifany")
 
 
 # ------------------- STEP 3 -------------------------- #
-# descriptive statistics for the three variables, and the report's figures
+# descriptive statistics for the three variables, and Figures 1-3 for the report
 
 # part 3.a - DV and continuous IV: valid N, mean, median, mode, variance, sd, range, IQR
 # R has no built-in mode, so stat_mode() takes the most common value
@@ -296,62 +296,44 @@ group_mode <- as.character(group_counts$net_group[which.max(group_counts$n)])
 group_mode
 # result: valid N 1212; at or below mean 717 (59%), above mean 495 (41%); mode = at or below mean
 
-# part 3.c - one style for every figure
-# the report is built on one unit, X = A4 width / 135 = 4.41pt (the x-height of its text), and one grid:
-# base grid of 6 columns (16X, gutters 3X): labels 1 | text 3 | evidence 2. figures sit in the evidence zone (2 columns)
-# and is a whole number of lines tall (one line = 2.5X). plot text uses the report's small size.
-# alignment rule: the plot panel fills the column, so its left edge IS the column edge;
-# there are no y-axes, values are labelled directly on the data.
-# clearance: nothing comes closer than X to anything else (labels sit X away from marks).
-# minimum viable visualisation: each figure shows only what its job needs; anything the
-# table, a caption or another figure already carries is left out.
-X     <- 595.28 / 135              # points: A4 width / 135, the report's unit
-# base grid: 6 columns of 16X with 3X gutters; a figure spans whole columns
-span   <- function(n) (n * 16 * X + (n - 1) * 3 * X) / 72   # width of n columns, inches
-col_c  <- span(2)                  # evidence zone: 2 columns
-col_bc <- span(5)                  # text + evidence: 5 columns, the one breakout (Figure 5)
-line  <- 2.5 * X / 72              # one line (11pt), inches
-fs    <- (5 / 6) * X / 0.519       # small text: x-height 5/6 X (font x-height = 0.519 em), 7.2pt
-lw    <- (X / 10) / .pt            # hairline, X/10
-# one colour, one meaning: red = group 1 (above the mean) and the cut point; grey = group 0;
-# everything else is ink. red stays darker than grey when printed without colour.
-ink <- "#1a1a1a"; grey <- "#a6a6a6"; red <- "#b2182b"
-grey_text <- "#666666"                     # grey for text: darker than grey marks, so it stays legible
-# plot text uses ABC Areal if it is installed (licensed, not shared), else the system sans
-fam <- "sans"
-if (requireNamespace("systemfonts", quietly = TRUE) &&
-    "ABC Areal Variable" %in% systemfonts::system_fonts()$family) fam <- "ABC Areal Variable"
+# part 3.c - one look for all figures
+# the figures are saved as SVG at the exact size of their slot in the report (Report/report.typ):
+# the report's unit is X = 4.41pt, one line of text is 2.5X, a grid column is 16X with 3X gutters.
+library(svglite)                                 # install.packages("svglite") once if needed
+X      <- 595.28 / 135                           # points
+col_c  <- 35 * X / 72                            # figure column (2 grid columns), inches
+col_bc <- 92 * X / 72                            # text + figure columns (5 grid columns), inches
+line   <- 2.5 * X / 72                           # one line of the report, inches
+fs     <- 7.1                                    # plot text size, points
+lw     <- 0.15                                   # thin line, mm
+# colours: red = group 1 (above the mean) and the cut point, grey = group 0, dark grey = everything else
+red <- "#b2182b"; grey <- "#a6a6a6"; dark <- "#5c5c5c"; text_grey <- "#666666"
+# plot text in the report's font if it is installed, otherwise the system sans
+fam <- if ("ABC Areal Variable" %in% systemfonts::system_fonts()$family) "ABC Areal Variable" else "sans"
 
-theme_report <- theme_void(base_size = fs, base_family = fam) +
-  theme(axis.text.x = element_text(colour = grey_text, size = fs, margin = margin(t = 2)),
+theme_report <- theme_void(base_family = fam) +
+  theme(axis.text.x = element_text(colour = text_grey, size = fs, margin = margin(t = 2)),
         legend.position = "none",
-        plot.margin = margin(X, 0, 0, 0),   # clearance: X between a caption and its plot
+        plot.margin = margin(X, 0, 0, 0),
         plot.background = element_rect(fill = "white", colour = NA))
-note <- function(...) annotate("text", family = fam, size = fs / .pt, ...)   # in-plot label
-white_lines <- function(at) geom_hline(yintercept = at, colour = "white", linewidth = 2 * lw)
+label <- function(...) annotate("text", family = fam, size = fs / .pt, ...)   # text inside a plot
 
-out_dir <- "figures"
-dir.create(out_dir, showWarnings = FALSE)
-# figures are saved as SVG (vector), so lines and text stay sharp at any size.
-# svglite writes the font's system name; the report knows it as "ABC Areal".
+dir.create("figures", showWarnings = FALSE)
 save_fig <- function(p, file, lines, width = col_c) {
-  path <- file.path(out_dir, file)
-  ggsave(path, p, width = width, height = lines * line, device = svglite::svglite)
+  path <- file.path("figures", file)
+  ggsave(path, p, width = width, height = lines * line, device = svglite)
+  # the report knows the font as "ABC Areal"
   writeLines(gsub("ABC Areal Variable", "ABC Areal", readLines(path), fixed = TRUE), path)
 }
-# minutes axis shared by Figures 2 and 5, so the two read against each other
-x_minutes <- scale_x_continuous(breaks = c(240, 480, 720, 960), labels = c("4h", "8h", "12h", "16h"),
-                                limits = c(0, 1080), expand = c(0, 0))
+x_hours <- scale_x_continuous(breaks = c(240, 480, 720, 960), labels = c("4h", "8h", "12h", "16h"),
+                              limits = c(0, 1080), expand = c(0, 0))
 
-# part 3.d - Figure 1: DV histogram, one bar per answer (binwidth 1), share on top
-# (the mean is in Table 1, so it is not repeated here)
+# part 3.d - Figure 1: histogram of the DV, one bar per answer, share of respondents on top
 fig1 <- ggplot(filter(ess, !is.na(lonely)), aes(lonely)) +
-  # dark grey, not ink, and a white gap of about X between bars, so the largest mass on the
-  # page stays quiet (light grey is reserved for group 0)
-  geom_histogram(binwidth = 1, boundary = 0.5, fill = "#5c5c5c") +
-  geom_vline(xintercept = c(1.5, 2.5, 3.5), colour = "white", linewidth = 10 * lw) +   # gaps, tops intact
+  geom_histogram(binwidth = 1, boundary = 0.5, fill = dark) +
+  geom_vline(xintercept = c(1.5, 2.5, 3.5), colour = "white", linewidth = 1.5) +   # gaps between bars
   geom_text(stat = "bin", binwidth = 1, boundary = 0.5, vjust = -0.7, family = fam, size = fs / .pt,
-            colour = ink, aes(label = after_stat(paste0(round(100 * count / sum(count)), "%")))) +
+            aes(label = after_stat(paste0(round(100 * count / sum(count)), "%")))) +
   scale_x_continuous(breaks = 1:4, labels = c("None", "Some", "Most", "All"),
                      limits = c(0.5, 4.5), expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 1300), expand = c(0, 0)) +
@@ -359,33 +341,33 @@ fig1 <- ggplot(filter(ess, !is.na(lonely)), aes(lonely)) +
 fig1
 save_fig(fig1, "fig1_lonely.svg", lines = 6)
 
-# part 3.e - Figure 2: IV histogram in 10-minute bins, bars coloured by group, the mean
-# (= cut point) marked; the group sizes are in Figure 3, so they are not repeated here.
-# white lines every 50 people stand in for a y-axis
+# part 3.e - Figure 2: histogram of the IV in 10-minute bins, bars coloured by group,
+# the mean (= cut point) marked; white lines every 50 people stand in for a y-axis
 fig2 <- ggplot(filter(ess, !is.na(net_min)), aes(net_min, fill = net_group)) +
   geom_histogram(binwidth = 10, boundary = 0, closed = "left") +
   scale_fill_manual(values = c(grey, red)) +
-  white_lines(c(50, 100, 150)) +
+  geom_hline(yintercept = c(50, 100, 150), colour = "white", linewidth = 2 * lw) +
   annotate("segment", x = cut_point, xend = cut_point, y = 0, yend = 215, linewidth = 1.5 * lw, colour = red) +
-  note(x = cut_point + 25, y = 200, hjust = 0, colour = red, label = "mean (cut)") +   # its value is printed once, under Grouping
-  x_minutes +
+  label(x = cut_point + 25, y = 200, hjust = 0, colour = red, label = "mean (cut)") +
+  x_hours +
   scale_y_continuous(limits = c(0, 220), expand = c(0, 0)) +
   theme_report
 fig2
 save_fig(fig2, "fig2_internet.svg", lines = 6)
 
-# part 3.f - Figure 3: bar chart of the grouping variable, count and share
+# part 3.f - Figure 3: bar chart of the grouping variable, count and share of each group
 fig3 <- ggplot(group_counts, aes(n, net_group, fill = net_group)) +
   geom_col(width = 0.7) +
   geom_text(aes(label = sprintf("%s  %d (%.0f%%)", c("0 at or below", "1 above"), n, 100 * share),
-                colour = net_group), hjust = 0, nudge_x = 60, family = fam, size = fs / .pt) +   # 60 people = about X
+                colour = net_group), hjust = 0, nudge_x = 60, family = fam, size = fs / .pt) +
   scale_fill_manual(values = c(grey, red)) +
-  scale_colour_manual(values = c(grey_text, red)) +
+  scale_colour_manual(values = c(text_grey, red)) +
   scale_x_continuous(limits = c(0, 2200), expand = c(0, 0)) +
-  scale_y_discrete(expand = expansion(add = 0.7)) +   # clearance above and below the bars
+  scale_y_discrete(expand = expansion(add = 0.7)) +
   theme_report + theme(axis.text.x = element_blank())
 fig3
 save_fig(fig3, "fig3_groups.svg", lines = 3)
+
 
 
 # ------------------- STEP 4 -------------------------- #
@@ -393,10 +375,9 @@ save_fig(fig3, "fig3_groups.svg", lines = 3)
 # binary variable compared with respondents on the other side of the binary variable?
 # is the mean of feeling lonely different between high and low internet usage?
 
-# chosen t-test: Welch two-sample t-test (R's default in t.test)
+# chosen t-test: Independent two-sample t-test
 # reason: we want to compare the means of fltlnl for the two independent groups high and low
-# internet usage; the groups differ in size (717 vs 495) and spread (sd 0.60 vs 0.65), and
-# Welch does not assume equal variances
+# internet usage
 
 ess %>%
   group_by(net_group) %>%
@@ -428,8 +409,11 @@ t.test(ess$lonely ~ ess$net_group)
 # mean in group At or below mean       mean in group Above mean
 #                      1.302098                       1.325253
 
+
+
+
 # part 4.b - Figure 4: mean loneliness in each group with its 95% confidence interval
-tt <- t.test(ess$lonely ~ ess$net_group)        # Welch: R's default, no equal-variance assumption
+tt <- t.test(ess$lonely ~ ess$net_group)        # the same test, kept as an object for the figure and step 6
 group_means <- ess %>%
   filter(!is.na(net_group), !is.na(lonely)) %>%
   group_by(net_group) %>%
@@ -450,19 +434,15 @@ save_fig(fig4, "fig4_means.svg", lines = 5)
 
 
 # ------------------- STEP 5 -------------------------- #
-# the limitation of the cut point: the t-test only compares the two group means.
-# Figure 5 shows every respondent: minutes online (x) against loneliness (y), coloured by
-# group, and the cut point. the group means are not drawn: they differ by 0.02 on a 1-4 scale,
-# too little to see here, and Figure 4 shows them on a zoomed axis. loneliness has only 4 values, so the
-# points are spread a little up and down (jitter) to stop them hiding each other; the
-# spread is random but set.seed() makes it the same every run.
+# the limitation of the cut point: the t-test only compares two group means.
+# Figure 5 shows every respondent, minutes online (x) against loneliness (y), coloured by
+# group, with the cut point. loneliness has only 4 values, so the points are spread a little
+# up and down (jitter) so they do not hide each other; set.seed() keeps the figure the same every run.
 set.seed(6)
-points <- filter(ess, !is.na(net_min), !is.na(lonely))
-
-fig5 <- ggplot(points, aes(net_min, lonely, colour = net_group)) +
+fig5 <- ggplot(filter(ess, !is.na(net_min), !is.na(lonely)), aes(net_min, lonely, colour = net_group)) +
   geom_jitter(width = 0, height = 0.22, size = 0.7, alpha = 0.55, stroke = 0) +
   annotate("segment", x = cut_point, xend = cut_point, y = 0.6, yend = 4.4, linewidth = 1.5 * lw, colour = red) +
-  note(x = 1105, y = 1:4, hjust = 1, colour = grey_text, label = 1:4) +       # the loneliness scale, in its own strip
+  label(x = 1105, y = 1:4, hjust = 1, colour = text_grey, label = 1:4) +   # the loneliness scale
   scale_colour_manual(values = c(grey, red)) +
   scale_x_continuous(breaks = seq(120, 960, 120), labels = paste0(seq(2, 16, 2), "h"),
                      limits = c(0, 1110), expand = c(0, 0)) +
@@ -470,37 +450,42 @@ fig5 <- ggplot(points, aes(net_min, lonely, colour = net_group)) +
   theme_report
 fig5
 save_fig(fig5, "fig5_scatter.svg", lines = 5, width = col_bc)   # the one full-width figure
-# result: loneliness is spread the same way on both sides of the cut point; the two
-# group means are almost the same height. the split hides how minutes vary inside each
-# group, which Report 2 uses in full.
+# result: loneliness is spread the same way on both sides of the cut point. the split hides
+# how minutes vary inside each group, which Report 2 uses in full.
 
 
 # ------------------- STEP 6 -------------------------- #
 # every number printed in the report, written to one file that the report reads,
 # so no number is typed by hand
-f <- function(x, d = 0) formatC(x, format = "f", digits = d, big.mark = ",")
-report_numbers <- data.frame(rbind(
-  c("n_total",    f(nrow(ess))),                   c("cut",        f(cut_point, 1)),
-  c("lonely_n",   f(desc["valid_n", "lonely"])),   c("net_n",      f(desc["valid_n", "net_min"])),
-  c("lonely_mean", f(desc["mean", "lonely"], 2)),  c("net_mean",   f(desc["mean", "net_min"], 1)),
-  c("lonely_median", f(desc["median", "lonely"])), c("net_median", f(desc["median", "net_min"])),
-  c("lonely_mode", f(desc["mode", "lonely"])),     c("net_mode",   f(desc["mode", "net_min"])),
-  c("lonely_var",  f(desc["variance", "lonely"], 2)), c("net_var", f(desc["variance", "net_min"])),
-  c("lonely_sd",   f(desc["sd", "lonely"], 2)),    c("net_sd",     f(desc["sd", "net_min"], 1)),
-  c("lonely_range", paste0(f(desc["min", "lonely"]), "–", f(desc["max", "lonely"]))),
-  c("net_range",   paste0(f(desc["min", "net_min"]), "–", f(desc["max", "net_min"]))),
-  c("lonely_iqr",  f(desc["iqr", "lonely"])),      c("net_iqr",    f(desc["iqr", "net_min"])),
-  c("group_n",     f(sum(group_counts$n))),
-  c("n0", f(group_means$n[1])),  c("m0", f(group_means$m[1], 2)),  c("sd0", f(group_means$s[1], 2)),
-  c("n1", f(group_means$n[2])),  c("m1", f(group_means$m[2], 2)),  c("sd1", f(group_means$s[2], 2)),
-  c("g0", f(group_counts$n[1])), c("g1", f(group_counts$n[2])),
-  c("on_cut", f(sum(ess$net_min == cut_point, na.rm = TRUE))),
-  c("net_missing", f(sum(is.na(ess$net_min)))),        c("group_mode", ifelse(group_mode == "Above mean", "1", "0")),
-  c("diff",        sprintf("%+.2f", diff(tt$estimate))),        # group 1 minus group 0
-  c("diff_lo",     sprintf("%.2f", -tt$conf.int[2])), c("diff_hi", sprintf("%.2f", -tt$conf.int[1])),
-  c("t",           sprintf("%.2f", -tt$statistic)), c("df",       sprintf("%.0f", tt$parameter)),
-  c("p",           sprintf("%.2f", tt$p.value))
-))
-names(report_numbers) <- c("name", "value")
-write.csv(report_numbers, file.path(out_dir, "report_numbers.csv"), row.names = FALSE)
-report_numbers
+f <- function(x, digits = 0) formatC(x, format = "f", digits = digits, big.mark = ",")
+numbers <- c(
+  n_total     = f(nrow(ess)),
+  cut         = f(cut_point, 1),
+  on_cut      = f(sum(ess$net_min == cut_point, na.rm = TRUE)),   # respondents exactly on the mean
+  net_missing = f(sum(is.na(ess$net_min))),
+  # Table 1
+  lonely_n = f(desc["valid_n", "lonely"]),     net_n      = f(desc["valid_n", "net_min"]),
+  lonely_mean = f(desc["mean", "lonely"], 2),  net_mean   = f(desc["mean", "net_min"], 1),
+  lonely_median = f(desc["median", "lonely"]), net_median = f(desc["median", "net_min"]),
+  lonely_mode = f(desc["mode", "lonely"]),     net_mode   = f(desc["mode", "net_min"]),
+  lonely_var = f(desc["variance", "lonely"], 2), net_var  = f(desc["variance", "net_min"]),
+  lonely_sd  = f(desc["sd", "lonely"], 2),     net_sd     = f(desc["sd", "net_min"], 1),
+  lonely_range = paste0(f(desc["min", "lonely"]), "–", f(desc["max", "lonely"])),
+  net_range  = paste0(f(desc["min", "net_min"]), "–", f(desc["max", "net_min"])),
+  lonely_iqr = f(desc["iqr", "lonely"]),       net_iqr    = f(desc["iqr", "net_min"]),
+  # groups
+  group_n    = f(sum(group_counts$n)),
+  group_mode = ifelse(group_mode == "Above mean", "1", "0"),
+  n0 = f(group_means$n[1]), sd0 = f(group_means$s[1], 2),
+  n1 = f(group_means$n[2]), sd1 = f(group_means$s[2], 2),
+  # t-test, reported as group 1 minus group 0 (t.test gives group 0 minus group 1, so signs flip)
+  diff    = sprintf("%+.2f", diff(tt$estimate)),
+  diff_lo = sprintf("%.2f", -tt$conf.int[2]),
+  diff_hi = sprintf("%.2f", -tt$conf.int[1]),
+  t       = sprintf("%.2f", -tt$statistic),
+  df      = sprintf("%.0f", tt$parameter),
+  p       = sprintf("%.2f", tt$p.value)
+)
+write.csv(data.frame(name = names(numbers), value = numbers),
+          "figures/report_numbers.csv", row.names = FALSE)
+numbers
