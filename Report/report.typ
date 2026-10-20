@@ -2,13 +2,17 @@
 // Each lorem(n) is that block's word budget. Show the grid: typst compile report.typ --input grid=true
 //
 // ONE UNIT. Everything is a multiple of X, the x-height of the body text.
-//   X        = 4.5pt                       Arial x-height = 0.5186 em → body 8.68pt
+//   X        = 4.5pt                       ABC Areal x-height = 0.519 em → body 8.67pt
 //   line     = 3X  = 13.5pt                baseline grid
 //   gutter   = 3X  = one line
 //   column   = 16X = 72pt                  6 columns
 //   margins  = 12X left, 10X top
 //   module   = 3 lines + 1 empty line; 14 module rows = 55 lines
-//   type     title x-height 2X (17.35pt) · body X (8.68pt) · small ¾X (6.51pt)
+//   type     title x-height 2X (17.34pt) · body X (8.67pt) · small ¾X (6.50pt)
+//   faces    ABC Areal for the text you read; ABC Areal Mono for the data: variable names,
+//            captions, Table 1, side notes and the text inside every plot (same x-height,
+//            so both sit on one grid). The fonts are licensed and stay out of the repo:
+//            install them locally, or compile with --font-path pointing at them.
 //   rules    X/10 = 0.45pt
 //   figures  whole columns wide, whole lines tall (make_figures_draft.R uses the same numbers)
 //
@@ -22,7 +26,7 @@
 
 // ---------- the unit and everything derived from it ----------
 #let X     = 4.5pt
-#let xh    = 0.5186                          // Arial x-height / em
+#let xh    = 0.519                           // ABC Areal / ABC Areal Mono x-height / em
 #let u     = 3 * X                           // line
 #let gut   = 3 * X
 #let colw  = 16 * X
@@ -54,13 +58,15 @@
     for m in range(1, nmod + 1) { place(dy: ly(mtop(m)), rect(width: tw, height: 3 * u, stroke: 0.4pt + rgb(255, 0, 0, 45%))) }
   }) })
 
-#set text(font: ("Arial", "Liberation Sans"), size: body-size,
+#let sans = ("ABC Areal", "Arial", "Liberation Sans")
+#let mono = ("ABC Areal Mono", "Courier New", "DejaVu Sans Mono")
+#set text(font: sans, size: body-size,
           top-edge: u - base-drop, bottom-edge: -base-drop, lang: "en", hyphenate: true)
 #set par(justify: false, leading: 0pt, spacing: 0pt)
-#show raw: set text(font: ("Arial", "Liberation Sans"), size: 1.25em)   // variable names in Arial at body size
+#show raw: set text(font: mono, size: 1.25em)   // variable names in mono at the size around them (raw defaults to 0.8em)
 
 #let at(c, l, n, body) = place(dx: cx(c), dy: ly(l), block(width: span(n), { set block(spacing: 0pt); body }))
-#let small(body) = text(size: small-size, body)
+#let small(body) = text(font: mono, size: small-size, body)   // the data voice
 #let label(id) = text(weight: "bold", id)
 #let meta(body) = text(fill: luma(42%), body)
 #let side(m, body) = at(5, mtop(m), 2, small(meta(body)))
@@ -87,24 +93,24 @@
 
 // ---------- modules 3–6: 1 Variables ----------
 #sec(3, heading: [1 Variables], sub: [Dependent])[#lorem(56)]
-#fig(3, 6, [#label[Figure 1]  Felt lonely, past week (`fltlnl`), N = 1,382], "f1_dv_hist.png")
+#fig(3, 6, [#label[Fig. 1]  Felt lonely, `fltlnl`, N 1,382], "f1_dv_hist.png")
 
 #sec(5, sub: [Independent])[#lorem(56)]
-#side(5)[Asked only of people online most days or every day: 168 others were not asked and 4 said “don't know”. They stay missing rather than 0 minutes.]
+#side(5)[Asked only if online most days: 168 not asked, 4 don't know. Kept missing, not 0 min.]
 
 // ---------- modules 7–8: Figure 2 breakout ----------
-#fig(7, 6, [#label[Figure 2]  Internet use per day (`netustm`), 10-min bins, N = 1,212. #meta[Lower panel: mean loneliness per band, 95% CI; dashed = all.]], "f2_iv_hist.png", c: 2, cols: 5)
+#fig(7, 6, [#label[Fig. 2]  Minutes online per day, `netustm`, N 1,212. #meta[Below: loneliness per band, 95% CI]], "f2_iv_hist.png", c: 2, cols: 5)
 
 // ---------- module 9: 2 Grouping ----------
 #sec(9, heading: [2 Grouping])[#lorem(24)]
-#fig(9, 2, [#label[Figure 3]  Groups (`net_group`), N = 1,212, mode 0], "f3_group_bar.png")
+#fig(9, 2, [#label[Fig. 3]  `net_group`, N 1,212, mode 0], "f3_group_bar.png")
 
 // ---------- modules 10–11: 3 Descriptives, 4 Test; Table 1 in the margin ----------
 #sec(10, heading: [3 Descriptives])[#lorem(24)]
 #sec(11, heading: [4 Test])[#lorem(24)]
 #let r = table.hline(stroke: hair)
 #at(5, mtop(10), 2, small(table(columns: (span(2) / 3,) * 3, stroke: none, inset: 0pt, align: (left, right, right),
-  [#label[Table 1]], [Loneliness], [Internet, min],
+  [#label[Table 1]], [Lonely], [Min/day],
   r,
   [Valid N],  [1,382], [1,212],
   [Mean],     [1.31],  [235.6],
@@ -118,6 +124,6 @@
 )))
 
 // ---------- modules 12–14: 5 Interpretation; Figure 4 and the test result in the margin ----------
-#sec(12, heading: [5 Interpretation])[#lorem(80)]
-#fig(13, 2, [#label[Figure 4]  Mean loneliness by group, 95% CI], "f4_group_means.png")
-#side(14)[#label[Welch t-test]  group 1 − group 0: +0.02, 95% CI −0.05 to 0.09; t~=~0.63, df~=~1004, p~=~0.53]
+#sec(12, heading: [5 Interpretation])[#lorem(76)]
+#fig(13, 2, [#label[Fig. 4]  Mean loneliness, 95% CI], "f4_group_means.png")
+#side(14)[#label[Welch t-test] \ 1 − 0: +0.02, 95% CI −0.05 to 0.09 \ t 0.63, df 1004, p 0.53]

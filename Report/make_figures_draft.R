@@ -4,7 +4,10 @@
 suppressMessages({library(readr); library(dplyr); library(ggplot2); library(patchwork)})  # patchwork stacks Figure 2's two panels
 args <- commandArgs(TRUE)
 out  <- if (length(args) > 0) args[1] else "Report/figures"
-fam  <- if (length(args) > 1) args[2] else "Arial"
+# plot text is the data voice: ABC Areal Mono (installed locally, not in the repo: its
+# licence forbids redistribution). Falls back to a system mono if it isn't installed.
+has_font <- function(f) requireNamespace("systemfonts", quietly = TRUE) && f %in% systemfonts::system_fonts()$family
+fam  <- if (length(args) > 1) args[2] else if (has_font("ABC Areal Mono Variable")) "ABC Areal Mono Variable" else "mono"
 
 ess <- read_csv("Working/Group6_InternetAndLoneliness/ESS11_CHData.csv",
                 col_types = cols(.default = col_character())) %>%
@@ -19,7 +22,7 @@ ess <- ess %>% mutate(net_group = factor(ifelse(net_min > cut_point, 1, 0), leve
 # line = 3X, column = 16X, gutter = 3X; plot text has x-height 3/4 X; lines are X/10
 pt   <- 1 / 72
 X    <- 4.5
-xh   <- 0.5186                                  # Arial x-height / em
+xh   <- 0.519                                   # ABC Areal (and Mono) x-height / em
 line <- 3 * X
 span <- function(n) n * 16 * X + (n - 1) * 3 * X
 w      <- span(2) * pt                          # margin figures: columns 5-6
