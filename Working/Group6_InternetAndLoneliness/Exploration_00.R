@@ -364,7 +364,7 @@ fig2 <- ggplot(filter(ess, !is.na(net_min)), aes(net_min, fill = net_group)) +
   scale_fill_manual(values = c(grey, red)) +
   white_lines(c(50, 100, 150)) +
   annotate("segment", x = cut_point, xend = cut_point, y = 0, yend = 215, linewidth = 1.5 * lw, colour = red) +
-  note(x = cut_point + 25, y = 200, hjust = 0, colour = red, label = sprintf("mean %.1f min", cut_point)) +
+  note(x = cut_point + 25, y = 200, hjust = 0, colour = red, label = "mean (cut)") +   # its value is printed once, under Grouping
   x_minutes +
   scale_y_continuous(limits = c(0, 220), expand = c(0, 0)) +
   theme_report
@@ -379,6 +379,7 @@ fig3 <- ggplot(group_counts, aes(n, net_group, fill = net_group)) +
   scale_fill_manual(values = c(grey, red)) +
   scale_colour_manual(values = c(grey_text, red)) +
   scale_x_continuous(limits = c(0, 2200), expand = c(0, 0)) +
+  scale_y_discrete(expand = expansion(add = 0.7)) +   # clearance above and below the bars
   theme_report + theme(axis.text.x = element_blank())
 fig3
 save_fig(fig3, "fig3_groups.svg", lines = 3)

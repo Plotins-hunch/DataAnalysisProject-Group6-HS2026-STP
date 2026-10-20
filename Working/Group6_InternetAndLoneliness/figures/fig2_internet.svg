@@ -249,7 +249,7 @@
 <line x1='0.00' y1='27.40' x2='154.33' y2='27.40' style='stroke-width: 0.66; stroke: #FFFFFF; stroke-linecap: butt;' />
 <line x1='0.00' y1='17.81' x2='154.33' y2='17.81' style='stroke-width: 0.66; stroke: #FFFFFF; stroke-linecap: butt;' />
 <line x1='33.66' y1='46.57' x2='33.66' y2='5.35' style='stroke-width: 0.50; stroke: #B2182B; stroke-linecap: butt;' />
-<text x='37.23' y='10.76' style='font-size: 7.08px;fill: #B2182B; font-family: "ABC Areal";' textLength='50.47px' lengthAdjust='spacingAndGlyphs'>mean 235.6 min</text>
+<text x='37.23' y='10.76' style='font-size: 7.08px;fill: #B2182B; font-family: "ABC Areal";' textLength='33.75px' lengthAdjust='spacingAndGlyphs'>mean (cut)</text>
 </g>
 <g clip-path='url(#cpMC4wMHwxNTQuMzN8MC4wMHw1NS4xMg==)'>
 <text x='34.30' y='54.37' text-anchor='middle' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='8.06px' lengthAdjust='spacingAndGlyphs'>4h</text>

@@ -29,8 +29,10 @@
 // MINIMUM VIABLE VISUALISATION   each figure shows only what its job needs; anything the
 //   table, a caption or another figure already carries is left out of the plot.
 // HIERARCHY of information, expressed only by position, ink and size:
-//   1  the answer and its evidence (Figure 4)      top of the page, ink
-//   2  the question                                 top of the page, ink
+//   1  the question, as the title                   top of the page, display size
+//   2  the answer                                   under it, ink
+// ZERO REDUNDANCY   every fact is printed once, where it is used: the cut point in Grouping,
+//   the missing count with the IV, the test result under Figure 4, nothing as a pointer.
 //   3  section headings 1–5 (the rubric's parts)    column A, ink
 //   3b key facts under each heading                  column A, grey (name, scale, N, cut, p)
 //   4  body text: the reasoning                     column B, ink
@@ -142,16 +144,14 @@
 
   // ---- header: the title is the one large thing on the page (rule 1) ----
   tag[Report 1 \ Group 6],
-  grid.cell(colspan: 2, { set par(leading: 3 * u - title-size); text(size: title-size, top-edge: hang + cap * title-size, bottom-edge: -(3 * u - hang - cap * title-size))[Internet use and loneliness \ in Switzerland] }),
+  grid.cell(colspan: 2, { set par(leading: 3 * u - title-size); text(size: title-size, top-edge: hang + cap * title-size, bottom-edge: -(3 * u - hang - cap * title-size))[Is internet use associated \ with loneliness?] }),
 
-  // ---- fact sheet: question, context, answer; the result's evidence beside it ----
+  // ---- fact sheet: the title is the question; here only what nothing else says ----
   grid.cell(colspan: 2, grid(columns: (col-a, col-b), column-gutter: gut,
-    tag[Question], [Is people's internet use associated with their feeling of loneliness?],
     tag[Data],     meta[European Social Survey Round 11, Switzerland, N #n.n_total],
-    tag[Method],   meta[Split at mean internet use (#n.cut min); Welch t-test],
     tag[Answer],   [#lorem(8) #g1[above the mean] #lorem(8)],
   )),
-  fig([Figure 4 Mean loneliness by group, 95% CI \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 4),
+  [],
 
   // ---- 1 Variables ----
   ..row([1 Variables \ #keys([Dependent], `fltlnl`, [scale 1–4], [N #n.lonely_n])],
@@ -167,11 +167,11 @@
         evidence({
           [Figure 3 Groups, N #n.group_n, mode #n.group_mode]
           image(out + "fig3_groups.svg", width: col-c, height: 3 * u)
-          meta[#n.on_cut on the mean (would go to 0) \ #n.net_missing without an answer: in neither group]
+          meta[#n.on_cut on the mean; missing in neither group]
         })),
 
   // ---- 3 Descriptives: Table 1 beside its reading ----
-  ..row([3 Descriptives \ #keys([Table 1], [Figures 1–3])],
+  ..row([3 Descriptives],
         [#lorem(64)],
         small-table(
           [Table 1], [Loneliness], [Minutes], rule,
@@ -185,16 +185,12 @@
         )),
 
   // ---- 4 Test ----
-  ..row([4 Test \ #keys([Welch], [p #n.p])],
-        [#lorem(26)],
-        small-table(
-          [Loneliness], [N], [Mean · SD], rule,
-          [0 at or below],   n.n0, [#n.m0 · #n.sd0],
-          g1[1 above], n.n1, [#n.m1 · #n.sd1], rule,
-        )),
+  ..row([4 Test],
+        [#lorem(34)],
+        fig([Figure 4 Mean loneliness, 95% CI \ 0: N #n.n0, SD #n.sd0 · #g1[1: N #n.n1, SD #n.sd1] \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 4)),
 
   // ---- 5 Interpretation ----
-  ..row([5 Interpretation \ #keys([Figure 5])],
-        [#lorem(86)],
+  ..row([5 Interpretation],
+        [#lorem(72)],
         fig([Figure 5 Respondents and group means], "fig5_scatter.svg", 6)),
 )
