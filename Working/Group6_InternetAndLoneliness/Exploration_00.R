@@ -304,6 +304,7 @@ group_mode
 # there are no y-axes, values are labelled directly on the data.
 X     <- 4.5                       # points
 col_c <- 35 * X / 72               # evidence column width, inches
+col_bc <- 92 * X / 72              # text + evidence columns (54X + 3X + 35X): the one breakout, Figure 2
 line  <- 3 * X / 72                # one line, inches
 fs    <- 0.75 * X / 0.519          # small text: x-height 3/4 X (font x-height = 0.519 em)
 lw    <- (X / 10) / .pt            # hairline, X/10
@@ -325,8 +326,8 @@ white_lines <- function(at) geom_hline(yintercept = at, colour = "white", linewi
 
 out_dir <- "figures"
 dir.create(out_dir, showWarnings = FALSE)
-save_fig <- function(p, file, lines) {
-  ggsave(file.path(out_dir, file), p, width = col_c, height = lines * line, dpi = 600)
+save_fig <- function(p, file, lines, width = col_c) {
+  ggsave(file.path(out_dir, file), p, width = width, height = lines * line, dpi = 600)
 }
 # minutes axis shared by Figures 2 and 5, so the two read against each other
 x_minutes <- scale_x_continuous(breaks = c(240, 480, 720, 960), labels = c("4h", "8h", "12h", "16h"),
@@ -350,20 +351,22 @@ fig1
 save_fig(fig1, "fig1_lonely.png", lines = 4)
 
 # part 3.e - Figure 2: IV histogram in 10-minute bins, bars coloured by group, the mean
-# (= cut point) marked, groups labelled directly instead of a legend
+# (= cut point) marked, groups labelled directly instead of a legend.
+# the only full-width figure: its long tail and the heaping at whole hours need the width
 fig2 <- ggplot(filter(ess, !is.na(net_min)), aes(net_min, fill = net_group)) +
   geom_histogram(binwidth = 10, boundary = 0, closed = "left") +
   scale_fill_manual(values = c(grey, red)) +
   white_lines(c(50, 100, 150)) +
   annotate("segment", x = cut_point, xend = cut_point, y = 0, yend = 265, linewidth = 1.5 * lw, colour = red) +
   note(x = cut_point + 20, y = 245, hjust = 0, colour = red, label = sprintf("mean = cut point %.1f min", cut_point)) +
-  note(x = 1080, y = 175, hjust = 1, colour = red, label = sprintf("1 above the mean %d", group_counts$n[2])) +
-  note(x = 1080, y = 120, hjust = 1, colour = grey, label = sprintf("0 at or below %d", group_counts$n[1])) +
-  x_minutes +
+  note(x = 1080, y = 245, hjust = 1, colour = red, label = sprintf("1 above the mean %d", group_counts$n[2])) +
+  note(x = 800, y = 245, hjust = 1, colour = grey, label = sprintf("0 at or below %d", group_counts$n[1])) +
+  scale_x_continuous(breaks = seq(120, 960, 120), labels = paste0(seq(2, 16, 2), "h"),
+                     limits = c(0, 1080), expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 270), expand = c(0, 0)) +
   theme_report
 fig2
-save_fig(fig2, "fig2_internet.png", lines = 4)
+save_fig(fig2, "fig2_internet.png", lines = 3, width = col_bc)
 
 # part 3.f - Figure 3: bar chart of the grouping variable, count and share
 fig3 <- ggplot(group_counts, aes(n, net_group, fill = net_group)) +

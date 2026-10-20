@@ -10,10 +10,19 @@
 // FOUR RULES
 //   1  Size follows column. A and B are set at the text size (x-height X, 8.67pt); C, and the
 //      text inside every plot, at the small size (x-height ¾X, 6.50pt). Two sizes, nothing else.
-//   2  Every left edge sits on A, B or C. Plot panels fill column C: no y-axes, values are
+//   2  Every left edge sits on A, B or C. Plot panels fill their column: no y-axes, values are
 //      labelled on the data, so the data starts on the column edge.
+//   2b Breakout: a figure whose data needs width spans B+C in a row of its own, label in A.
+//      Only Figure 2 (long tail, heaping at whole hours, the cut point) qualifies.
 //   3  A row's elements start on the same baseline: label, text and caption share line one.
 //   4  Rows are separated by one empty line; a row is as tall as its tallest element, in whole lines.
+// HIERARCHY of information, expressed only by position, ink and size:
+//   1  the answer and its evidence (Figure 4)      top of the page, ink
+//   2  the question                                 top of the page, ink
+//   3  section headings 1–5 (the rubric's parts)    column A, ink
+//   4  body text: the reasoning                     column B, ink
+//   5  evidence: figures, Table 1, notes            column C, small size
+//   6  context: data, method, names, course         grey
 // ONE FAMILY, ONE WEIGHT   ABC Areal regular throughout. ABC Areal Mono only for variable names.
 // THREE INKS   ink for content; grey for supporting information; red for one meaning only:
 //              group 1 (above the mean) and the cut point, in figures and text alike.
@@ -68,9 +77,9 @@
 #let g1(body) = text(fill: red, body)
 // column C: everything at the small size, tabular figures
 #let evidence(body) = text(size: small-size, number-width: "tabular", body)
-#let fig(caption, file, lines) = evidence({
+#let fig(caption, file, lines, width: col-c) = evidence({
   caption
-  image(out + file, width: col-c, height: lines * u)
+  image(out + file, width: width, height: lines * u)
 })
 
 // one row of the page: A | B | C, all starting on the same line
@@ -81,14 +90,14 @@
   column-gutter: gut,
   row-gutter: u,
   // header: title and course | names
-  ..row(meta[Report 1 \ Group 6 \ HS2026],
+  ..row(meta[Report 1 \ Group 6, HS2026],
         [Internet use and loneliness in Switzerland \ #meta[Data Analysis for Public Policy, ETH Zürich]],
-        evidence(meta[Gabriele Pizzi \ Marlo (Clara) Roth \ Ole Handschug \ Joshua Silalahi])),
+        evidence(meta[Gabriele Pizzi, Marlo (Clara) Roth \ Ole Handschug, Joshua Silalahi])),
   // fact sheet: each label on the line it labels (rule 3); the result's evidence beside it
   grid.cell(colspan: 2, grid(columns: (col-a, col-b), column-gutter: gut,
     meta[Question], [Is people's internet use associated with their feeling of loneliness?],
-    meta[Data],     [European Social Survey Round 11, Switzerland, N #n.n_total],
-    meta[Method],   [Internet use split at its mean (#n.cut min); Welch t-test of loneliness between the groups],
+    meta[Data],     meta[European Social Survey Round 11, Switzerland, N #n.n_total],
+    meta[Method],   meta[Split at mean internet use (#n.cut min); Welch t-test],
     meta[Answer],   [#lorem(6) #g1[above the mean] #lorem(6)],
   )),
   fig([Figure 4 Mean loneliness, 95% CI; dashed: all], "fig4_means.png", 2),
@@ -98,7 +107,10 @@
         fig([Figure 1 Felt lonely, `fltlnl`, N #n.lonely_n], "fig1_lonely.png", 4)),
   ..row(meta[Independent],
         [#lorem(50)],
-        fig([Figure 2 Minutes online per day, `netustm`, N #n.net_n], "fig2_internet.png", 4)),
+        evidence(meta[Asked only of people online most days: 168 not asked, 4 don't know. Kept missing, not 0 minutes.])),
+  // the breakout (rule 2b): Figure 2 across B and C, its label in A
+  meta[Figure 2],
+  grid.cell(colspan: 2, fig([Minutes online per day, `netustm`, N #(n.net_n); #g1[red: above the mean]. White lines every 50 people.], "fig2_internet.png", 3, width: col-b + gut + col-c)),
   // 2 Grouping
   ..row([2 Grouping],
         [#lorem(10) #g1[above the mean (1)] #lorem(12)],
@@ -109,7 +121,6 @@
         evidence(table(columns: (1fr, 1fr, 1fr), stroke: none, inset: 0pt, align: (left, right, right),
           [Table 1], [Loneliness], [Minutes],
           table.hline(stroke: hair),
-          [Valid N],  n.lonely_n,      n.net_n,
           [Mean],     n.lonely_mean,   n.net_mean,
           [Median],   n.lonely_median, n.net_median,
           [Mode],     n.lonely_mode,   n.net_mode,
@@ -124,6 +135,6 @@
         evidence[Welch t-test, #g1[1] − 0 \ difference #n.diff, 95% CI #n.diff_lo to #n.diff_hi \ t #n.t, df #n.df, p #n.p]),
   // 5 Interpretation
   ..row([5 Interpretation],
-        [#lorem(68)],
-        fig([Figure 5 Mean loneliness per band of internet time, 95% CI; dashed: all], "fig5_bands.png", 3)),
+        [#lorem(52)],
+        fig([Figure 5 Loneliness per band, 95% CI; dashed: all], "fig5_bands.png", 3)),
 )
