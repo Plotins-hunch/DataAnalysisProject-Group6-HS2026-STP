@@ -21,8 +21,8 @@
 //   7  Text and evidence never repeat each other. Captions say only what is drawn (variable,
 //      unit, encoding), never a finding; the text never restates a number shown in C, it
 //      says why and what it means.
-//   3  A row's elements hang from one line: the cap height of every first line, whatever its
-//      size (title, text, small), sits on the same hang line.
+//   3  Every line of every size sits on the baseline grid (title lines take three grid lines);
+//      a row's elements share their first baseline.
 //   4  Rows are rectangles: text and evidence start on the same line and end on the same line.
 //      Each text budget is measured to fill exactly the lines its evidence takes.
 //   5  Clearance: nothing comes closer than X to anything else: caption to plot, label to mark.
@@ -78,11 +78,6 @@
 #let title-size = 2 * u / cap                      // cap height = 2 lines (5X), 30.8pt; leading 3 lines
 #let hair   = X / 10
 #let base-drop = 0.6 * X                          // text baseline sits 0.6X above each line's bottom
-// HANG LINE (rule 3): every size hangs its capitals from the same line, `hang` below the top of
-// a grid line. Text sits exactly on the baseline grid; small text and the title take the
-// baseline offset that puts their cap height on the same hang line.
-#let hang   = u - base-drop - cap * text-size
-#let hung(size, lines: 1) = (top-edge: hang + cap * size, bottom-edge: -(lines * u - hang - cap * size))
 #let show-grid = sys.inputs.at("grid", default: "false") == "true"
 
 #let ink  = rgb("#1a1a1a")
@@ -132,10 +127,12 @@
 #let tag(body) = text(font: ("ABC Areal Mono", "Courier New"), fill: grey, body)
 #let g1(body) = text(fill: red, body)
 // column C: everything at the small size, tabular figures
-#let evidence(body) = text(size: small-size, number-width: "tabular", ..hung(small-size), body)
+#let evidence(body) = text(size: small-size, number-width: "tabular", body)   // same line box: baselines on the grid
+// caption and image as separate blocks: the caption's line box is one grid line, the image a
+// whole number of lines, so nothing shifts off the baseline grid
 #let fig(caption, file, lines, width: col-c) = evidence({
-  caption
-  image(out + file, width: width, height: lines * u)
+  block(width: width, caption)
+  block(image(out + file, width: width, height: lines * u))
 })
 
 // one row of the page: A | B | C, all starting on the same line
@@ -154,7 +151,7 @@
 
   // ---- header: the title is the one large thing on the page (rule 1) ----
   tag[Report 1 \ Group 6],
-  grid.cell(colspan: 2, { set par(leading: 3 * u - title-size); text(size: title-size, top-edge: hang + cap * title-size, bottom-edge: -(3 * u - hang - cap * title-size))[Is internet use linked \ to self-reported loneliness?] }),
+  grid.cell(colspan: 2, { text(size: title-size, top-edge: 3 * u - base-drop, bottom-edge: -base-drop)[Is internet use linked \ to self-reported loneliness?] }),
 
   // ---- findings: the first row, built like every other row (label | text | evidence) ----
   // two sentences: the result in plain language, then its meaning and main caveat
@@ -174,8 +171,8 @@
   ..row([2 Grouping \ #keys(`net_group`)],
         [#lorem(12) #g1[above the mean (1)] #lorem(16)],
         evidence({
-          [Figure 3 Groups, N #n.group_n, mode #n.group_mode]
-          image(out + "fig3_groups.svg", width: col-c, height: 3 * u)
+          block[Figure 3 Groups, N #n.group_n, mode #n.group_mode]
+          block(image(out + "fig3_groups.svg", width: col-c, height: 3 * u))
         })),
 
   // ---- 3 Descriptives: Table 1 beside its reading ----
