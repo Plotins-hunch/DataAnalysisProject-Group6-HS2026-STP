@@ -311,6 +311,7 @@ text_size    <- 2.5               # text inside the plots, about 7 pt
 
 # colours: red = group 1 (above the mean) and the cut point, grey = group 0, dark = everything else
 red <- "#b2182b"; grey <- "#a6a6a6"; dark <- "#5c5c5c"; text_grey <- "#666666"
+group_colours <- c(grey, red)     # in the order of the factor levels: 0 at or below, 1 above
 
 # font: the report's font if it is installed, otherwise the system sans-serif
 font <- if ("ABC Areal Variable" %in% systemfonts::system_fonts()$family) "ABC Areal Variable" else "sans"
@@ -357,7 +358,7 @@ fig2 <- ggplot(minutes_data, aes(net_min, fill = net_group)) +
   geom_vline(xintercept = cut_point, colour = red, linewidth = 0.2) +
   annotate("text", x = cut_point + 25, y = 200, label = "mean (cut)", hjust = 0,
            colour = red, family = font, size = text_size) +
-  scale_fill_manual(values = c(grey, red)) +
+  scale_fill_manual(values = group_colours) +
   scale_x_continuous(breaks = c(240, 480, 720, 960), labels = c("4h", "8h", "12h", "16h"),
                      limits = c(0, 1080), expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 220), expand = c(0, 0)) +
@@ -372,7 +373,7 @@ group_counts <- group_counts %>%
 fig3 <- ggplot(group_counts, aes(n, net_group, fill = net_group)) +
   geom_col(width = 0.7) +
   geom_text(aes(label = label, colour = net_group), hjust = -0.1, family = font, size = text_size) +
-  scale_fill_manual(values = c(grey, red)) +
+  scale_fill_manual(values = group_colours) +
   scale_colour_manual(values = c(text_grey, red)) +
   scale_x_continuous(limits = c(0, 2200), expand = c(0, 0)) +   # room for the labels
   scale_y_discrete(expand = expansion(add = 0.7)) +             # room above and below the bars
@@ -436,7 +437,7 @@ group_means
 fig4 <- ggplot(group_means, aes(m, net_group, colour = net_group)) +
   geom_pointrange(aes(xmin = lo, xmax = hi), linewidth = 0.4, size = 0.3) +
   geom_text(aes(x = hi, label = sprintf("%.2f", m)), hjust = -0.3, family = font, size = text_size) +
-  scale_colour_manual(values = c(grey, red)) +
+  scale_colour_manual(values = group_colours) +
   scale_x_continuous(limits = c(1.2, 1.45), breaks = c(1.25, 1.3, 1.35, 1.4), expand = c(0, 0)) +
   theme_report
 fig4
@@ -452,7 +453,7 @@ set.seed(6)
 fig5 <- ggplot(both_data, aes(net_min, lonely, colour = net_group)) +
   geom_jitter(width = 0, height = 0.22, size = 0.7, alpha = 0.55, stroke = 0) +
   geom_vline(xintercept = cut_point, colour = red, linewidth = 0.2) +
-  scale_colour_manual(values = c(grey, red)) +
+  scale_colour_manual(values = group_colours) +
   scale_x_continuous(breaks = seq(120, 960, 120), labels = paste0(seq(2, 16, 2), "h"),
                      limits = c(0, 1080), expand = c(0, 0)) +
   scale_y_continuous(breaks = 1:4, limits = c(0.6, 4.4), position = "right", expand = c(0, 0)) +
@@ -465,29 +466,40 @@ save_fig(fig5, "fig5_scatter.svg", wide_width, lines = 5)
 
 # ------------------- STEP 6 -------------------------- #
 # every number printed in the report, written to one file that the report reads,
-# so no number is typed by hand
-fmt <- function(x, digits = 0) formatC(x, format = "f", digits = digits, big.mark = ",")   # 1234.5 -> "1,234.5"
-numbers <- c(
+# so no number is typed by hand. each name below is used in Report/report.typ as n.name
+
+fmt  <- function(x, digits = 0) formatC(x, format = "f", digits = digits, big.mark = ",")   # 1234.5 -> "1,234.5"
+stat <- function(name, variable, digits = 0) fmt(desc[name, variable], digits)              # one cell of desc
+
+sample_numbers <- c(
   n_total     = fmt(nrow(ess)),
   cut         = fmt(cut_point, 1),
   on_cut      = fmt(sum(ess$net_min == cut_point, na.rm = TRUE)),   # respondents exactly on the mean
-  net_missing = fmt(sum(is.na(ess$net_min))),
-  # Table 1
-  lonely_n = fmt(desc["valid_n", "lonely"]),     net_n      = fmt(desc["valid_n", "net_min"]),
-  lonely_mean = fmt(desc["mean", "lonely"], 2),  net_mean   = fmt(desc["mean", "net_min"], 1),
-  lonely_median = fmt(desc["median", "lonely"]), net_median = fmt(desc["median", "net_min"]),
-  lonely_mode = fmt(desc["mode", "lonely"]),     net_mode   = fmt(desc["mode", "net_min"]),
-  lonely_var = fmt(desc["variance", "lonely"], 2), net_var  = fmt(desc["variance", "net_min"]),
-  lonely_sd  = fmt(desc["sd", "lonely"], 2),     net_sd     = fmt(desc["sd", "net_min"], 1),
-  lonely_range = paste0(fmt(desc["min", "lonely"]), "–", fmt(desc["max", "lonely"])),
-  net_range  = paste0(fmt(desc["min", "net_min"]), "–", fmt(desc["max", "net_min"])),
-  lonely_iqr = fmt(desc["iqr", "lonely"]),       net_iqr    = fmt(desc["iqr", "net_min"]),
-  # groups
+  net_missing = fmt(sum(is.na(ess$net_min)))
+)
+
+table1_numbers <- c(
+  lonely_n      = stat("valid_n", "lonely"),      net_n      = stat("valid_n", "net_min"),
+  lonely_mean   = stat("mean", "lonely", 2),      net_mean   = stat("mean", "net_min", 1),
+  lonely_median = stat("median", "lonely"),       net_median = stat("median", "net_min"),
+  lonely_mode   = stat("mode", "lonely"),         net_mode   = stat("mode", "net_min"),
+  lonely_var    = stat("variance", "lonely", 2),  net_var    = stat("variance", "net_min"),
+  lonely_sd     = stat("sd", "lonely", 2),        net_sd     = stat("sd", "net_min", 1),
+  lonely_iqr    = stat("iqr", "lonely"),          net_iqr    = stat("iqr", "net_min"),
+  lonely_range  = paste0(stat("min", "lonely"), "–", stat("max", "lonely")),
+  net_range     = paste0(stat("min", "net_min"), "–", stat("max", "net_min"))
+)
+
+group_numbers <- c(
   group_n    = fmt(sum(group_counts$n)),
   group_mode = ifelse(group_mode == "Above mean", "1", "0"),
   n0 = fmt(group_means$n[1]), sd0 = fmt(group_means$s[1], 2),
-  n1 = fmt(group_means$n[2]), sd1 = fmt(group_means$s[2], 2),
-  # t-test, reported as group 1 minus group 0 (t.test gives group 0 minus group 1, so signs flip)
+  n1 = fmt(group_means$n[2]), sd1 = fmt(group_means$s[2], 2)
+)
+
+# the report gives the difference as group 1 minus group 0; t.test gives group 0 minus group 1,
+# so the signs are flipped here
+test_numbers <- c(
   diff    = sprintf("%+.2f", diff(tt$estimate)),
   diff_lo = sprintf("%.2f", -tt$conf.int[2]),
   diff_hi = sprintf("%.2f", -tt$conf.int[1]),
@@ -495,6 +507,8 @@ numbers <- c(
   df      = sprintf("%.0f", tt$parameter),
   p       = sprintf("%.2f", tt$p.value)
 )
+
+numbers <- c(sample_numbers, table1_numbers, group_numbers, test_numbers)
 write.csv(data.frame(name = names(numbers), value = numbers),
           "figures/report_numbers.csv", row.names = FALSE)
 numbers
