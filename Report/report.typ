@@ -16,6 +16,8 @@
 //      Only Figure 2 (long tail, heaping at whole hours, the cut point) qualifies.
 //   3  A row's elements start on the same baseline: label, text and caption share line one.
 //   4  Rows are separated by one empty line; a row is as tall as its tallest element, in whole lines.
+// MINIMUM VIABLE VISUALISATION   each figure shows only what its job needs; anything the
+//   table, a caption or another figure already carries is left out of the plot.
 // HIERARCHY of information, expressed only by position, ink and size:
 //   1  the answer and its evidence (Figure 4)      top of the page, ink
 //   2  the question                                 top of the page, ink
@@ -108,7 +110,7 @@
     meta[Method],   meta[Split at mean internet use (#n.cut min); Welch t-test],
     meta[Answer],   [#lorem(6) #g1[above the mean] #lorem(6)],
   )),
-  fig([Figure 4 Mean loneliness, 95% CI; dashed: all \ Welch t-test #g1[1] − 0: #n.diff (95% CI #n.diff_lo to #n.diff_hi), \ t #n.t, df #n.df, p #n.p], "fig4_means.png", 3),
+  fig([Figure 4 Mean loneliness by group, 95% CI \ Welch t-test #g1[1] − 0: #n.diff (95% CI #n.diff_lo to #n.diff_hi), \ t #n.t, df #n.df, p #n.p], "fig4_means.png", 3),
 
   // ---- 1 Variables ----
   ..row([1 Variables \ #keys([Dependent], `fltlnl`, [scale 1–4], [N #n.lonely_n])],
@@ -128,7 +130,7 @@
         )),
   // the breakout (rule 2b): Figure 2 across B and C, its label in A
   meta[Figure 2],
-  grid.cell(colspan: 2, fig([Minutes online per day, `netustm`, N #(n.net_n); #g1[red: above the mean]. White lines every 50 people.], "fig2_internet.png", 3, width: col-b + gut + col-c)),
+  grid.cell(colspan: 2, fig([Minutes online per day, `netustm`, N #(n.net_n); grey at or below the mean, #g1[red above it]. White lines every 50 people], "fig2_internet.png", 3, width: col-b + gut + col-c)),
 
   // ---- 2 Grouping ----
   ..row([2 Grouping \ #keys(`net_group`, [cut #n.cut min])],
@@ -152,5 +154,5 @@
   // ---- 5 Interpretation ----
   ..row([5 Interpretation \ #keys([Figure 5])],
         [#lorem(58)],
-        fig([Figure 5 Loneliness per band, 95% CI; dashed: all], "fig5_bands.png", 5)),
+        fig([Figure 5 Every respondent, loneliness (1–4, jittered) by minutes online; lines: group means], "fig5_scatter.png", 5)),
 )
