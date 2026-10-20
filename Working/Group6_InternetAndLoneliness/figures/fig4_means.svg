@@ -32,13 +32,13 @@
 <line x1='41.99' y1='16.15' x2='112.40' y2='16.15' style='stroke-width: 0.85; stroke: #B2182B; stroke-linecap: butt;' />
 <circle cx='62.92' cy='36.43' r='1.99' style='stroke-width: 1.42; stroke: #A6A6A6; fill: #A6A6A6;' />
 <circle cx='77.20' cy='16.15' r='1.99' style='stroke-width: 1.42; stroke: #B2182B; fill: #B2182B;' />
-<text x='93.63' y='38.97' style='font-size: 7.11px;fill: #A6A6A6; font-family: "ABC Areal";' textLength='12.59px' lengthAdjust='spacingAndGlyphs'>1.30</text>
-<text x='116.14' y='18.70' style='font-size: 7.11px;fill: #B2182B; font-family: "ABC Areal";' textLength='12.48px' lengthAdjust='spacingAndGlyphs'>1.33</text>
+<text x='93.63' y='38.97' style='font-size: 7.11px;fill: #A6A6A6; font-family: "ABC Areal Variable";' textLength='12.59px' lengthAdjust='spacingAndGlyphs'>1.30</text>
+<text x='116.14' y='18.70' style='font-size: 7.11px;fill: #B2182B; font-family: "ABC Areal Variable";' textLength='12.48px' lengthAdjust='spacingAndGlyphs'>1.33</text>
 </g>
 <g clip-path='url(#cpMC4wMHwxNTQuMDh8MC4wMHw1NS4wOA==)'>
-<text x='30.82' y='54.34' text-anchor='middle' style='font-size: 7.00px;fill: #666666; font-family: "ABC Areal";' textLength='12.10px' lengthAdjust='spacingAndGlyphs'>1.25</text>
-<text x='61.63' y='54.34' text-anchor='middle' style='font-size: 7.00px;fill: #666666; font-family: "ABC Areal";' textLength='12.38px' lengthAdjust='spacingAndGlyphs'>1.30</text>
-<text x='92.45' y='54.34' text-anchor='middle' style='font-size: 7.00px;fill: #666666; font-family: "ABC Areal";' textLength='12.18px' lengthAdjust='spacingAndGlyphs'>1.35</text>
-<text x='123.26' y='54.34' text-anchor='middle' style='font-size: 7.00px;fill: #666666; font-family: "ABC Areal";' textLength='12.44px' lengthAdjust='spacingAndGlyphs'>1.40</text>
+<text x='30.82' y='54.34' text-anchor='middle' style='font-size: 7.00px;fill: #666666; font-family: "ABC Areal Variable";' textLength='12.10px' lengthAdjust='spacingAndGlyphs'>1.25</text>
+<text x='61.63' y='54.34' text-anchor='middle' style='font-size: 7.00px;fill: #666666; font-family: "ABC Areal Variable";' textLength='12.38px' lengthAdjust='spacingAndGlyphs'>1.30</text>
+<text x='92.45' y='54.34' text-anchor='middle' style='font-size: 7.00px;fill: #666666; font-family: "ABC Areal Variable";' textLength='12.18px' lengthAdjust='spacingAndGlyphs'>1.35</text>
+<text x='123.26' y='54.34' text-anchor='middle' style='font-size: 7.00px;fill: #666666; font-family: "ABC Areal Variable";' textLength='12.44px' lengthAdjust='spacingAndGlyphs'>1.40</text>
 </g>
 </svg>
