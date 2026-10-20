@@ -452,17 +452,16 @@ save_fig(fig4, "fig4_means.svg", lines = 4)
 # ------------------- STEP 5 -------------------------- #
 # the limitation of the cut point: the t-test only compares the two group means.
 # Figure 5 shows every respondent: minutes online (x) against loneliness (y), coloured by
-# group, with the two group means the t-test compares. loneliness has only 4 values, so the
+# group, and the cut point. the group means are not drawn: they differ by 0.02 on a 1-4 scale,
+# too little to see here, and Figure 4 shows them on a zoomed axis. loneliness has only 4 values, so the
 # points are spread a little up and down (jitter) to stop them hiding each other; the
 # spread is random but set.seed() makes it the same every run.
 set.seed(6)
 points <- filter(ess, !is.na(net_min), !is.na(lonely))
-mean_lines <- group_means %>% mutate(from = c(0, cut_point), to = c(cut_point, 1080))
 
 fig5 <- ggplot(points, aes(net_min, lonely, colour = net_group)) +
   geom_jitter(width = 0, height = 0.22, size = 0.7, alpha = 0.55, stroke = 0) +
   annotate("segment", x = cut_point, xend = cut_point, y = 0.6, yend = 4.4, linewidth = 1.5 * lw, colour = red) +
-  geom_segment(data = mean_lines, aes(x = from, xend = pmin(to, 1080), y = m, yend = m), linewidth = 3 * lw) +
   note(x = 1105, y = 1:4, hjust = 1, colour = grey_text, label = 1:4) +       # the loneliness scale, in its own strip
   scale_colour_manual(values = c(grey, red)) +
   scale_x_continuous(breaks = seq(120, 960, 120), labels = paste0(seq(2, 16, 2), "h"),

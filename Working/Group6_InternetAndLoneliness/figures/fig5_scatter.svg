@@ -1240,8 +1240,6 @@
 <circle cx='43.86' cy='41.21' r='0.75' style='stroke-width: 0.00; stroke: #A6A6A6; stroke-opacity: 0.55; fill: #A6A6A6; fill-opacity: 0.55;' />
 <circle cx='21.93' cy='40.38' r='0.75' style='stroke-width: 0.00; stroke: #A6A6A6; stroke-opacity: 0.55; fill: #A6A6A6; fill-opacity: 0.55;' />
 <line x1='86.09' y1='46.57' x2='86.09' y2='4.39' style='stroke-width: 0.50; stroke: #B2182B; stroke-linecap: butt;' />
-<line x1='0.00' y1='38.77' x2='86.09' y2='38.77' style='stroke-width: 0.99; stroke: #A6A6A6; stroke-linecap: butt;' />
-<line x1='86.09' y1='38.52' x2='394.71' y2='38.52' style='stroke-width: 0.99; stroke: #B2182B; stroke-linecap: butt;' />
 <text x='403.84' y='44.66' text-anchor='end' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='2.74px' lengthAdjust='spacingAndGlyphs'>1</text>
 <text x='403.84' y='33.56' text-anchor='end' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='3.94px' lengthAdjust='spacingAndGlyphs'>2</text>
 <text x='403.84' y='22.47' text-anchor='end' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='4.03px' lengthAdjust='spacingAndGlyphs'>3</text>

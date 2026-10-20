@@ -196,7 +196,7 @@
 
   // ---- the one breakout (rule 2b): Figure 5, the question itself, across B and C ----
   tag[Figure 5],
-  grid.cell(colspan: 2, fig([Every respondent, loneliness (1–4, jittered) by minutes online, #g1[red above the mean], lines: group means], "fig5_scatter.svg", 5, width: col-b + gut + col-c)),
+  grid.cell(colspan: 2, fig([Every respondent, loneliness (1–4, jittered) by minutes online, #g1[red above the mean]], "fig5_scatter.svg", 5, width: col-b + gut + col-c)),
 
   // ---- 5 Interpretation: the result beside its reading ----
   ..row([5 Interpretation],
