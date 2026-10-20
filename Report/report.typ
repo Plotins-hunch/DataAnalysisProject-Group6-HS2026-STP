@@ -2,12 +2,12 @@
 // Compile from the repo root:  typst compile --root . --font-path <ABC Areal folder> Report/report.typ
 // Show the grid:               add  --input grid=true
 //
-// ONE UNIT   X = 4.5pt, the x-height of the text (ABC Areal: x-height 0.519 em).
-// ONE GRID   a baseline every 3X, and a base grid of 12 columns of 6X, gutters 3X. Three zones,
-//            each a whole number of columns, the same on every row:
-//              A  labels    2 columns   15X   67.5pt
-//              B  text      6 columns   51X   229.5pt
-//              C  evidence  4 columns   33X   148.5pt
+// ONE UNIT   X = A4 width / 135 = 4.41pt, the x-height of the text (ABC Areal: 0.519 em).
+// ONE GRID   a baseline every 3X; 6 columns of 16X, gutters 3X, margins 12X (page = 135X).
+//            Three zones, each a whole number of columns, the same on every row:
+//              A  labels    1 column    16X
+//              B  text      3 columns   54X
+//              C  evidence  2 columns   35X
 // FOUR RULES
 //   1  Size follows role. Three sizes, all from X:
 //        title  x-height 3X (26pt), two lines on a leading of two grid lines, the one large thing
@@ -42,31 +42,34 @@
 // DATA   every figure and number comes from Working/Group6_InternetAndLoneliness/Exploration_00.R.
 //        The licensed fonts stay out of the repo; without them Typst falls back to Arial.
 
-#let X      = 4.5pt
+// X is taken from the page: A4 width = 135X, so margins and columns divide it exactly
+#let X      = 595.28pt / 135                      // 4.41pt
 #let xh     = 0.519
 #let u      = 3 * X                               // one line
 #let gut    = 3 * X
-// BASE GRID: 12 equal columns of 6X with gutters of 3X (one line). Every width is a whole
-// number of columns: labels 2, text 6, evidence 4, the Figure 2 breakout 10.
-#let ncol   = 12
-#let col    = 6 * X
+// BASE GRID: 6 equal columns of 16X with gutters of 3X (one line), margins 12X:
+// 12 + 6·16 + 5·3 + 12 = 135X = the page width. Labels 1 column, text 3, evidence 2,
+// the Figure 2 breakout 5.
+#let ncol   = 6
+#let col    = 16 * X
+#let margin = 12 * X
 #let span(n) = n * col + (n - 1) * gut
-#let col-a  = span(2)                             // 15X  67.5pt
-#let col-b  = span(6)                             // 51X  229.5pt
-#let col-c  = span(4)                             // 33X  148.5pt
-#let tw     = span(ncol)                          // 105X 472.5pt
+#let col-a  = span(1)                             // 16X  70.6pt
+#let col-b  = span(3)                             // 54X  238.1pt
+#let col-c  = span(2)                             // 35X  154.3pt
+#let tw     = span(ncol)                          // 111X 489.5pt
 #let nlin   = 55
 #let th     = nlin * u
 #let text-size  = X / xh                          // 8.67pt
 #let small-size = 5 / 6 * X / xh                  // 7.23pt
 #let title-size = 3 * X / xh                      // 26.0pt
 #let hair   = X / 10
-#let base-drop = 3.5pt                            // text baseline sits 3.5pt above each line's bottom
+#let base-drop = 0.78 * X                         // text baseline sits 0.78X above each line's bottom
 // HANG LINE (rule 3): every size hangs its capitals from the same line, `hang` below the top of
 // a grid line. Text sits exactly on the baseline grid; small text and the title take the
 // baseline offset that puts their cap height on the same hang line.
 #let cap    = 0.716                               // ABC Areal cap height / em
-#let hang   = u - base-drop - cap * text-size     // 3.79pt
+#let hang   = u - base-drop - cap * text-size
 #let hung(size, lines: 1) = (top-edge: hang + cap * size, bottom-edge: -(lines * u - hang - cap * size))
 #let show-grid = sys.inputs.at("grid", default: "false") == "true"
 
@@ -74,8 +77,10 @@
 #let grey = luma(42%)
 #let red  = rgb("#b2182b")
 
-#set page(paper: "a4", margin: (left: 12 * X, top: 10 * X, right: 595.28pt - 12 * X - tw, bottom: 841.89pt - 10 * X - th),
-  background: if show-grid { place(dx: 12 * X, dy: 10 * X, {
+// vertical: top margin 12X, 55 lines of 3X; the rest of A4 (13.9X) is the bottom margin,
+// which holds the credits
+#set page(paper: "a4", margin: (left: margin, right: margin, top: margin, bottom: 841.89pt - margin - th),
+  background: if show-grid { place(dx: margin, dy: margin, {
     for i in range(ncol) { place(dx: i * (col + gut), rect(width: col, height: th, fill: luma(94%), stroke: none)) }
     for i in range(nlin) { place(dy: i * u + u - base-drop, line(length: tw, stroke: 0.25pt + rgb(0, 120, 255, 50%))) }
   }) })
@@ -142,16 +147,16 @@
     meta[Question], [Is people's internet use associated with their feeling of loneliness?],
     meta[Data],     meta[European Social Survey Round 11, Switzerland, N #n.n_total],
     meta[Method],   meta[Split at mean internet use (#n.cut min); Welch t-test],
-    meta[Answer],   [#lorem(5) #g1[above the mean] #lorem(5)],
+    meta[Answer],   [#lorem(6) #g1[above the mean] #lorem(6)],
   )),
   fig([Figure 4 Mean loneliness by group, 95% CI \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 3),
 
   // ---- 1 Variables ----
   ..row([1 Variables \ #keys([Dependent], `fltlnl`, [scale 1–4], [N #n.lonely_n])],
-        [#lorem(43)],
+        [#lorem(47)],
         fig([Figure 1 Felt lonely in the past week], "fig1_lonely.svg", 5)),
   ..row(keys([Independent], `netustm`, [minutes per day], [N #n.net_n], [#n.net_missing missing]),
-        [#lorem(50)],
+        [#lorem(55)],
         small-table(
           [Table 1], [Loneliness], [Minutes], rule,
           [Mean],     n.lonely_mean,   n.net_mean,
@@ -168,17 +173,17 @@
 
   // ---- 2 Grouping ----
   ..row([2 Grouping \ #keys(`net_group`, [cut #n.cut min])],
-        [#lorem(9) #g1[above the mean (1)] #lorem(12)],
+        [#lorem(10) #g1[above the mean (1)] #lorem(13)],
         evidence(meta[#n.on_cut on the mean (would go to 0) \ #n.net_missing without an answer: in neither group])),
 
   // ---- 3 Descriptives ----
   ..row([3 Descriptives \ #keys([Table 1], [Figures 1–3])],
-        [#lorem(19)],
+        [#lorem(21)],
         fig([Figure 3 Groups, N #n.group_n, mode #n.group_mode], "fig3_groups.svg", 2)),
 
   // ---- 4 Test ----
   ..row([4 Test \ #keys([Welch], [p #n.p])],
-        [#lorem(19)],
+        [#lorem(21)],
         small-table(
           [Loneliness], [N], [Mean · SD], rule,
           [0 at or below],   n.n0, [#n.m0 · #n.sd0],
@@ -187,6 +192,6 @@
 
   // ---- 5 Interpretation ----
   ..row([5 Interpretation \ #keys([Figure 5])],
-        [#lorem(40)],
+        [#lorem(44)],
         fig([Figure 5 Respondents and group means], "fig5_scatter.svg", 5)),
 )

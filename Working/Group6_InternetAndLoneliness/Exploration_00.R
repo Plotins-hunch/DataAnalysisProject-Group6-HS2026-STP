@@ -297,19 +297,19 @@ group_mode
 # result: valid N 1212; at or below mean 717 (59%), above mean 495 (41%); mode = at or below mean
 
 # part 3.c - one style for every figure
-# the report is built on one unit, X = 4.5pt (the x-height of its text), and one grid of
-# base grid of 12 columns (6X, gutters 3X): labels 2 | text 6 | evidence 4. figures sit in the evidence zone (4 columns)
+# the report is built on one unit, X = A4 width / 135 = 4.41pt (the x-height of its text), and one grid:
+# base grid of 6 columns (16X, gutters 3X): labels 1 | text 3 | evidence 2. figures sit in the evidence zone (2 columns)
 # and is a whole number of lines tall (one line = 3X). plot text uses the report's small size.
 # alignment rule: the plot panel fills the column, so its left edge IS the column edge;
 # there are no y-axes, values are labelled directly on the data.
 # clearance: nothing comes closer than X to anything else (labels sit X away from marks).
 # minimum viable visualisation: each figure shows only what its job needs; anything the
 # table, a caption or another figure already carries is left out.
-X     <- 4.5                       # points
-# base grid: 12 columns of 6X with 3X gutters; a figure spans whole columns
-span   <- function(n) (n * 6 * X + (n - 1) * 3 * X) / 72   # width of n columns, inches
-col_c  <- span(4)                  # evidence column: 4 columns
-col_bc <- span(10)                 # text + evidence: 10 columns, the one breakout (Figure 2)
+X     <- 595.28 / 135              # points: A4 width / 135, the report's unit
+# base grid: 6 columns of 16X with 3X gutters; a figure spans whole columns
+span   <- function(n) (n * 16 * X + (n - 1) * 3 * X) / 72   # width of n columns, inches
+col_c  <- span(2)                  # evidence zone: 2 columns
+col_bc <- span(5)                  # text + evidence: 5 columns, the one breakout (Figure 2)
 line  <- 3 * X / 72                # one line, inches
 fs    <- (5 / 6) * X / 0.519       # small text: x-height 5/6 X (font x-height = 0.519 em), 7.2pt
 lw    <- (X / 10) / .pt            # hairline, X/10
