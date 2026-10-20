@@ -20,11 +20,10 @@
 //      size (title, text, small), sits on the same hang line.
 //   4  Rows are separated by one empty line; a row is as tall as its tallest element, in whole lines.
 //   5  Clearance: nothing comes closer than X to anything else: caption to plot, label to mark.
-//   6  Rules, not boxes: a grey hairline (X/10) runs across all three columns in the middle of
-//      the empty line between rows, so it separates without costing a line or crowding.
-// FRAME   the credits sit in a footer band in the bottom margin, column by column; one line of
-//   tracked capitals runs up the left margin (after the Lacroix Chessex invoice and the
-//   Bauhaus Dessau stationery).
+//   6  Zones: white space is the structure. Rows inside a zone are one empty line apart;
+//      zones are two apart: statement (title, fact sheet) | description (sections 1–3) |
+//      inference (sections 4–5). No rules, no boxes.
+// FOOT    the credits sit at the foot of the page on the same three columns.
 //      Figures are vector (SVG), so every line and letter stays sharp.
 // MINIMUM VIABLE VISUALISATION   each figure shows only what its job needs; anything the
 //   table, a caption or another figure already carries is left out of the plot.
@@ -82,19 +81,14 @@
 #let credits = (
   [Authors],
   [Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi],
-  align(right)[1/1],
+  [Data Analysis for Public Policy \ ETH Zürich, HS2026],
 )
 #set page(
   footer-descent: 0pt,
   footer: context {
     set text(size: small-size, fill: grey, number-width: "tabular")
-    line(length: tw, stroke: hair + luma(72%))
-    v(X)
     grid(columns: (col-a, col-b, col-c), column-gutter: gut, ..credits)
   },
-  foreground: place(left + bottom, dx: 12 * X / 2 - X, dy: -(841.89pt - 10 * X - th),
-    rotate(-90deg, origin: bottom + left, reflow: true,
-      text(size: small-size, fill: grey, tracking: 0.3em, upper[Data Analysis for Public Policy · ETH Zürich · HS2026]))),
 )
 #set text(font: ("ABC Areal", "Arial"), size: text-size, fill: ink,
           top-edge: u - base-drop, bottom-edge: -base-drop, lang: "en", hyphenate: true)
@@ -121,10 +115,8 @@
   image(out + file, width: width, height: lines * u)
 })
 
-// rule 6: a hairline across the page in the middle of the empty line above a row
-#let ruled(body) = { place(dy: -u / 2, line(length: tw, stroke: hair + luma(72%))); body }
 // one row of the page: A | B | C, all starting on the same line
-#let row(a, b, c) = (ruled(a), b, c)
+#let row(a, b, c) = (a, b, c)
 
 #let keys(..lines) = meta(lines.pos().join(linebreak()))   // grey key facts, one per line
 #let small-table(..cells) = evidence(table(columns: (1.6fr, 1fr, 1fr), stroke: none, inset: 0pt,
@@ -134,19 +126,20 @@
 #grid(
   columns: (col-a, col-b, col-c),
   column-gutter: gut,
-  row-gutter: u,
+  //           title  facts→DV  DV   IV  Fig2  grp  desc→test  test
+  row-gutter: (u,     2 * u,    u,   u,  u,    u,   2 * u,     u),
 
   // ---- header: the title is the one large thing on the page (rule 1) ----
   meta[Report 1 \ Group 6],
   grid.cell(colspan: 2, text(size: title-size, ..hung(title-size, lines: 2))[Internet use and loneliness \ in Switzerland]),
 
   // ---- fact sheet: question, context, answer; the result's evidence beside it ----
-  grid.cell(colspan: 2, ruled(grid(columns: (col-a, col-b), column-gutter: gut,
+  grid.cell(colspan: 2, grid(columns: (col-a, col-b), column-gutter: gut,
     meta[Question], [Is people's internet use associated with their feeling of loneliness?],
     meta[Data],     meta[European Social Survey Round 11, Switzerland, N #n.n_total],
     meta[Method],   meta[Split at mean internet use (#n.cut min); Welch t-test],
     meta[Answer],   [#lorem(6) #g1[above the mean] #lorem(6)],
-  ))),
+  )),
   fig([Figure 4 Mean loneliness by group, 95% CI \ Welch t-test #g1[1] − 0: #n.diff (95% CI #n.diff_lo to #n.diff_hi), \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 3),
 
   // ---- 1 Variables ----
@@ -166,7 +159,7 @@
           [IQR],      n.lonely_iqr,    n.net_iqr, rule,
         )),
   // the breakout (rule 2b): Figure 2 across B and C, its label in A
-  ruled(meta[Figure 2]),
+  meta[Figure 2],
   grid.cell(colspan: 2, fig([Minutes online per day, `netustm`, N #n.net_n, grey at or below the mean, #g1[red above it], white lines every 50 people], "fig2_internet.svg", 4, width: col-b + gut + col-c)),
 
   // ---- 2 Grouping ----
