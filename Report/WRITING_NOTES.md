@@ -20,15 +20,18 @@ How to write the body text of `report.typ` so it works with the figures.
 - **Full sentences, no bullet points** (brief, section 6).
 - **Keep to each section's word budget**, or the page overflows. Re-compile after every section.
 
-| Section | Words | Evidence beside it |
+| Section | Words (fills exactly these lines) | Evidence beside it |
 |---|---|---|
-| Findings | ~34 | the data (ESS 11, N) |
-| 1 Variables, dependent | ~56 | Figure 1 |
-| 1 Variables, independent | ~58 | Figure 2 |
-| 2 Grouping | ~30 | Figure 3 |
-| 3 Descriptives | ~56 | Table 1 |
-| 4 Test | ~26 | group N and SD |
-| 5 Interpretation | ~60 | Figure 4 (and Figure 5 above it) |
+| Findings | ~26 (3 lines) | the data (ESS 11, N) |
+| 1 Variables, dependent | ~58 (7 lines) | Figure 1 |
+| 1 Variables, independent | ~58 (7 lines) | Figure 2 |
+| 2 Grouping | ~30 (4 lines) | Figure 3 |
+| 3 Descriptives | ~78 (9 lines) | Table 1 |
+| 4 Test | ~26 (3 lines) | group N and SD |
+| 5 Interpretation | ~69 (8 lines) | Figure 4 (and Figure 5 above it) |
+
+Each row is a rectangle: the text should end on the same line as its evidence. About 9 words fill
+one line; if a section ends a line short or long, adjust by about 9 words.
 
 ## What each section must say, and what to mention about its figure
 

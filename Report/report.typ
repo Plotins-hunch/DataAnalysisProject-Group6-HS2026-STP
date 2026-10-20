@@ -23,7 +23,8 @@
 //      says why and what it means.
 //   3  A row's elements hang from one line: the cap height of every first line, whatever its
 //      size (title, text, small), sits on the same hang line.
-//   4  A row is as tall as its tallest element, in whole lines.
+//   4  Rows are rectangles: text and evidence start on the same line and end on the same line.
+//      Each text budget is measured to fill exactly the lines its evidence takes.
 //   5  Clearance: nothing comes closer than X to anything else: caption to plot, label to mark.
 //   6  Spacing scale, all in lines: 0 inside a block · 1 between rows · 2 between zones
 //      (statement | description 1–3 | inference 4–5). As in the CV grid: every entry sits on
@@ -158,20 +159,20 @@
   // ---- findings: the first row, built like every other row (label | text | evidence) ----
   // two sentences: the result in plain language, then its meaning and main caveat
   ..row(tag[Findings],
-        [#lorem(14) #g1[above the mean] #lorem(18)],
+        [#lorem(10) #g1[above the mean] #lorem(12)],
         evidence(meta[European Social Survey Round 11 \ Switzerland, 2023 \ N #n.n_total respondents])),
 
   // ---- 1 Variables ----
   ..row([1 Variables \ #keys([Dependent], `fltlnl`)],
-        [#lorem(56)],
-        fig([Figure 1 Self-reported loneliness, past week], "fig1_lonely.svg", 5)),
+        [#lorem(58)],
+        fig([Figure 1 Self-reported loneliness, past week], "fig1_lonely.svg", 6)),
   ..row(keys([Independent], `netustm`),
         [#lorem(58)],
-        fig([Figure 2 Self-reported minutes online per day], "fig2_internet.svg", 5)),
+        fig([Figure 2 Self-reported minutes online per day], "fig2_internet.svg", 6)),
 
   // ---- 2 Grouping: the group bar chart and the boundary note ----
   ..row([2 Grouping \ #keys(`net_group`)],
-        [#lorem(12) #g1[above the mean (1)] #lorem(20)],
+        [#lorem(12) #g1[above the mean (1)] #lorem(16)],
         evidence({
           [Figure 3 Groups, N #n.group_n, mode #n.group_mode]
           image(out + "fig3_groups.svg", width: col-c, height: 3 * u)
@@ -179,7 +180,7 @@
 
   // ---- 3 Descriptives: Table 1 beside its reading ----
   ..row([3 Descriptives],
-        [#lorem(56)],
+        [#lorem(78)],
         small-table(
           [Table 1], `fltlnl`, `netustm`, rule,
           [Valid N],  n.lonely_n,      n.net_n,
@@ -195,7 +196,11 @@
   // ---- 4 Test: the case for Welch beside the text ----
   ..row([4 Test],
         [#lorem(26)],
-        evidence[0 at or below: N #n.n0, SD #n.sd0 \ #g1[1 above: N #n.n1, SD #n.sd1]]),
+        small-table(
+          [Group], [N], [SD], rule,
+          [0 at or below], n.n0, n.sd0,
+          g1[1 above], g1(n.n1), g1(n.sd1),
+        )),
 
   // ---- the one breakout (rule 2b): Figure 5, the question itself, across B and C ----
   tag[Figure 5],
@@ -203,6 +208,6 @@
 
   // ---- 5 Interpretation: the result beside its reading ----
   ..row([5 Interpretation],
-        [#lorem(60)],
-        fig([Figure 4 Mean self-reported loneliness, 95% CI \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 4)),
+        [#lorem(69)],
+        fig([Figure 4 Mean self-reported loneliness, 95% CI \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 5)),
 )

@@ -357,7 +357,7 @@ fig1 <- ggplot(filter(ess, !is.na(lonely)), aes(lonely)) +
   scale_y_continuous(limits = c(0, 1300), expand = c(0, 0)) +
   theme_report
 fig1
-save_fig(fig1, "fig1_lonely.svg", lines = 5)
+save_fig(fig1, "fig1_lonely.svg", lines = 6)
 
 # part 3.e - Figure 2: IV histogram in 10-minute bins, bars coloured by group, the mean
 # (= cut point) marked; the group sizes are in Figure 3, so they are not repeated here.
@@ -372,7 +372,7 @@ fig2 <- ggplot(filter(ess, !is.na(net_min)), aes(net_min, fill = net_group)) +
   scale_y_continuous(limits = c(0, 220), expand = c(0, 0)) +
   theme_report
 fig2
-save_fig(fig2, "fig2_internet.svg", lines = 5)
+save_fig(fig2, "fig2_internet.svg", lines = 6)
 
 # part 3.f - Figure 3: bar chart of the grouping variable, count and share
 fig3 <- ggplot(group_counts, aes(n, net_group, fill = net_group)) +
@@ -446,7 +446,7 @@ fig4 <- ggplot(group_means, aes(m, net_group, colour = net_group)) +
   scale_x_continuous(limits = c(1.2, 1.45), breaks = c(1.25, 1.3, 1.35, 1.4), expand = c(0, 0)) +
   theme_report
 fig4
-save_fig(fig4, "fig4_means.svg", lines = 4)
+save_fig(fig4, "fig4_means.svg", lines = 5)
 
 
 # ------------------- STEP 5 -------------------------- #

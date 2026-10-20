@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='154.33pt' height='44.09pt' viewBox='0 0 154.33 44.09'>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='154.33pt' height='55.12pt' viewBox='0 0 154.33 55.12'>
 <defs>
   <style type='text/css'><![CDATA[
     .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
@@ -16,30 +16,30 @@
 </defs>
 <rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
 <defs>
-  <clipPath id='cpMC4wMHwxNTQuMzN8MC4wMHw0NC4wOQ=='>
-    <rect x='0.00' y='0.00' width='154.33' height='44.09' />
+  <clipPath id='cpMC4wMHwxNTQuMzN8MC4wMHw1NS4xMg=='>
+    <rect x='0.00' y='0.00' width='154.33' height='55.12' />
   </clipPath>
 </defs>
-<g clip-path='url(#cpMC4wMHwxNTQuMzN8MC4wMHw0NC4wOQ==)'>
-<rect x='0.00' y='0.00' width='154.33' height='44.09' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF;' />
+<g clip-path='url(#cpMC4wMHwxNTQuMzN8MC4wMHw1NS4xMg==)'>
+<rect x='0.00' y='0.00' width='154.33' height='55.12' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF;' />
 </g>
 <defs>
-  <clipPath id='cpMC4wMHwxNTQuMzN8NC4zOXwzNS41NA=='>
-    <rect x='0.00' y='4.39' width='154.33' height='31.15' />
+  <clipPath id='cpMC4wMHwxNTQuMzN8NC4zOXw0Ni41Nw=='>
+    <rect x='0.00' y='4.39' width='154.33' height='42.17' />
   </clipPath>
 </defs>
-<g clip-path='url(#cpMC4wMHwxNTQuMzN8NC4zOXwzNS41NA==)'>
-<line x1='36.06' y1='27.05' x2='90.00' y2='27.05' style='stroke-width: 0.99; stroke: #A6A6A6; stroke-linecap: butt;' />
-<line x1='42.06' y1='12.89' x2='112.58' y2='12.89' style='stroke-width: 0.99; stroke: #B2182B; stroke-linecap: butt;' />
-<circle cx='63.03' cy='27.05' r='2.70' style='stroke-width: 0.71; stroke: #A6A6A6; fill: #A6A6A6;' />
-<circle cx='77.32' cy='12.89' r='2.70' style='stroke-width: 0.71; stroke: #B2182B; fill: #B2182B;' />
-<text x='94.93' y='29.58' style='font-size: 7.08px;fill: #A6A6A6; font-family: "ABC Areal";' textLength='12.54px' lengthAdjust='spacingAndGlyphs'>1.30</text>
-<text x='117.52' y='15.42' style='font-size: 7.08px;fill: #B2182B; font-family: "ABC Areal";' textLength='12.42px' lengthAdjust='spacingAndGlyphs'>1.33</text>
+<g clip-path='url(#cpMC4wMHwxNTQuMzN8NC4zOXw0Ni41Nw==)'>
+<line x1='36.06' y1='35.06' x2='90.00' y2='35.06' style='stroke-width: 0.99; stroke: #A6A6A6; stroke-linecap: butt;' />
+<line x1='42.06' y1='15.89' x2='112.58' y2='15.89' style='stroke-width: 0.99; stroke: #B2182B; stroke-linecap: butt;' />
+<circle cx='63.03' cy='35.06' r='2.70' style='stroke-width: 0.71; stroke: #A6A6A6; fill: #A6A6A6;' />
+<circle cx='77.32' cy='15.89' r='2.70' style='stroke-width: 0.71; stroke: #B2182B; fill: #B2182B;' />
+<text x='94.93' y='37.60' style='font-size: 7.08px;fill: #A6A6A6; font-family: "ABC Areal";' textLength='12.54px' lengthAdjust='spacingAndGlyphs'>1.30</text>
+<text x='117.52' y='18.43' style='font-size: 7.08px;fill: #B2182B; font-family: "ABC Areal";' textLength='12.42px' lengthAdjust='spacingAndGlyphs'>1.33</text>
 </g>
-<g clip-path='url(#cpMC4wMHwxNTQuMzN8MC4wMHw0NC4wOQ==)'>
-<text x='30.87' y='43.35' text-anchor='middle' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>1.25</text>
-<text x='61.73' y='43.35' text-anchor='middle' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='12.54px' lengthAdjust='spacingAndGlyphs'>1.30</text>
-<text x='92.60' y='43.35' text-anchor='middle' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='12.33px' lengthAdjust='spacingAndGlyphs'>1.35</text>
-<text x='123.47' y='43.35' text-anchor='middle' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='12.59px' lengthAdjust='spacingAndGlyphs'>1.40</text>
+<g clip-path='url(#cpMC4wMHwxNTQuMzN8MC4wMHw1NS4xMg==)'>
+<text x='30.87' y='54.37' text-anchor='middle' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>1.25</text>
+<text x='61.73' y='54.37' text-anchor='middle' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='12.54px' lengthAdjust='spacingAndGlyphs'>1.30</text>
+<text x='92.60' y='54.37' text-anchor='middle' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='12.33px' lengthAdjust='spacingAndGlyphs'>1.35</text>
+<text x='123.47' y='54.37' text-anchor='middle' style='font-size: 7.08px;fill: #666666; font-family: "ABC Areal";' textLength='12.59px' lengthAdjust='spacingAndGlyphs'>1.40</text>
 </g>
 </svg>
