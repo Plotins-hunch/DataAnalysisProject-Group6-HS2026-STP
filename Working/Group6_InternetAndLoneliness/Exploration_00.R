@@ -261,82 +261,119 @@ table(ess$net_group, useNA = "ifany")
 # result: At or below mean 717, Above mean 495, NA 172
 
 
-# ------------------- STEP 3 - ILLUSTRATIONS -------------------------- #
-# one ggplot per variable, as the assignment asks:
-#   DV (lonely)       -> histogram
-#   IV (net_min)      -> histogram
-#   group (net_group) -> bar chart
-# every plot drops NA, so each one shows the valid N only.
-# plots are also saved as png into a "figures" folder for the report.
+# ------------------- STEP 3 -------------------------- #
+# descriptive statistics for the three variables, and the report's figures
 
-dir.create("figures", showWarnings = FALSE) # make folder if it is not there yet
+# part 3.a - DV and continuous IV: valid N, mean, median, mode, variance, sd, range, IQR
+# R has no built-in mode, so stat_mode() takes the most common value
+stat_mode <- function(x) as.numeric(names(which.max(table(x))))
 
-# shared look for all plots, so they read as one set
-theme_set(theme_minimal(base_size = 12) +
-            theme(panel.grid.minor = element_blank(),
-                  plot.title.position = "plot"))
-bar_fill <- "#4C72B0" # one colour for all bars
+describe_num <- function(x) {
+  x <- x[!is.na(x)]                             # valid answers only
+  c(valid_n = length(x), mean = mean(x), median = median(x), mode = stat_mode(x),
+    variance = var(x), sd = sd(x), min = min(x), max = max(x), iqr = IQR(x))
+}
+desc <- data.frame(lonely = describe_num(ess$lonely), net_min = describe_num(ess$net_min))
+round(desc, 2)
+# result:     lonely   net_min
+#  valid_n   1382.00   1212.00
+#  mean         1.31    235.55
+#  median       1.00    180.00
+#  mode         1.00    120.00
+#  variance     0.38  39098.04
+#  sd           0.61    197.73
+#  min / max    1 / 4   4 / 1080
+#  iqr          0.00    270.00
 
-# part 3.a - DV histogram
-# lonely only takes the values 1-4, so binwidth = 1 gives one bar per answer.
-# the x axis keeps the answer labels, so the reader sees what 1-4 mean.
-n_dv <- sum(!is.na(ess$lonely)) # valid N, printed in the subtitle
-
-plot_dv <- ggplot(filter(ess, !is.na(lonely)), aes(x = lonely)) +
-  geom_histogram(binwidth = 1, fill = bar_fill, colour = "white") +
-  geom_vline(xintercept = mean(ess$lonely, na.rm = TRUE),
-             linetype = "dashed") + # dashed line = mean
-  scale_x_continuous(breaks = 1:4,
-                     labels = c("None or\nalmost none", "Some",
-                                "Most", "All or\nalmost all")) +
-  labs(title = "Felt lonely, past week (fltlnl)",
-       subtitle = paste0("Valid N = ", n_dv, "; dashed line = mean"),
-       x = "How much of the time (1-4)", y = "Number of respondents")
-plot_dv
-ggsave("figures/fig1_dv_lonely_hist.png", plot_dv, width = 6, height = 4, dpi = 300)
-# READ: most people sit in the lowest category (floor effect, right-skewed)
-
-# part 3.b - IV histogram
-# binwidth = 30 minutes (half an hour). the dashed line is the mean,
-# which is also the cut point for the grouping variable (step 2.b).
-n_iv <- sum(!is.na(ess$net_min))
-
-plot_iv <- ggplot(filter(ess, !is.na(net_min)), aes(x = net_min)) +
-  geom_histogram(binwidth = 30, boundary = 0, fill = bar_fill, colour = "white") +
-  geom_vline(xintercept = cut_point, linetype = "dashed") +
-  annotate("text", x = cut_point, y = Inf, vjust = 1.5, hjust = -0.05,
-           label = paste0("mean / cut point = ", round(cut_point, 1), " min")) +
-  scale_x_continuous(breaks = seq(0, 1080, by = 120)) + # tick every 2 hours
-  labs(title = "Internet use on a typical day (netustm)",
-       subtitle = paste0("Valid N = ", n_iv,
-                         " (regular internet users only); bins of 30 min"),
-       x = "Minutes per day", y = "Number of respondents")
-plot_iv
-ggsave("figures/fig2_iv_netmin_hist.png", plot_iv, width = 6, height = 4, dpi = 300)
-# READ: right-skewed with a long tail up to 1,080 min; spikes at round
-# numbers (e.g. 60, 120, 180 min) show response heaping
-
-# part 3.c - bar chart of the grouping variable
-# count and share of each group are written on top of the bars
+# part 3.b - binary grouping variable: valid N, count and share in each group, mode
+# (no mean, sd, range or IQR: they mean nothing for a 0/1 category)
 group_counts <- ess %>%
   filter(!is.na(net_group)) %>%
   count(net_group) %>%
-  mutate(share = n / sum(n),
-         label = paste0(n, " (", round(100 * share), "%)"))
+  mutate(share = n / sum(n))
 group_counts
+group_mode <- as.character(group_counts$net_group[which.max(group_counts$n)])
+group_mode
+# result: valid N 1212; at or below mean 717 (59%), above mean 495 (41%); mode = at or below mean
 
-plot_group <- ggplot(group_counts, aes(x = net_group, y = n)) +
-  geom_col(fill = bar_fill, width = 0.6) +
-  geom_text(aes(label = label), vjust = -0.5) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) + # room for labels
-  labs(title = "Grouping variable: internet use split at the mean",
-       subtitle = paste0("Valid N = ", sum(group_counts$n),
-                         "; cut point = ", round(cut_point, 1), " min"),
-       x = NULL, y = "Number of respondents")
-plot_group
-ggsave("figures/fig3_group_bar.png", plot_group, width = 6, height = 4, dpi = 300)
-# READ: both groups are reasonably large; the "at or below mean" group is
-# bigger because the right-skewed tail pulls the mean above the median
+# part 3.c - one style for every figure
+# all sizes come from one unit, X = 4.5pt (the x-height of the report's body text):
+# line = 3X, column = 16X, gutter = 3X, plot text x-height = 3/4 X, lines X/10.
+# the report places each figure on that grid, so the figures are saved at their exact size.
+library(patchwork)   # stacks the two panels of Figure 2
+
+X    <- 4.5                                       # points
+span <- function(n) (n * 16 * X + (n - 1) * 3 * X) / 72   # width of n columns, inches
+line <- 3 * X / 72                                # one line, inches
+fs   <- 0.75 * X / 0.519                          # plot text size (font x-height = 0.519 em)
+lw   <- (X / 10) / .pt                            # hairline in ggplot units
+black <- "#000000"; grey <- "#8c8c8c"             # grey = group 0, black = group 1
+# plot text uses ABC Areal Mono if it is installed (licensed, not shared), else the system mono
+fam <- "mono"
+if (requireNamespace("systemfonts", quietly = TRUE) &&
+    "ABC Areal Mono Variable" %in% systemfonts::system_fonts()$family) fam <- "ABC Areal Mono Variable"
+
+theme_report <- theme_void(base_size = fs, base_family = fam) +
+  theme(axis.text   = element_text(colour = black, size = fs),
+        axis.text.x = element_text(margin = margin(t = 2)),
+        axis.text.y = element_text(margin = margin(r = 3), hjust = 1),
+        legend.position = "none",
+        plot.margin = margin(2, 2, 0, 0),
+        plot.background = element_rect(fill = "white", colour = NA))
+note <- function(...) annotate("text", family = fam, size = fs / .pt, ...)   # in-plot label
+white_lines <- function(at) geom_hline(yintercept = at, colour = "white", linewidth = 2 * lw)
+
+out_dir <- "figures"
+dir.create(out_dir, showWarnings = FALSE)
+save_fig <- function(p, file, cols, lines) {
+  ggsave(file.path(out_dir, file), p, width = span(cols), height = lines * line, dpi = 600)
+}
+
+# part 3.d - Figure 1: DV histogram, one bar per answer (binwidth 1), share and count on top
+fig1 <- ggplot(filter(ess, !is.na(lonely)), aes(lonely)) +
+  geom_histogram(binwidth = 1, boundary = 0.5, fill = black) +
+  white_lines(c(250, 500, 750)) +                 # white lines through the bars replace a grid
+  geom_text(stat = "bin", binwidth = 1, boundary = 0.5, vjust = -0.25, lineheight = 0.9,
+            family = fam, size = fs / .pt,
+            aes(label = after_stat(paste0(round(100 * count / sum(count)), "%\n",
+                                          formatC(count, big.mark = ",", format = "d"))))) +
+  annotate("point", x = desc["mean", "lonely"], y = -140, shape = 17, size = 1.2) +
+  note(x = desc["mean", "lonely"] + 0.12, y = -140, hjust = 0,
+       label = sprintf("mean %.2f", desc["mean", "lonely"])) +
+  scale_x_continuous(breaks = 1:4, labels = c("None", "Some", "Most", "All")) +
+  scale_y_continuous(limits = c(-230, 1480), expand = c(0, 0)) +
+  theme_report + theme(axis.text.y = element_blank())
+fig1
+
+# part 3.e - Figure 2 (top panel): IV histogram in 10-minute bins, bars shaded by group,
+# the mean (= cut point) marked, groups labelled directly instead of a legend
+x_minutes <- scale_x_continuous(breaks = seq(0, 1080, 120), labels = c(0, paste0(seq(2, 18, 2), "h")),
+                                limits = c(0, 1080), expand = expansion(add = c(5, 10)))
+fig2_top <- ggplot(filter(ess, !is.na(net_min)), aes(net_min, fill = net_group)) +
+  geom_histogram(binwidth = 10, boundary = 0, closed = "left") +
+  scale_fill_manual(values = c(grey, black)) +
+  white_lines(c(50, 100, 150)) +
+  annotate("segment", x = cut_point, xend = cut_point, y = 0, yend = 195, linewidth = 1.5 * lw) +
+  note(x = cut_point + 25, y = 190, hjust = 0, label = sprintf("mean = cut point, %.1f min", cut_point)) +
+  note(x = 1075, y = 185, hjust = 1, label = sprintf("1  above mean: %d", group_counts$n[2])) +
+  note(x = 1075, y = 140, hjust = 1, colour = grey, label = sprintf("0  at or below: %d", group_counts$n[1])) +
+  x_minutes +
+  scale_y_continuous(breaks = c(50, 100, 150), limits = c(0, 205), expand = c(0, 0)) +
+  theme_report + theme(axis.text.x = element_blank())
+# its lower panel is built in step 5, where it belongs
+
+# part 3.f - Figure 3: bar chart of the grouping variable, count and share
+fig3 <- ggplot(group_counts, aes(n, net_group, fill = net_group)) +
+  geom_col(width = 0.62) +
+  geom_text(aes(label = sprintf("%d (%.0f%%)", n, 100 * share)), hjust = -0.1, family = fam, size = fs / .pt) +
+  scale_fill_manual(values = c(grey, black)) +
+  scale_y_discrete(labels = c("0  At or below", "1  Above")) +
+  scale_x_continuous(limits = c(0, 1180), expand = c(0, 0)) +
+  theme_report + theme(axis.text.x = element_blank())
+fig3
+
+save_fig(fig1, "fig1_lonely.png", cols = 2, lines = 6)
+save_fig(fig3, "fig3_groups.png", cols = 2, lines = 2)
 
 
 # ------------------- STEP 4 -------------------------- #
@@ -344,9 +381,10 @@ ggsave("figures/fig3_group_bar.png", plot_group, width = 6, height = 4, dpi = 30
 # binary variable compared with respondents on the other side of the binary variable?
 # is the mean of feeling lonely different between high and low internet usage?
 
-# chosen t-test: Independent two-sample t-test
+# chosen t-test: Welch two-sample t-test (R's default in t.test)
 # reason: we want to compare the means of fltlnl for the two independent groups high and low
-# internet usage
+# internet usage; the groups differ in size (717 vs 495) and spread (sd 0.60 vs 0.65), and
+# Welch does not assume equal variances
 
 ess %>%
   group_by(net_group) %>%
@@ -377,3 +415,85 @@ t.test(ess$lonely ~ ess$net_group)
 # sample estimates:
 # mean in group At or below mean       mean in group Above mean
 #                      1.302098                       1.325253
+
+# part 4.b - Figure 4: mean loneliness in each group with its 95% confidence interval;
+# the dashed line is the mean of all respondents
+tt <- t.test(ess$lonely ~ ess$net_group)        # Welch: R's default, no equal-variance assumption
+group_means <- ess %>%
+  filter(!is.na(net_group), !is.na(lonely)) %>%
+  group_by(net_group) %>%
+  summarise(n = n(), m = mean(lonely), s = sd(lonely)) %>%
+  mutate(lo = m - qt(0.975, n - 1) * s / sqrt(n),
+         hi = m + qt(0.975, n - 1) * s / sqrt(n))
+group_means
+
+fig4 <- ggplot(group_means, aes(m, net_group, colour = net_group)) +
+  annotate("segment", x = desc["mean", "lonely"], xend = desc["mean", "lonely"], y = 0.6, yend = 2.4,
+           linewidth = lw, linetype = "22", colour = grey) +
+  geom_segment(aes(x = lo, xend = hi, yend = net_group), linewidth = 3 * lw) +
+  geom_point(size = 1.8) +
+  geom_text(aes(x = hi, label = sprintf("%.2f", m)), hjust = -0.3, family = fam, size = fs / .pt, colour = black) +
+  scale_colour_manual(values = c(grey, black)) +
+  scale_y_discrete(labels = c("0", "1")) +
+  scale_x_continuous(limits = c(1.2, 1.45), breaks = c(1.2, 1.3, 1.4)) +
+  theme_report
+fig4
+save_fig(fig4, "fig4_means.png", cols = 2, lines = 2)
+
+
+# ------------------- STEP 5 -------------------------- #
+# the limitation of the cut point: the t-test only sees "left or right of the mean".
+# mean loneliness inside bands of internet time shows what the split throws away.
+# drawn under the IV histogram on the same minutes axis (Figure 2, lower panel).
+
+breaks <- c(0, 60, 120, 180, 240, 360, 480, 1080)   # under 1h, 1-2h, 2-3h, 3-4h, 4-6h, 6-8h, 8h+
+bands <- ess %>%
+  filter(!is.na(net_min), !is.na(lonely)) %>%
+  mutate(band = cut(net_min, breaks, right = FALSE, include.lowest = TRUE)) %>%
+  group_by(band) %>%
+  summarise(n = n(), m = mean(lonely), se = sd(lonely) / sqrt(n())) %>%
+  mutate(from = head(breaks, -1), to = breaks[-1], mid = (from + to) / 2,
+         side = factor(ifelse(to <= cut_point + 5, "At or below mean", "Above mean"),
+                       levels = levels(ess$net_group)))
+bands
+# result: band means stay between about 1.2 and 1.4 with overlapping intervals,
+# so no trend is hidden inside the two groups
+
+fig2_bottom <- ggplot(bands) +
+  annotate("segment", x = cut_point, xend = cut_point, y = 1.05, yend = 1.6, linewidth = 1.5 * lw) +
+  annotate("segment", x = 0, xend = 1080, y = desc["mean", "lonely"], yend = desc["mean", "lonely"],
+           linewidth = lw, linetype = "22", colour = grey) +
+  geom_segment(aes(x = mid, xend = mid, y = m - 1.96 * se, yend = m + 1.96 * se, colour = side), linewidth = 1.5 * lw) +
+  geom_segment(aes(x = from + 4, xend = to - 4, y = m, yend = m, colour = side), linewidth = 3 * lw) +
+  scale_colour_manual(values = c(grey, black)) +
+  x_minutes +
+  scale_y_continuous(breaks = c(1.2, 1.4), limits = c(1.05, 1.6), expand = c(0, 0)) +
+  theme_report
+fig2 <- fig2_top / fig2_bottom + plot_layout(heights = c(4, 2))
+fig2
+save_fig(fig2, "fig2_internet.png", cols = 5, lines = 6)
+
+
+# ------------------- STEP 6 -------------------------- #
+# every number printed in the report, written to one file that the report reads,
+# so no number is typed by hand
+f <- function(x, d = 0) formatC(x, format = "f", digits = d, big.mark = ",")
+report_numbers <- data.frame(rbind(
+  c("lonely_n",   f(desc["valid_n", "lonely"])),   c("net_n",      f(desc["valid_n", "net_min"])),
+  c("lonely_mean", f(desc["mean", "lonely"], 2)),  c("net_mean",   f(desc["mean", "net_min"], 1)),
+  c("lonely_median", f(desc["median", "lonely"])), c("net_median", f(desc["median", "net_min"])),
+  c("lonely_mode", f(desc["mode", "lonely"])),     c("net_mode",   f(desc["mode", "net_min"])),
+  c("lonely_var",  f(desc["variance", "lonely"], 2)), c("net_var", f(desc["variance", "net_min"])),
+  c("lonely_sd",   f(desc["sd", "lonely"], 2)),    c("net_sd",     f(desc["sd", "net_min"], 1)),
+  c("lonely_range", paste0(f(desc["min", "lonely"]), "–", f(desc["max", "lonely"]))),
+  c("net_range",   paste0(f(desc["min", "net_min"]), "–", f(desc["max", "net_min"]))),
+  c("lonely_iqr",  f(desc["iqr", "lonely"])),      c("net_iqr",    f(desc["iqr", "net_min"])),
+  c("group_n",     f(sum(group_counts$n))),        c("group_mode", ifelse(group_mode == "Above mean", "1", "0")),
+  c("diff",        sprintf("%+.2f", diff(tt$estimate))),        # group 1 minus group 0
+  c("diff_lo",     sprintf("%.2f", -tt$conf.int[2])), c("diff_hi", sprintf("%.2f", -tt$conf.int[1])),
+  c("t",           sprintf("%.2f", -tt$statistic)), c("df",       sprintf("%.0f", tt$parameter)),
+  c("p",           sprintf("%.2f", tt$p.value))
+))
+names(report_numbers) <- c("name", "value")
+write.csv(report_numbers, file.path(out_dir, "report_numbers.csv"), row.names = FALSE)
+report_numbers

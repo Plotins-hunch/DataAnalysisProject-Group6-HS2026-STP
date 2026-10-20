@@ -57,8 +57,25 @@
 1. Put the R script and the data files in the same folder, and open that folder as an RStudio Project (or set it as the working directory).
 2. Install the packages once if needed:
    ```r
-   install.packages(c("readr", "dplyr", "ggplot2"))
+   install.packages(c("readr", "dplyr", "ggplot2", "patchwork"))
    ```
 3. Open `00_exploration.R` and run it from top to bottom: line by line with Ctrl/Cmd + Enter, or all at once with **Source**.
 
 The script reads all columns as text, because the CSV stores answers as labels (e.g. "Some of the time"). It then converts the variables we use into numbers itself.
+
+The script runs from the raw CSV through every recode, statistic, test and figure in the report:
+step 3 computes the descriptives and Figures 1–3, step 4 runs the Welch t-test and draws Figure 4,
+step 5 draws the cut-point panel of Figure 2, and step 6 writes every number the report prints to
+`figures/report_numbers.csv`. All figures go to `figures/`.
+
+## Building the report
+
+The one-page report is `Report/report.typ` ([Typst](https://typst.app)). It reads the figures and
+numbers straight from the script's `figures/` folder, so run the script first, then from the repo root:
+
+```sh
+typst compile --root . --font-path <folder with the ABC Areal fonts> Report/report.typ
+```
+
+The report is set in ABC Areal and ABC Areal Mono. They are licensed fonts and are not in the repo:
+install them locally (the PDF embeds them). Without them, Typst and R fall back to system fonts.

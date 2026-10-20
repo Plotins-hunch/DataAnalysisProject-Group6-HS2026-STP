@@ -14,7 +14,12 @@
 //            so both sit on one grid). The fonts are licensed and stay out of the repo:
 //            install them locally, or compile with --font-path pointing at them.
 //   rules    X/10 = 0.45pt
-//   figures  whole columns wide, whole lines tall (make_figures_draft.R uses the same numbers)
+//   figures  whole columns wide, whole lines tall (the R script uses the same numbers)
+//
+// DATA. Every figure and every number on the page comes from the analysis script
+// Working/Group6_InternetAndLoneliness/Exploration_00.R (steps 3–6), which writes them to
+// its figures/ folder. Nothing is typed by hand. Compile from the repo root:
+//   typst compile --root . --font-path <folder with ABC Areal> Report/report.typ
 //
 // Construction (Müller-Brockmann): every element starts on a module top and spans whole
 // modules (1 = 3 lines, 2 = 7, 3 = 11). Only three widths are used:
@@ -47,6 +52,16 @@
 #let mtop(m) = (m - 1) * 4 + 1               // first line of module row m
 #let show-grid = sys.inputs.at("grid", default: "false") == "true"
 
+#let out = "/Working/Group6_InternetAndLoneliness/figures/"          // the script's output folder
+#let n = {                                                            // report_numbers.csv → n.name
+  let d = (:)
+  for row in csv(out + "report_numbers.csv").slice(1) {
+    let v = row.at(1)
+    d.insert(row.at(0), if v.starts-with("-") { "−" + v.slice(1) } else { v })   // true minus sign
+  }
+  d
+}
+
 // every line box is exactly one line (3X): the baseline sits 3.5pt above the box bottom
 #let base-drop = 3.5pt
 
@@ -72,7 +87,7 @@
 #let side(m, body) = at(5, mtop(m), 2, small(meta(body)))
 #let fig(m, lines, caption, file, c: 5, cols: 2) = at(c, mtop(m), cols, {
   block(height: u, small(caption))
-  image("figures/" + file, width: span(cols), height: lines * u)
+  image(out + file, width: span(cols), height: lines * u)
 })
 #let sec(m, heading: none, sub: none, body) = {
   if heading != none { at(1, mtop(m), 1, text(weight: "bold", heading)) }
@@ -93,17 +108,17 @@
 
 // ---------- modules 3–6: 1 Variables ----------
 #sec(3, heading: [1 Variables], sub: [Dependent])[#lorem(56)]
-#fig(3, 6, [#label[Fig. 1]  Felt lonely, `fltlnl`, N 1,382], "f1_dv_hist.png")
+#fig(3, 6, [#label[Fig. 1]  Felt lonely, `fltlnl`, N #n.lonely_n], "fig1_lonely.png")
 
 #sec(5, sub: [Independent])[#lorem(56)]
 #side(5)[Asked only if online most days: 168 not asked, 4 don't know. Kept missing, not 0 min.]
 
 // ---------- modules 7–8: Figure 2 breakout ----------
-#fig(7, 6, [#label[Fig. 2]  Minutes online per day, `netustm`, N 1,212. #meta[Below: loneliness per band, 95% CI]], "f2_iv_hist.png", c: 2, cols: 5)
+#fig(7, 6, [#label[Fig. 2]  Minutes online per day, `netustm`, N #n.net_n. #meta[Below: loneliness per band, 95% CI]], "fig2_internet.png", c: 2, cols: 5)
 
 // ---------- module 9: 2 Grouping ----------
 #sec(9, heading: [2 Grouping])[#lorem(24)]
-#fig(9, 2, [#label[Fig. 3]  `net_group`, N 1,212, mode 0], "f3_group_bar.png")
+#fig(9, 2, [#label[Fig. 3]  `net_group`, N #n.group_n, mode #n.group_mode], "fig3_groups.png")
 
 // ---------- modules 10–11: 3 Descriptives, 4 Test; Table 1 in the margin ----------
 #sec(10, heading: [3 Descriptives])[#lorem(24)]
@@ -112,18 +127,18 @@
 #at(5, mtop(10), 2, small(table(columns: (span(2) / 3,) * 3, stroke: none, inset: 0pt, align: (left, right, right),
   [#label[Table 1]], [Lonely], [Min/day],
   r,
-  [Valid N],  [1,382], [1,212],
-  [Mean],     [1.31],  [235.6],
-  [Median],   [1],     [180],
-  [Mode],     [1],     [120],
-  [Variance], [0.38],  [39,098],
-  [SD],       [0.61],  [197.7],
-  [Range],    [1–4],   [4–1,080],
-  [IQR],      [0],     [270],
+  [Valid N],  n.lonely_n,      n.net_n,
+  [Mean],     n.lonely_mean,   n.net_mean,
+  [Median],   n.lonely_median, n.net_median,
+  [Mode],     n.lonely_mode,   n.net_mode,
+  [Variance], n.lonely_var,    n.net_var,
+  [SD],       n.lonely_sd,     n.net_sd,
+  [Range],    n.lonely_range,  n.net_range,
+  [IQR],      n.lonely_iqr,    n.net_iqr,
   r,
 )))
 
 // ---------- modules 12–14: 5 Interpretation; Figure 4 and the test result in the margin ----------
 #sec(12, heading: [5 Interpretation])[#lorem(76)]
-#fig(13, 2, [#label[Fig. 4]  Mean loneliness, 95% CI], "f4_group_means.png")
-#side(14)[#label[Welch t-test] \ 1 − 0: +0.02, 95% CI −0.05 to 0.09 \ t 0.63, df 1004, p 0.53]
+#fig(13, 2, [#label[Fig. 4]  Mean loneliness, 95% CI], "fig4_means.png")
+#side(14)[#label[Welch t-test] \ 1 − 0: #n.diff, 95% CI #n.diff_lo to #n.diff_hi \ t #n.t, df #n.df, p #n.p]
