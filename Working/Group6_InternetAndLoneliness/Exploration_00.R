@@ -319,8 +319,15 @@ text_size    <- 2.5               # text inside the plots, about 7 pt
 red <- "#b2182b"; grey <- "#a6a6a6"; dark <- "#5c5c5c"; text_grey <- "#666666"
 group_colours <- c(grey, red)     # in the order of the factor levels: 0 at or below, 1 above
 
-# font: the report's font if it is installed on this computer, otherwise the system sans-serif
-font <- if ("ABC Areal Variable" %in% systemfonts::system_fonts()$family) "ABC Areal Variable" else "sans"
+# font: the report's font, read from the repo's Report/fonts folder so the figures look the same
+# on every computer; if the file is not there, the system sans-serif is used instead
+font_file <- "../../Report/fonts/ABCArealVariable.ttf"
+if (file.exists(font_file)) {
+  systemfonts::register_font("ABC Areal", plain = font_file)   # makes the file usable under this name
+  font <- "ABC Areal"
+} else {
+  font <- "sans"
+}
 
 # theme: no grid, no legend, no y-axis; the values are written on the data instead.
 # theme_void() is an empty look; theme() switches single elements back on or sets them
@@ -333,10 +340,7 @@ theme_report <- theme_void(base_family = font) +
 # function(...) { } defines our own command; ggsave() writes a plot to a file
 dir.create("figures", showWarnings = FALSE)                # the folder the figures go to
 save_fig <- function(p, file, width, lines) {
-  path <- file.path("figures", file)
-  ggsave(path, p, width = width, height = lines * line_height)
-  # the report knows the font as "ABC Areal": replace the name inside the saved file
-  writeLines(gsub("ABC Areal Variable", "ABC Areal", readLines(path), fixed = TRUE), path)
+  ggsave(file.path("figures", file), p, width = width, height = lines * line_height)
 }
 
 # the respondents each figure can use: filter() keeps the rows where the condition is true,
