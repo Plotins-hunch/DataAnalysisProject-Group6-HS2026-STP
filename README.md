@@ -2,7 +2,7 @@
 
 **Course:** Data Analysis for Public Policy Research (860-0041-00L), ETH Zurich, HS2026
 **Assignment:** Group Report #1: Operationalisation, Descriptives, and Comparing Two Groups (due 28 October 2026)
-**Group members:** Gabriele Pizzi, Clara Roth, Ole Handschug, Joshua Silalahi
+**Group members:** Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi
 
 **Research question:** Is people's internet use associated with their feeling of loneliness?
 
@@ -18,6 +18,7 @@
 | `ESS11_CH_codebook.html`, `ESS10_CH_codebook.html` | Codebooks: variable names, question wording, answer codes |
 | `ESS11_CH_questionnaire.pdf`, `ESS10_CH_questionnaire.pdf` | Original questionnaires |
 | `Group_Research_Project_Report_1_Assignment_Details.pdf` | Assignment brief and grading rubric |
+| `figures/` | ggplot charts made by Step 3 of the script: DV histogram, IV histogram, group bar chart |
 
 1. **Chose the dataset: ESS Round 11.** The only direct loneliness question (`fltlnl`) exists in Round 11 but not in Round 10. The whole "how much of the time during the past week did you…" block is missing from Round 10.
 2. **Listed all candidate items** for each concept by searching the column names and the codebook.
@@ -61,3 +62,21 @@
 3. Open `00_exploration.R` and run it from top to bottom: line by line with Ctrl/Cmd + Enter, or all at once with **Source**.
 
 The script reads all columns as text, because the CSV stores answers as labels (e.g. "Some of the time"). It then converts the variables we use into numbers itself.
+
+The script runs from the raw CSV through every recode, statistic, test and figure in the report:
+step 3 computes the descriptives and Figures 1–3, step 4 runs the t-test and draws Figure 4,
+step 5 draws Figure 5 (the cut-point limitation), and step 6 writes every number the report prints to
+`figures/report_numbers.csv`. All figures go to `figures/` as SVG, which needs one more package:
+`install.packages("svglite")`.
+
+## Building the report
+
+The one-page report is `Report/report.typ` ([Typst](https://typst.app)). It reads the figures and
+numbers straight from the script's `figures/` folder, so run the script first, then from the repo root:
+
+```sh
+typst compile --root . --font-path <folder with the ABC Areal fonts> Report/report.typ
+```
+
+The report is set in ABC Areal and ABC Areal Mono. They are licensed fonts and are not in the repo:
+install them locally (the PDF embeds them). Without them, Typst and R fall back to system fonts.
