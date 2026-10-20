@@ -16,6 +16,11 @@
 //   2  Every left edge sits on A, B or C. Plot panels fill their column: no y-axes, values are
 //      labelled on the data, so the data starts on the column edge.
 //      Every piece of evidence sits in C beside the paragraph that reads it.
+//   2b One breakout: the figure that shows the question itself (Figure 5, every respondent)
+//      spans B+C in a row of its own, label in A.
+//   7  Text and evidence never repeat each other. Captions say only what is drawn (variable,
+//      unit, encoding), never a finding; the text never restates a number shown in C, it
+//      says why and what it means.
 //   3  A row's elements hang from one line: the cap height of every first line, whatever its
 //      size (title, text, small), sits on the same hang line.
 //   4  A row is as tall as its tallest element, in whole lines.
@@ -41,6 +46,7 @@
 // ONE FAMILY, ONE WEIGHT   ABC Areal regular throughout. ABC Areal Mono only for variable names.
 // THREE INKS   ink for content; grey for supporting information; red for one meaning only:
 //              group 1 (above the mean) and the cut point, in figures and text alike.
+// TEXT   how to write the body text against the figures: Report/WRITING_NOTES.md
 // DATA   every figure and number comes from Working/Group6_InternetAndLoneliness/Exploration_00.R.
 //        The licensed fonts stay out of the repo; without them Typst falls back to Arial.
 
@@ -139,8 +145,8 @@
 #grid(
   columns: (col-a, col-b, col-c),
   column-gutter: gut,
-  //           title  facts→DV  DV   IV   grp  desc→test  test
-  row-gutter: (2 * u, 2 * u,    u,   u,   u,   2 * u,     u),
+  //           title  facts→DV  DV   IV   grp  desc→test  test  fig5
+  row-gutter: (2 * u, 2 * u,    u,   u,   u,   2 * u,     u,    u),
 
   // ---- header: the title is the one large thing on the page (rule 1) ----
   tag[Report 1 \ Group 6],
@@ -156,10 +162,10 @@
   // ---- 1 Variables ----
   ..row([1 Variables \ #keys([Dependent], `fltlnl`, [scale 1–4], [N #n.lonely_n])],
         [#lorem(56)],
-        fig([Figure 1 Felt lonely in the past week], "fig1_lonely.svg", 6)),
+        fig([Figure 1 Felt lonely in the past week], "fig1_lonely.svg", 5)),
   ..row(keys([Independent], `netustm`, [min per day], [N #n.net_n], [#n.net_missing missing]),
         [#lorem(58)],
-        fig([Figure 2 Minutes online, #g1[above the mean]], "fig2_internet.svg", 5)),
+        fig([Figure 2 Time online, #g1[red above the mean]], "fig2_internet.svg", 5)),
 
   // ---- 2 Grouping: the group bar chart and the boundary note ----
   ..row([2 Grouping \ #keys(`net_group`, [cut #n.cut min])],
@@ -184,13 +190,17 @@
           [IQR],      n.lonely_iqr,    n.net_iqr, rule,
         )),
 
-  // ---- 4 Test ----
+  // ---- 4 Test: the case for Welch beside the text ----
   ..row([4 Test],
-        [#lorem(34)],
-        fig([Figure 4 Mean loneliness, 95% CI \ 0: N #n.n0, SD #n.sd0 · #g1[1: N #n.n1, SD #n.sd1] \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 4)),
+        [#lorem(26)],
+        evidence[0 at or below: N #n.n0, SD #n.sd0 \ #g1[1 above: N #n.n1, SD #n.sd1]]),
 
-  // ---- 5 Interpretation ----
+  // ---- the one breakout (rule 2b): Figure 5, the question itself, across B and C ----
+  tag[Figure 5],
+  grid.cell(colspan: 2, fig([Every respondent, loneliness (1–4, jittered) by minutes online, #g1[red above the mean], lines: group means], "fig5_scatter.svg", 5, width: col-b + gut + col-c)),
+
+  // ---- 5 Interpretation: the result beside its reading ----
   ..row([5 Interpretation],
-        [#lorem(72)],
-        fig([Figure 5 Respondents and group means], "fig5_scatter.svg", 6)),
+        [#lorem(60)],
+        fig([Figure 4 Mean loneliness, 95% CI \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 4)),
 )

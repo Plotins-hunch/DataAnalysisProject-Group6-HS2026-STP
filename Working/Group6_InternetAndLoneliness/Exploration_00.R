@@ -309,7 +309,7 @@ X     <- 595.28 / 135              # points: A4 width / 135, the report's unit
 # base grid: 6 columns of 16X with 3X gutters; a figure spans whole columns
 span   <- function(n) (n * 16 * X + (n - 1) * 3 * X) / 72   # width of n columns, inches
 col_c  <- span(2)                  # evidence zone: 2 columns
-col_bc <- span(5)                  # text + evidence: 5 columns, the one breakout (Figure 2)
+col_bc <- span(5)                  # text + evidence: 5 columns, the one breakout (Figure 5)
 line  <- 2.5 * X / 72              # one line (11pt), inches
 fs    <- (5 / 6) * X / 0.519       # small text: x-height 5/6 X (font x-height = 0.519 em), 7.2pt
 lw    <- (X / 10) / .pt            # hairline, X/10
@@ -354,7 +354,7 @@ fig1 <- ggplot(filter(ess, !is.na(lonely)), aes(lonely)) +
   scale_y_continuous(limits = c(0, 1300), expand = c(0, 0)) +
   theme_report
 fig1
-save_fig(fig1, "fig1_lonely.svg", lines = 6)
+save_fig(fig1, "fig1_lonely.svg", lines = 5)
 
 # part 3.e - Figure 2: IV histogram in 10-minute bins, bars coloured by group, the mean
 # (= cut point) marked; the group sizes are in Figure 3, so they are not repeated here.
@@ -457,17 +457,17 @@ points <- filter(ess, !is.na(net_min), !is.na(lonely))
 mean_lines <- group_means %>% mutate(from = c(0, cut_point), to = c(cut_point, 1080))
 
 fig5 <- ggplot(points, aes(net_min, lonely, colour = net_group)) +
-  geom_jitter(width = 0, height = 0.22, size = 0.55, alpha = 0.6, stroke = 0) +
+  geom_jitter(width = 0, height = 0.22, size = 0.7, alpha = 0.55, stroke = 0) +
   annotate("segment", x = cut_point, xend = cut_point, y = 0.6, yend = 4.4, linewidth = 1.5 * lw, colour = red) +
   geom_segment(data = mean_lines, aes(x = from, xend = pmin(to, 1080), y = m, yend = m), linewidth = 3 * lw) +
-  note(x = 1150, y = 1:4, hjust = 1, colour = grey_text, label = 1:4) +       # the loneliness scale, in its own strip
+  note(x = 1105, y = 1:4, hjust = 1, colour = grey_text, label = 1:4) +       # the loneliness scale, in its own strip
   scale_colour_manual(values = c(grey, red)) +
-  scale_x_continuous(breaks = c(240, 480, 720, 960), labels = c("4h", "8h", "12h", "16h"),
-                     limits = c(0, 1160), expand = c(0, 0)) +
+  scale_x_continuous(breaks = seq(120, 960, 120), labels = paste0(seq(2, 16, 2), "h"),
+                     limits = c(0, 1110), expand = c(0, 0)) +
   scale_y_continuous(limits = c(0.6, 4.4), expand = c(0, 0)) +
   theme_report
 fig5
-save_fig(fig5, "fig5_scatter.svg", lines = 6)
+save_fig(fig5, "fig5_scatter.svg", lines = 5, width = col_bc)   # the one full-width figure
 # result: loneliness is spread the same way on both sides of the cut point; the two
 # group means are almost the same height. the split hides how minutes vary inside each
 # group, which Report 2 uses in full.
