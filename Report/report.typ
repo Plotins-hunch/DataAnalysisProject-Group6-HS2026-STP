@@ -3,10 +3,11 @@
 // Show the grid:               add  --input grid=true
 //
 // ONE UNIT   X = 4.5pt, the x-height of the text (ABC Areal: x-height 0.519 em).
-// ONE GRID   a baseline every 3X, and three columns, the same on every row:
-//              A  labels    16X   72pt
-//              B  text      54X   243pt
-//              C  evidence  35X   157.5pt      gutters 3X
+// ONE GRID   a baseline every 3X, and a base grid of 12 columns of 6X, gutters 3X. Three zones,
+//            each a whole number of columns, the same on every row:
+//              A  labels    2 columns   15X   67.5pt
+//              B  text      6 columns   51X   229.5pt
+//              C  evidence  4 columns   33X   148.5pt
 // FOUR RULES
 //   1  Size follows role. Three sizes, all from X:
 //        title  x-height 3X (26pt), two lines on a leading of two grid lines, the one large thing
@@ -23,7 +24,7 @@
 //   6  Zones: white space is the structure. Rows inside a zone are one empty line apart;
 //      zones are two apart: statement (title, fact sheet) | description (sections 1–3) |
 //      inference (sections 4–5). No rules, no boxes.
-// FOOT    the credits sit at the foot of the page on the same three columns.
+// FOOT    the credits sit at the foot of the page on the same three zones.
 //      Figures are vector (SVG), so every line and letter stays sharp.
 // MINIMUM VIABLE VISUALISATION   each figure shows only what its job needs; anything the
 //   table, a caption or another figure already carries is left out of the plot.
@@ -45,10 +46,15 @@
 #let xh     = 0.519
 #let u      = 3 * X                               // one line
 #let gut    = 3 * X
-#let col-a  = 16 * X
-#let col-b  = 54 * X
-#let col-c  = 35 * X
-#let tw     = col-a + col-b + col-c + 2 * gut     // 111X = 499.5pt
+// BASE GRID: 12 equal columns of 6X with gutters of 3X (one line). Every width is a whole
+// number of columns: labels 2, text 6, evidence 4, the Figure 2 breakout 10.
+#let ncol   = 12
+#let col    = 6 * X
+#let span(n) = n * col + (n - 1) * gut
+#let col-a  = span(2)                             // 15X  67.5pt
+#let col-b  = span(6)                             // 51X  229.5pt
+#let col-c  = span(4)                             // 33X  148.5pt
+#let tw     = span(ncol)                          // 105X 472.5pt
 #let nlin   = 55
 #let th     = nlin * u
 #let text-size  = X / xh                          // 8.67pt
@@ -70,9 +76,7 @@
 
 #set page(paper: "a4", margin: (left: 12 * X, top: 10 * X, right: 595.28pt - 12 * X - tw, bottom: 841.89pt - 10 * X - th),
   background: if show-grid { place(dx: 12 * X, dy: 10 * X, {
-    for (x, w) in ((0pt, col-a), (col-a + gut, col-b), (col-a + col-b + 2 * gut, col-c)) {
-      place(dx: x, rect(width: w, height: th, fill: luma(94%), stroke: none))
-    }
+    for i in range(ncol) { place(dx: i * (col + gut), rect(width: col, height: th, fill: luma(94%), stroke: none)) }
     for i in range(nlin) { place(dy: i * u + u - base-drop, line(length: tw, stroke: 0.25pt + rgb(0, 120, 255, 50%))) }
   }) })
 
@@ -138,16 +142,16 @@
     meta[Question], [Is people's internet use associated with their feeling of loneliness?],
     meta[Data],     meta[European Social Survey Round 11, Switzerland, N #n.n_total],
     meta[Method],   meta[Split at mean internet use (#n.cut min); Welch t-test],
-    meta[Answer],   [#lorem(6) #g1[above the mean] #lorem(6)],
+    meta[Answer],   [#lorem(5) #g1[above the mean] #lorem(5)],
   )),
-  fig([Figure 4 Mean loneliness by group, 95% CI \ Welch t-test #g1[1] − 0: #n.diff (95% CI #n.diff_lo to #n.diff_hi), \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 3),
+  fig([Figure 4 Mean loneliness by group, 95% CI \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 3),
 
   // ---- 1 Variables ----
   ..row([1 Variables \ #keys([Dependent], `fltlnl`, [scale 1–4], [N #n.lonely_n])],
-        [#lorem(50)],
+        [#lorem(43)],
         fig([Figure 1 Felt lonely in the past week], "fig1_lonely.svg", 5)),
   ..row(keys([Independent], `netustm`, [minutes per day], [N #n.net_n], [#n.net_missing missing]),
-        [#lorem(58)],
+        [#lorem(50)],
         small-table(
           [Table 1], [Loneliness], [Minutes], rule,
           [Mean],     n.lonely_mean,   n.net_mean,
@@ -164,17 +168,17 @@
 
   // ---- 2 Grouping ----
   ..row([2 Grouping \ #keys(`net_group`, [cut #n.cut min])],
-        [#lorem(10) #g1[above the mean (1)] #lorem(14)],
-        evidence(meta[#n.on_cut respondents sit exactly on the mean; a value equal to it would go to group 0. The #n.net_missing without a minutes answer stay out of both groups.])),
+        [#lorem(9) #g1[above the mean (1)] #lorem(12)],
+        evidence(meta[#n.on_cut on the mean (would go to 0) \ #n.net_missing without an answer: in neither group])),
 
   // ---- 3 Descriptives ----
   ..row([3 Descriptives \ #keys([Table 1], [Figures 1–3])],
-        [#lorem(22)],
+        [#lorem(19)],
         fig([Figure 3 Groups, N #n.group_n, mode #n.group_mode], "fig3_groups.svg", 2)),
 
   // ---- 4 Test ----
   ..row([4 Test \ #keys([Welch], [p #n.p])],
-        [#lorem(22)],
+        [#lorem(19)],
         small-table(
           [Loneliness], [N], [Mean · SD], rule,
           [0 at or below],   n.n0, [#n.m0 · #n.sd0],
@@ -183,6 +187,6 @@
 
   // ---- 5 Interpretation ----
   ..row([5 Interpretation \ #keys([Figure 5])],
-        [#lorem(46)],
-        fig([Figure 5 Every respondent; lines: group means], "fig5_scatter.svg", 5)),
+        [#lorem(40)],
+        fig([Figure 5 Respondents and group means], "fig5_scatter.svg", 5)),
 )
