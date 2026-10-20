@@ -9,13 +9,15 @@
 //              C  evidence  35X   157.5pt      gutters 3X
 // FOUR RULES
 //   1  Size follows column. A and B are set at the text size (x-height X, 8.67pt); C, and the
-//      text inside every plot, at the small size (x-height ¾X, 6.50pt). Two sizes, nothing else.
+//      text inside every plot, at the small size (x-height ⅚X, 7.23pt). Two sizes, nothing else.
 //   2  Every left edge sits on A, B or C. Plot panels fill their column: no y-axes, values are
 //      labelled on the data, so the data starts on the column edge.
 //   2b Breakout: a figure whose data needs width spans B+C in a row of its own, label in A.
 //      Only Figure 2 (long tail, heaping at whole hours, the cut point) qualifies.
 //   3  A row's elements start on the same baseline: label, text and caption share line one.
 //   4  Rows are separated by one empty line; a row is as tall as its tallest element, in whole lines.
+//   5  Clearance: nothing comes closer than X to anything else: caption to plot, label to mark.
+//      Figures are vector (SVG), so every line and letter stays sharp.
 // MINIMUM VIABLE VISUALISATION   each figure shows only what its job needs; anything the
 //   table, a caption or another figure already carries is left out of the plot.
 // HIERARCHY of information, expressed only by position, ink and size:
@@ -43,7 +45,7 @@
 #let nlin   = 55
 #let th     = nlin * u
 #let text-size  = X / xh                          // 8.67pt
-#let small-size = 0.75 * X / xh                   // 6.50pt
+#let small-size = 5 / 6 * X / xh                  // 7.23pt
 #let hair   = X / 10
 #let base-drop = 3.5pt                            // baseline sits 3.5pt above each line's bottom
 #let show-grid = sys.inputs.at("grid", default: "false") == "true"
@@ -110,12 +112,12 @@
     meta[Method],   meta[Split at mean internet use (#n.cut min); Welch t-test],
     meta[Answer],   [#lorem(6) #g1[above the mean] #lorem(6)],
   )),
-  fig([Figure 4 Mean loneliness by group, 95% CI \ Welch t-test #g1[1] − 0: #n.diff (95% CI #n.diff_lo to #n.diff_hi), \ t #n.t, df #n.df, p #n.p], "fig4_means.png", 3),
+  fig([Figure 4 Mean loneliness by group, 95% CI \ Welch t-test #g1[1] − 0: #n.diff (95% CI #n.diff_lo to #n.diff_hi), \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 3),
 
   // ---- 1 Variables ----
   ..row([1 Variables \ #keys([Dependent], `fltlnl`, [scale 1–4], [N #n.lonely_n])],
         [#lorem(50)],
-        fig([Figure 1 Felt lonely in the past week], "fig1_lonely.png", 5)),
+        fig([Figure 1 Felt lonely in the past week], "fig1_lonely.svg", 5)),
   ..row(keys([Independent], `netustm`, [minutes per day], [N #n.net_n], [#n.net_missing missing]),
         [#lorem(66)],
         small-table(
@@ -130,7 +132,7 @@
         )),
   // the breakout (rule 2b): Figure 2 across B and C, its label in A
   meta[Figure 2],
-  grid.cell(colspan: 2, fig([Minutes online per day, `netustm`, N #(n.net_n); grey at or below the mean, #g1[red above it]. White lines every 50 people], "fig2_internet.png", 3, width: col-b + gut + col-c)),
+  grid.cell(colspan: 2, fig([Minutes online per day, `netustm`, N #n.net_n, grey at or below the mean, #g1[red above it], white lines every 50 people], "fig2_internet.svg", 4, width: col-b + gut + col-c)),
 
   // ---- 2 Grouping ----
   ..row([2 Grouping \ #keys(`net_group`, [cut #n.cut min])],
@@ -140,7 +142,7 @@
   // ---- 3 Descriptives ----
   ..row([3 Descriptives \ #keys([Table 1], [Figures 1–3])],
         [#lorem(30)],
-        fig([Figure 3 Groups, N #n.group_n, mode #n.group_mode], "fig3_groups.png", 2)),
+        fig([Figure 3 Groups, N #n.group_n, mode #n.group_mode], "fig3_groups.svg", 2)),
 
   // ---- 4 Test ----
   ..row([4 Test \ #keys([Welch], [p #n.p])],
@@ -154,5 +156,5 @@
   // ---- 5 Interpretation ----
   ..row([5 Interpretation \ #keys([Figure 5])],
         [#lorem(58)],
-        fig([Figure 5 Every respondent, loneliness (1–4, jittered) by minutes online; lines: group means], "fig5_scatter.png", 5)),
+        fig([Figure 5 Every respondent, loneliness (1–4, jittered) by minutes online; lines: group means], "fig5_scatter.svg", 6)),
 )

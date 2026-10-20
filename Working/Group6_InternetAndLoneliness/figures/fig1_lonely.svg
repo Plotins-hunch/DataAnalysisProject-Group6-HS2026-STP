@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='157.50pt' height='67.50pt' viewBox='0 0 157.50 67.50'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHwxNTcuNTB8MC4wMHw2Ny41MA=='>
+    <rect x='0.00' y='0.00' width='157.50' height='67.50' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHwxNTcuNTB8MC4wMHw2Ny41MA==)'>
+<rect x='0.00' y='0.00' width='157.50' height='67.50' style='stroke-width: 0.75; stroke: none; fill: #FFFFFF;' />
+</g>
+<defs>
+  <clipPath id='cpMC4wMHwxNTcuNTB8NC40OHw1OC44MA=='>
+    <rect x='0.00' y='4.48' width='157.50' height='54.32' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHwxNTcuNTB8NC40OHw1OC44MA==)'>
+<rect x='0.00' y='15.35' width='39.38' height='43.46' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #1A1A1A;' />
+<rect x='39.38' y='47.10' width='39.38' height='11.70' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #1A1A1A;' />
+<rect x='78.75' y='57.26' width='39.38' height='1.55' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #1A1A1A;' />
+<rect x='118.13' y='57.76' width='39.38' height='1.04' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #1A1A1A;' />
+<text x='19.69' y='11.72' text-anchor='middle' style='font-size: 7.23px;fill: #1A1A1A; font-family: "ABC Areal";' textLength='13.54px' lengthAdjust='spacingAndGlyphs'>75%</text>
+<text x='59.06' y='43.48' text-anchor='middle' style='font-size: 7.23px;fill: #1A1A1A; font-family: "ABC Areal";' textLength='14.15px' lengthAdjust='spacingAndGlyphs'>20%</text>
+<text x='98.44' y='53.63' text-anchor='middle' style='font-size: 7.23px;fill: #1A1A1A; font-family: "ABC Areal";' textLength='10.02px' lengthAdjust='spacingAndGlyphs'>3%</text>
+<text x='137.81' y='54.14' text-anchor='middle' style='font-size: 7.23px;fill: #1A1A1A; font-family: "ABC Areal";' textLength='9.92px' lengthAdjust='spacingAndGlyphs'>2%</text>
+</g>
+<g clip-path='url(#cpMC4wMHwxNTcuNTB8MC4wMHw2Ny41MA==)'>
+<text x='19.69' y='66.74' text-anchor='middle' style='font-size: 7.23px;fill: #666666; font-family: "ABC Areal";' textLength='17.55px' lengthAdjust='spacingAndGlyphs'>None</text>
+<text x='59.06' y='66.74' text-anchor='middle' style='font-size: 7.23px;fill: #666666; font-family: "ABC Areal";' textLength='18.94px' lengthAdjust='spacingAndGlyphs'>Some</text>
+<text x='98.44' y='66.74' text-anchor='middle' style='font-size: 7.23px;fill: #666666; font-family: "ABC Areal";' textLength='16.15px' lengthAdjust='spacingAndGlyphs'>Most</text>
+<text x='137.81' y='66.74' text-anchor='middle' style='font-size: 7.23px;fill: #666666; font-family: "ABC Areal";' textLength='8.32px' lengthAdjust='spacingAndGlyphs'>All</text>
+</g>
+</svg>
