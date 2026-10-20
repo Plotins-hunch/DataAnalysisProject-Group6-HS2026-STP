@@ -12,7 +12,7 @@ library(ggplot2)  # plot visualization
 # in the round 11 of the survey (ess11)
 
 # read only columns of ess 10 (n_max = 0), to check what it contains
-ess10_colnames <- names(read_csv("ESS10_CHData.csv", n_max = 0, 
+ess10_colnames <- names(read_csv("ESS10_CHData.csv", n_max = 0,
                                  show_col_types = FALSE))
 # print colnames
 ess10_colnames
@@ -24,12 +24,12 @@ View(data.frame(column = ess10_colnames))
 # loneliness-related items
 grep("lnl|lone", ess10_colnames, value = TRUE)
 # returns character(0) = no match
-# grep() searches text for a pattern. 
-#"lnl|lone" means “contains lnl OR lone”, and value = TRUE returns 
+# grep() searches text for a pattern.
+#"lnl|lone" means “contains lnl OR lone”, and value = TRUE returns
 # the matching names rather than their positions
 
 # READ ESS11 as text
-ess11 <- read_csv("ESS11_CHData.csv", 
+ess11 <- read_csv("ESS11_CHData.csv",
                   col_types = cols(.default = col_character()))
 ess11_colnames <- names(ess11)
 
@@ -41,10 +41,10 @@ c("fltlnl", "netustm", "netusoft") %in% ess11_colnames
 # Felt lonely, how often past week | Internet use, how much time on typical day
 # , in minutes | Internet use, how often
 
-grep("lnl|lone", ess11_colnames, value = TRUE)   # loneliness  -> [1] "fltlnl" 
-grep("^net", ess11_colnames, value = TRUE)       # internet    -> [1] "netusoft" "netustm" 
-grep("^scl|^inprdsc", ess11_colnames, value = TRUE) # social life -> [1] "sclmeet" "inprdsc" "sclact" 
-grep("^flt", ess11_colnames, value = TRUE)       # "felt ..." items -> [1] "fltdpr"  "flteeff" "fltlnl"  "fltsd"  
+grep("lnl|lone", ess11_colnames, value = TRUE)   # loneliness  -> [1] "fltlnl"
+grep("^net", ess11_colnames, value = TRUE)       # internet    -> [1] "netusoft" "netustm"
+grep("^scl|^inprdsc", ess11_colnames, value = TRUE) # social life -> [1] "sclmeet" "inprdsc" "sclact"
+grep("^flt", ess11_colnames, value = TRUE)       # "felt ..." items -> [1] "fltdpr"  "flteeff" "fltlnl"  "fltsd"
 
 
 # ----- part 3 - Compare the candidates -----
@@ -56,7 +56,7 @@ grep("^flt", ess11_colnames, value = TRUE)       # "felt ..." items -> [1] "fltd
 # answer codes that are not real answers are to be treated as missing
 missing_codes <- c("Refusal", "Don't know", "No answer", "Not applicable")
 
-# function: summarise ONE survey item (x = one column of ess11) 
+# function: summarise ONE survey item (x = one column of ess11)
 describe_item <- function(x){
   valid <- x[!is.na(x) & !(x %in% missing_codes)] # only real answers kept
   counts <- table(valid) # counts how often each answers occur
@@ -67,7 +67,7 @@ describe_item <- function(x){
     top_answer = names(which.max(counts)), # data mode is most common answer
     top_share = round(max(counts) / length(valid), 2)
     # proportion of respondents who chose the most common answer (0-1)
-    # top_share = (number of people giving the most common answer) 
+    # top_share = (number of people giving the most common answer)
     # / (number of valid answers)
   )
 }
@@ -89,7 +89,7 @@ iv_candidates <- c("netustm", "netusoft")
 # inprdsc - How many people with whom you can discuss personal matters
 # fltsd - Felt sad, how often past week
 # fltdpr - Felt depressed, how often past week
-# 
+#
 # netustm - Internet use, how much time on typical day in minutes
 # netusoft - how often does someone use internet
 
@@ -123,8 +123,8 @@ iv_compare
 round(prop.table(table(ess11$netusoft)), 2) # share in each answer option
 # multiply by 100 and read out the percentage
 # 4 out of 5 respondents gave the same answer (80%)
-# question can’t tell those 80% apart, because a daily 20-minute user and a 
-# daily 10-hour user both answer “Every day”. 
+# question can’t tell those 80% apart, because a daily 20-minute user and a
+# daily 10-hour user both answer “Every day”.
 # it has too little variation to compare people,
 # and a mean split would just be “every day” vs. “everyone else”.
 
@@ -146,7 +146,7 @@ table(ess11$netusoft[ess11$netustm %in% missing_codes])
 # sclact - how often would you say you take part in social activities?
 # fltsd - how much of the time during the past week... ...you felt sad?
 # fltdpr - how much of the time during the past week... ...you felt depressed?
-# netustm - how much time do you spend using the internet on a computer, 
+# netustm - how much time do you spend using the internet on a computer,
 # tablet, smartphone or other device, whether for work or personal use /day?
 # netusoft - How often do you use the internet on these or any other devices?
 
@@ -154,7 +154,7 @@ table(ess11$netusoft[ess11$netustm %in% missing_codes])
 # MEASURE:
 # Candidates are checked in priority order, stops at the first failure:
 #   (1) concept   - does the question wording measure our construct?
-#   (2) type      - continuous or Likert-type 
+#   (2) type      - continuous or Likert-type
 #   (3) variation - do answers spread out enough (top_share (0-1, most->least))
 # a well-spread item that measures the wrong thing, still the wrong item.
 
@@ -337,3 +337,43 @@ plot_group
 ggsave("figures/fig3_group_bar.png", plot_group, width = 6, height = 4, dpi = 300)
 # READ: both groups are reasonably large; the "at or below mean" group is
 # bigger because the right-skewed tail pulls the mean above the median
+
+
+# ------------------- STEP 4 -------------------------- #
+# Is the average level of the dependent variable different for respondents on one side of the
+# binary variable compared with respondents on the other side of the binary variable?
+# is the mean of feeling lonely different between high and low internet usage?
+
+# chosen t-test: Independent two-sample t-test
+# reason: we want to compare the means of fltlnl for the two independent groups high and low
+# internet usage
+
+ess %>%
+  group_by(net_group) %>%
+  summarise(
+    n = sum(!is.na(lonely)),
+    mean_lonely = mean(lonely, na.rm = TRUE),
+    sd_lonely = sd(lonely, na.rm = TRUE)
+  )
+
+# OUTPUT:
+#  net_group            n mean_lonely sd_lonely
+# At or below mean   715        1.30     0.595
+# Above mean         495        1.33     0.647
+# NA                 172        1.30     0.594
+
+# H0: mean_net_high = mean_net_low
+# H1: mean_net_high != mean_net_low
+
+# the function t.test performs a t-test.
+# it compares the means of the entries of lonely for net_group = "At or below mean" and "Above mean"
+t.test(ess$lonely ~ ess$net_group)
+
+# OUTPUT:
+# t = -0.63251, df = 1004, p-value = 0.5272
+# alternative hypothesis: true difference in means between group At or below mean and group Above mean is not equal to 0
+# 95 percent confidence interval:
+# -0.09499073  0.04868148
+# sample estimates:
+# mean in group At or below mean       mean in group Above mean
+#                      1.302098                       1.325253
