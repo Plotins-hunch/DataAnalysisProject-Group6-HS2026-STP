@@ -16,7 +16,8 @@
 //      labelled on the data, so the data starts on the column edge.
 //   2b Breakout: a figure whose data needs width spans B+C in a row of its own, label in A.
 //      Only Figure 2 (long tail, heaping at whole hours, the cut point) qualifies.
-//   3  A row's elements start on the same baseline: label, text and caption share line one.
+//   3  A row's elements hang from one line: the cap height of every first line, whatever its
+//      size (title, text, small), sits on the same hang line.
 //   4  Rows are separated by one empty line; a row is as tall as its tallest element, in whole lines.
 //   5  Clearance: nothing comes closer than X to anything else: caption to plot, label to mark.
 //      Figures are vector (SVG), so every line and letter stays sharp.
@@ -50,7 +51,13 @@
 #let small-size = 5 / 6 * X / xh                  // 7.23pt
 #let title-size = 3 * X / xh                      // 26.0pt
 #let hair   = X / 10
-#let base-drop = 3.5pt                            // baseline sits 3.5pt above each line's bottom
+#let base-drop = 3.5pt                            // text baseline sits 3.5pt above each line's bottom
+// HANG LINE (rule 3): every size hangs its capitals from the same line, `hang` below the top of
+// a grid line. Text sits exactly on the baseline grid; small text and the title take the
+// baseline offset that puts their cap height on the same hang line.
+#let cap    = 0.716                               // ABC Areal cap height / em
+#let hang   = u - base-drop - cap * text-size     // 3.79pt
+#let hung(size, lines: 1) = (top-edge: hang + cap * size, bottom-edge: -(lines * u - hang - cap * size))
 #let show-grid = sys.inputs.at("grid", default: "false") == "true"
 
 #let ink  = rgb("#1a1a1a")
@@ -84,7 +91,7 @@
 #let meta(body) = text(fill: grey, body)
 #let g1(body) = text(fill: red, body)
 // column C: everything at the small size, tabular figures
-#let evidence(body) = text(size: small-size, number-width: "tabular", body)
+#let evidence(body) = text(size: small-size, number-width: "tabular", ..hung(small-size), body)
 #let fig(caption, file, lines, width: col-c) = evidence({
   caption
   image(out + file, width: width, height: lines * u)
@@ -106,7 +113,7 @@
   // ---- header: the title is the one large thing on the page (rule 1) ----
   meta[Report 1 \ Group 6 \ ETH Zürich \ HS2026],
   grid.cell(colspan: 2, {
-    text(size: title-size, top-edge: 2 * u - base-drop, bottom-edge: -base-drop)[Internet use and loneliness \ in Switzerland]
+    text(size: title-size, ..hung(title-size, lines: 2))[Internet use and loneliness \ in Switzerland]
     linebreak()
     meta[Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi]
   }),
