@@ -20,6 +20,7 @@
 //   1  the answer and its evidence (Figure 4)      top of the page, ink
 //   2  the question                                 top of the page, ink
 //   3  section headings 1–5 (the rubric's parts)    column A, ink
+//   3b key facts under each heading                  column A, grey (name, scale, N, cut, p)
 //   4  body text: the reasoning                     column B, ink
 //   5  evidence: figures, Table 1, notes            column C, small size
 //   6  context: data, method, names, course         grey
@@ -85,56 +86,71 @@
 // one row of the page: A | B | C, all starting on the same line
 #let row(a, b, c) = (a, b, c)
 
+#let keys(..lines) = meta(lines.pos().join(linebreak()))   // grey key facts, one per line
+#let small-table(..cells) = evidence(table(columns: (1.6fr, 1fr, 1fr), stroke: none, inset: 0pt,
+  align: (left, right, right), ..cells))
+#let rule = table.hline(stroke: hair)
+
 #grid(
   columns: (col-a, col-b, col-c),
   column-gutter: gut,
   row-gutter: u,
-  // header: title and course | names
+
+  // ---- header: what, for whom, by whom ----
   ..row(meta[Report 1 \ Group 6, HS2026],
         [Internet use and loneliness in Switzerland \ #meta[Data Analysis for Public Policy, ETH Zürich]],
         evidence(meta[Gabriele Pizzi, Marlo (Clara) Roth \ Ole Handschug, Joshua Silalahi])),
-  // fact sheet: each label on the line it labels (rule 3); the result's evidence beside it
+
+  // ---- fact sheet: question, context, answer; the result's evidence beside it ----
   grid.cell(colspan: 2, grid(columns: (col-a, col-b), column-gutter: gut,
     meta[Question], [Is people's internet use associated with their feeling of loneliness?],
     meta[Data],     meta[European Social Survey Round 11, Switzerland, N #n.n_total],
     meta[Method],   meta[Split at mean internet use (#n.cut min); Welch t-test],
     meta[Answer],   [#lorem(6) #g1[above the mean] #lorem(6)],
   )),
-  fig([Figure 4 Mean loneliness, 95% CI; dashed: all], "fig4_means.png", 2),
-  // 1 Variables
-  ..row([1 Variables \ #meta[Dependent]],
+  fig([Figure 4 Mean loneliness, 95% CI; dashed: all \ Welch t-test #g1[1] − 0: #n.diff (95% CI #n.diff_lo to #n.diff_hi), \ t #n.t, df #n.df, p #n.p], "fig4_means.png", 3),
+
+  // ---- 1 Variables ----
+  ..row([1 Variables \ #keys([Dependent], `fltlnl`, [scale 1–4], [N #n.lonely_n])],
         [#lorem(50)],
-        fig([Figure 1 Felt lonely, `fltlnl`, N #n.lonely_n], "fig1_lonely.png", 4)),
-  ..row(meta[Independent],
-        [#lorem(50)],
-        evidence(meta[Asked only of people online most days: 168 not asked, 4 don't know. Kept missing, not 0 minutes.])),
-  // the breakout (rule 2b): Figure 2 across B and C, its label in A
-  meta[Figure 2],
-  grid.cell(colspan: 2, fig([Minutes online per day, `netustm`, N #(n.net_n); #g1[red: above the mean]. White lines every 50 people.], "fig2_internet.png", 3, width: col-b + gut + col-c)),
-  // 2 Grouping
-  ..row([2 Grouping],
-        [#lorem(10) #g1[above the mean (1)] #lorem(12)],
-        fig([Figure 3 Groups, `net_group`, N #n.group_n, mode #n.group_mode], "fig3_groups.png", 2)),
-  // 3 Descriptives
-  ..row([3 Descriptives],
-        [#lorem(50)],
-        evidence(table(columns: (1fr, 1fr, 1fr), stroke: none, inset: 0pt, align: (left, right, right),
-          [Table 1], [Loneliness], [Minutes],
-          table.hline(stroke: hair),
+        fig([Figure 1 Felt lonely in the past week], "fig1_lonely.png", 5)),
+  ..row(keys([Independent], `netustm`, [minutes per day], [N #n.net_n], [#n.net_missing missing]),
+        [#lorem(66)],
+        small-table(
+          [Table 1], [Loneliness], [Minutes], rule,
           [Mean],     n.lonely_mean,   n.net_mean,
           [Median],   n.lonely_median, n.net_median,
           [Mode],     n.lonely_mode,   n.net_mode,
           [Variance], n.lonely_var,    n.net_var,
           [SD],       n.lonely_sd,     n.net_sd,
           [Range],    n.lonely_range,  n.net_range,
-          [IQR],      n.lonely_iqr,    n.net_iqr,
-        ))),
-  // 4 Test: the test result as the evidence
-  ..row([4 Test],
-        [#lorem(32)],
-        evidence[Welch t-test, #g1[1] − 0 \ difference #n.diff, 95% CI #n.diff_lo to #n.diff_hi \ t #n.t, df #n.df, p #n.p]),
-  // 5 Interpretation
-  ..row([5 Interpretation],
-        [#lorem(52)],
-        fig([Figure 5 Loneliness per band, 95% CI; dashed: all], "fig5_bands.png", 3)),
+          [IQR],      n.lonely_iqr,    n.net_iqr, rule,
+        )),
+  // the breakout (rule 2b): Figure 2 across B and C, its label in A
+  meta[Figure 2],
+  grid.cell(colspan: 2, fig([Minutes online per day, `netustm`, N #(n.net_n); #g1[red: above the mean]. White lines every 50 people.], "fig2_internet.png", 3, width: col-b + gut + col-c)),
+
+  // ---- 2 Grouping ----
+  ..row([2 Grouping \ #keys(`net_group`, [cut #n.cut min])],
+        [#lorem(10) #g1[above the mean (1)] #lorem(14)],
+        evidence(meta[#n.on_cut respondents sit exactly on the mean; a value equal to it would go to group 0. The #n.net_missing without a minutes answer stay out of both groups.])),
+
+  // ---- 3 Descriptives ----
+  ..row([3 Descriptives \ #keys([Table 1], [Figures 1–3])],
+        [#lorem(30)],
+        fig([Figure 3 Groups, N #n.group_n, mode #n.group_mode], "fig3_groups.png", 2)),
+
+  // ---- 4 Test ----
+  ..row([4 Test \ #keys([Welch], [p #n.p])],
+        [#lorem(30)],
+        small-table(
+          [Loneliness], [N], [Mean · SD], rule,
+          [0 at or below],   n.n0, [#n.m0 · #n.sd0],
+          g1[1 above], n.n1, [#n.m1 · #n.sd1], rule,
+        )),
+
+  // ---- 5 Interpretation ----
+  ..row([5 Interpretation \ #keys([Figure 5])],
+        [#lorem(58)],
+        fig([Figure 5 Loneliness per band, 95% CI; dashed: all], "fig5_bands.png", 5)),
 )

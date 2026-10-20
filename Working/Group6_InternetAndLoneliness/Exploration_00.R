@@ -348,7 +348,7 @@ fig1 <- ggplot(filter(ess, !is.na(lonely)), aes(lonely)) +
   scale_y_continuous(limits = c(-360, 1420), expand = c(0, 0)) +   # room for labels at 4 lines tall
   theme_report
 fig1
-save_fig(fig1, "fig1_lonely.png", lines = 4)
+save_fig(fig1, "fig1_lonely.png", lines = 5)
 
 # part 3.e - Figure 2: IV histogram in 10-minute bins, bars coloured by group, the mean
 # (= cut point) marked, groups labelled directly instead of a legend.
@@ -443,7 +443,7 @@ fig4 <- ggplot(group_means, aes(m, net_group, colour = net_group)) +
   scale_x_continuous(limits = c(1.2, 1.45), breaks = c(1.25, 1.3, 1.35, 1.4), expand = c(0, 0)) +
   theme_report
 fig4
-save_fig(fig4, "fig4_means.png", lines = 2)
+save_fig(fig4, "fig4_means.png", lines = 3)
 
 
 # ------------------- STEP 5 -------------------------- #
@@ -475,7 +475,7 @@ fig5 <- ggplot(bands) +
   scale_y_continuous(limits = c(1.05, 1.6), expand = c(0, 0)) +
   theme_report
 fig5
-save_fig(fig5, "fig5_bands.png", lines = 3)
+save_fig(fig5, "fig5_bands.png", lines = 5)
 
 
 # ------------------- STEP 6 -------------------------- #
@@ -493,7 +493,12 @@ report_numbers <- data.frame(rbind(
   c("lonely_range", paste0(f(desc["min", "lonely"]), "–", f(desc["max", "lonely"]))),
   c("net_range",   paste0(f(desc["min", "net_min"]), "–", f(desc["max", "net_min"]))),
   c("lonely_iqr",  f(desc["iqr", "lonely"])),      c("net_iqr",    f(desc["iqr", "net_min"])),
-  c("group_n",     f(sum(group_counts$n))),        c("group_mode", ifelse(group_mode == "Above mean", "1", "0")),
+  c("group_n",     f(sum(group_counts$n))),
+  c("n0", f(group_means$n[1])),  c("m0", f(group_means$m[1], 2)),  c("sd0", f(group_means$s[1], 2)),
+  c("n1", f(group_means$n[2])),  c("m1", f(group_means$m[2], 2)),  c("sd1", f(group_means$s[2], 2)),
+  c("g0", f(group_counts$n[1])), c("g1", f(group_counts$n[2])),
+  c("on_cut", f(sum(ess$net_min == cut_point, na.rm = TRUE))),
+  c("net_missing", f(sum(is.na(ess$net_min)))),        c("group_mode", ifelse(group_mode == "Above mean", "1", "0")),
   c("diff",        sprintf("%+.2f", diff(tt$estimate))),        # group 1 minus group 0
   c("diff_lo",     sprintf("%.2f", -tt$conf.int[2])), c("diff_hi", sprintf("%.2f", -tt$conf.int[1])),
   c("t",           sprintf("%.2f", -tt$statistic)), c("df",       sprintf("%.0f", tt$parameter)),
