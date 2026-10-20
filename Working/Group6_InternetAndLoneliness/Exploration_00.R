@@ -297,16 +297,16 @@ group_mode
 # result: valid N 1212; at or below mean 717 (59%), above mean 495 (41%); mode = at or below mean
 
 # part 3.c - one style for every figure
-# all sizes come from one unit, X = 4.5pt (the x-height of the report's body text):
-# line = 3X, column = 16X, gutter = 3X, plot text x-height = 3/4 X, lines X/10.
-# the report places each figure on that grid, so the figures are saved at their exact size.
-library(patchwork)   # stacks the two panels of Figure 2
-
-X    <- 4.5                                       # points
-span <- function(n) (n * 16 * X + (n - 1) * 3 * X) / 72   # width of n columns, inches
-line <- 3 * X / 72                                # one line, inches
-fs   <- 0.75 * X / 0.519                          # plot text size (font x-height = 0.519 em)
-lw   <- (X / 10) / .pt                            # hairline in ggplot units
+# the report is built on one unit, X = 4.5pt (the x-height of its text), and one grid of
+# three columns: labels | text | evidence. every figure sits in the evidence column (35X wide)
+# and is a whole number of lines tall (one line = 3X). plot text uses the report's small size.
+# alignment rule: the plot panel fills the column, so its left edge IS the column edge;
+# there are no y-axes, values are labelled directly on the data.
+X     <- 4.5                       # points
+col_c <- 35 * X / 72               # evidence column width, inches
+line  <- 3 * X / 72                # one line, inches
+fs    <- 0.75 * X / 0.519          # small text: x-height 3/4 X (font x-height = 0.519 em)
+lw    <- (X / 10) / .pt            # hairline, X/10
 # one colour, one meaning: red = group 1 (above the mean) and the cut point; grey = group 0;
 # everything else is ink. red stays darker than grey when printed without colour.
 ink <- "#1a1a1a"; grey <- "#9a9a9a"; red <- "#b2182b"
@@ -316,64 +316,66 @@ if (requireNamespace("systemfonts", quietly = TRUE) &&
     "ABC Areal Variable" %in% systemfonts::system_fonts()$family) fam <- "ABC Areal Variable"
 
 theme_report <- theme_void(base_size = fs, base_family = fam) +
-  theme(axis.text   = element_text(colour = grey, size = fs),   # axes recede, data stands forward
-        axis.text.x = element_text(margin = margin(t = 2)),
-        axis.text.y = element_text(margin = margin(r = 3), hjust = 1),
+  theme(axis.text.x = element_text(colour = grey, size = fs, margin = margin(t = 2)),
         legend.position = "none",
-        plot.margin = margin(2, 2, 0, 0),
+        plot.margin = margin(0, 0, 0, 0),
         plot.background = element_rect(fill = "white", colour = NA))
 note <- function(...) annotate("text", family = fam, size = fs / .pt, ...)   # in-plot label
 white_lines <- function(at) geom_hline(yintercept = at, colour = "white", linewidth = 2 * lw)
 
 out_dir <- "figures"
 dir.create(out_dir, showWarnings = FALSE)
-save_fig <- function(p, file, cols, lines) {
-  ggsave(file.path(out_dir, file), p, width = span(cols), height = lines * line, dpi = 600)
+save_fig <- function(p, file, lines) {
+  ggsave(file.path(out_dir, file), p, width = col_c, height = lines * line, dpi = 600)
 }
+# minutes axis shared by Figures 2 and 5, so the two read against each other
+x_minutes <- scale_x_continuous(breaks = c(240, 480, 720, 960), labels = c("4h", "8h", "12h", "16h"),
+                                limits = c(0, 1080), expand = c(0, 0))
 
-# part 3.d - Figure 1: DV histogram, one bar per answer (binwidth 1), share and count on top
+# part 3.d - Figure 1: DV histogram, one bar per answer (binwidth 1), share on top,
+# the mean marked under the baseline
 fig1 <- ggplot(filter(ess, !is.na(lonely)), aes(lonely)) +
   geom_histogram(binwidth = 1, boundary = 0.5, fill = ink) +
   white_lines(c(250, 500, 750)) +                 # white lines through the bars replace a grid
   geom_text(stat = "bin", binwidth = 1, boundary = 0.5, vjust = -0.5, family = fam, size = fs / .pt,
             colour = ink, aes(label = after_stat(paste0(round(100 * count / sum(count)), "%")))) +
-  annotate("point", x = desc["mean", "lonely"], y = -140, shape = 17, size = 1.2, colour = ink) +
-  note(x = desc["mean", "lonely"] + 0.12, y = -140, hjust = 0, colour = ink,
+  annotate("point", x = desc["mean", "lonely"], y = -150, shape = 17, size = 1.2, colour = ink) +
+  note(x = desc["mean", "lonely"] + 0.1, y = -150, hjust = 0, colour = ink,
        label = sprintf("mean %.2f", desc["mean", "lonely"])) +
-  scale_x_continuous(breaks = 1:4, labels = c("None", "Some", "Most", "All")) +
-  scale_y_continuous(limits = c(-230, 1250), expand = c(0, 0)) +
-  theme_report + theme(axis.text.y = element_blank())
+  scale_x_continuous(breaks = 1:4, labels = c("None", "Some", "Most", "All"),
+                     limits = c(0.5, 4.5), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(-260, 1250), expand = c(0, 0)) +
+  theme_report
 fig1
+save_fig(fig1, "fig1_lonely.png", lines = 6)
 
-# part 3.e - Figure 2 (top panel): IV histogram in 10-minute bins, bars shaded by group,
-# the mean (= cut point) marked, groups labelled directly instead of a legend
-x_minutes <- scale_x_continuous(breaks = seq(0, 1080, 120), labels = c(0, paste0(seq(2, 18, 2), "h")),
-                                limits = c(0, 1080), expand = expansion(add = c(5, 10)))
-fig2_top <- ggplot(filter(ess, !is.na(net_min)), aes(net_min, fill = net_group)) +
+# part 3.e - Figure 2: IV histogram in 10-minute bins, bars coloured by group, the mean
+# (= cut point) marked, groups labelled directly instead of a legend
+fig2 <- ggplot(filter(ess, !is.na(net_min)), aes(net_min, fill = net_group)) +
   geom_histogram(binwidth = 10, boundary = 0, closed = "left") +
   scale_fill_manual(values = c(grey, red)) +
   white_lines(c(50, 100, 150)) +
-  annotate("segment", x = cut_point, xend = cut_point, y = 0, yend = 195, linewidth = 1.5 * lw, colour = red) +
-  note(x = cut_point + 25, y = 190, hjust = 0, colour = red, label = sprintf("mean = cut point, %.1f min", cut_point)) +
-  note(x = 1075, y = 185, hjust = 1, colour = red, label = sprintf("1  above mean: %d", group_counts$n[2])) +
-  note(x = 1075, y = 140, hjust = 1, colour = grey, label = sprintf("0  at or below: %d", group_counts$n[1])) +
+  annotate("segment", x = cut_point, xend = cut_point, y = 0, yend = 230, linewidth = 1.5 * lw, colour = red) +
+  note(x = cut_point + 20, y = 220, hjust = 0, colour = red, label = sprintf("mean = cut point %.1f min", cut_point)) +
+  note(x = 1080, y = 170, hjust = 1, colour = red, label = sprintf("1 above the mean %d", group_counts$n[2])) +
+  note(x = 1080, y = 140, hjust = 1, colour = grey, label = sprintf("0 at or below %d", group_counts$n[1])) +
   x_minutes +
-  scale_y_continuous(breaks = c(50, 100, 150), limits = c(0, 205), expand = c(0, 0)) +
-  theme_report + theme(axis.text.x = element_blank())
-# its lower panel is built in step 5, where it belongs
+  scale_y_continuous(limits = c(0, 235), expand = c(0, 0)) +
+  theme_report
+fig2
+save_fig(fig2, "fig2_internet.png", lines = 6)
 
 # part 3.f - Figure 3: bar chart of the grouping variable, count and share
 fig3 <- ggplot(group_counts, aes(n, net_group, fill = net_group)) +
-  geom_col(width = 0.62) +
-  geom_text(aes(label = sprintf("%d (%.0f%%)", n, 100 * share)), hjust = -0.1, family = fam, size = fs / .pt, colour = ink) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = sprintf("%s  %d (%.0f%%)", c("0 at or below", "1 above"), n, 100 * share),
+                colour = net_group), hjust = -0.05, family = fam, size = fs / .pt) +
   scale_fill_manual(values = c(grey, red)) +
-  scale_y_discrete(labels = c("0  At or below", "1  Above")) +
-  scale_x_continuous(limits = c(0, 1180), expand = c(0, 0)) +
+  scale_colour_manual(values = c(grey, red)) +
+  scale_x_continuous(limits = c(0, 2000), expand = c(0, 0)) +
   theme_report + theme(axis.text.x = element_blank())
 fig3
-
-save_fig(fig1, "fig1_lonely.png", cols = 2, lines = 6)
-save_fig(fig3, "fig3_groups.png", cols = 2, lines = 2)
+save_fig(fig3, "fig3_groups.png", lines = 2)
 
 
 # ------------------- STEP 4 -------------------------- #
@@ -428,23 +430,23 @@ group_means <- ess %>%
 group_means
 
 fig4 <- ggplot(group_means, aes(m, net_group, colour = net_group)) +
-  annotate("segment", x = desc["mean", "lonely"], xend = desc["mean", "lonely"], y = 0.6, yend = 2.4,
+  annotate("segment", x = desc["mean", "lonely"], xend = desc["mean", "lonely"], y = 0.5, yend = 2.5,
            linewidth = lw, linetype = "22", colour = grey) +
   geom_segment(aes(x = lo, xend = hi, yend = net_group), linewidth = 3 * lw) +
   geom_point(size = 1.8) +
   geom_text(aes(x = hi, label = sprintf("%.2f", m)), hjust = -0.3, family = fam, size = fs / .pt) +
   scale_colour_manual(values = c(grey, red)) +
-  scale_y_discrete(labels = c("0", "1")) +
-  scale_x_continuous(limits = c(1.2, 1.45), breaks = c(1.2, 1.3, 1.4)) +
+  scale_y_discrete() +                             # groups on y (the dashed line is placed by number)
+  scale_x_continuous(limits = c(1.2, 1.45), breaks = c(1.25, 1.3, 1.35, 1.4), expand = c(0, 0)) +
   theme_report
 fig4
-save_fig(fig4, "fig4_means.png", cols = 2, lines = 2)
+save_fig(fig4, "fig4_means.png", lines = 2)
 
 
 # ------------------- STEP 5 -------------------------- #
 # the limitation of the cut point: the t-test only sees "left or right of the mean".
 # mean loneliness inside bands of internet time shows what the split throws away.
-# drawn under the IV histogram on the same minutes axis (Figure 2, lower panel).
+# drawn as Figure 5, on the same minutes axis as Figure 2.
 
 breaks <- c(0, 60, 120, 180, 240, 360, 480, 1080)   # under 1h, 1-2h, 2-3h, 3-4h, 4-6h, 6-8h, 8h+
 bands <- ess %>%
@@ -459,7 +461,7 @@ bands
 # result: band means stay between about 1.2 and 1.4 with overlapping intervals,
 # so no trend is hidden inside the two groups
 
-fig2_bottom <- ggplot(bands) +
+fig5 <- ggplot(bands) +
   annotate("segment", x = cut_point, xend = cut_point, y = 1.05, yend = 1.6, linewidth = 1.5 * lw, colour = red) +
   annotate("segment", x = 0, xend = 1080, y = desc["mean", "lonely"], yend = desc["mean", "lonely"],
            linewidth = lw, linetype = "22", colour = grey) +
@@ -467,11 +469,10 @@ fig2_bottom <- ggplot(bands) +
   geom_segment(aes(x = from + 4, xend = to - 4, y = m, yend = m, colour = side), linewidth = 3 * lw) +
   scale_colour_manual(values = c(grey, red)) +
   x_minutes +
-  scale_y_continuous(breaks = c(1.2, 1.4), limits = c(1.05, 1.6), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(1.05, 1.6), expand = c(0, 0)) +
   theme_report
-fig2 <- fig2_top / fig2_bottom + plot_layout(heights = c(4, 2))
-fig2
-save_fig(fig2, "fig2_internet.png", cols = 5, lines = 6)
+fig5
+save_fig(fig5, "fig5_bands.png", lines = 3)
 
 
 # ------------------- STEP 6 -------------------------- #

@@ -57,7 +57,7 @@
 1. Put the R script and the data files in the same folder, and open that folder as an RStudio Project (or set it as the working directory).
 2. Install the packages once if needed:
    ```r
-   install.packages(c("readr", "dplyr", "ggplot2", "patchwork"))
+   install.packages(c("readr", "dplyr", "ggplot2"))
    ```
 3. Open `00_exploration.R` and run it from top to bottom: line by line with Ctrl/Cmd + Enter, or all at once with **Source**.
 
@@ -65,7 +65,7 @@ The script reads all columns as text, because the CSV stores answers as labels (
 
 The script runs from the raw CSV through every recode, statistic, test and figure in the report:
 step 3 computes the descriptives and Figures 1–3, step 4 runs the Welch t-test and draws Figure 4,
-step 5 draws the cut-point panel of Figure 2, and step 6 writes every number the report prints to
+step 5 draws Figure 5 (the cut-point limitation), and step 6 writes every number the report prints to
 `figures/report_numbers.csv`. All figures go to `figures/`.
 
 ## Building the report
