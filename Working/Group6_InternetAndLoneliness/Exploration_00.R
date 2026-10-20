@@ -358,19 +358,18 @@ save_fig(fig1, "fig1_lonely.svg", lines = 5)
 
 # part 3.e - Figure 2: IV histogram in 10-minute bins, bars coloured by group, the mean
 # (= cut point) marked; the group sizes are in Figure 3, so they are not repeated here.
-# the only full-width figure: its long tail and the heaping at whole hours need the width
+# white lines every 50 people stand in for a y-axis
 fig2 <- ggplot(filter(ess, !is.na(net_min)), aes(net_min, fill = net_group)) +
   geom_histogram(binwidth = 10, boundary = 0, closed = "left") +
   scale_fill_manual(values = c(grey, red)) +
   white_lines(c(50, 100, 150)) +
   annotate("segment", x = cut_point, xend = cut_point, y = 0, yend = 215, linewidth = 1.5 * lw, colour = red) +
-  note(x = cut_point + 15, y = 200, hjust = 0, colour = red, label = sprintf("mean = cut point %.1f min", cut_point)) +
-  scale_x_continuous(breaks = seq(120, 960, 120), labels = paste0(seq(2, 16, 2), "h"),
-                     limits = c(0, 1080), expand = c(0, 0)) +
+  note(x = cut_point + 25, y = 200, hjust = 0, colour = red, label = sprintf("mean %.1f min", cut_point)) +
+  x_minutes +
   scale_y_continuous(limits = c(0, 220), expand = c(0, 0)) +
   theme_report
 fig2
-save_fig(fig2, "fig2_internet.svg", lines = 4, width = col_bc)
+save_fig(fig2, "fig2_internet.svg", lines = 4)
 
 # part 3.f - Figure 3: bar chart of the grouping variable, count and share
 fig3 <- ggplot(group_counts, aes(n, net_group, fill = net_group)) +

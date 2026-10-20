@@ -15,8 +15,7 @@
 //        small  x-height ⅚X (7.23pt): column C and the text inside every plot
 //   2  Every left edge sits on A, B or C. Plot panels fill their column: no y-axes, values are
 //      labelled on the data, so the data starts on the column edge.
-//   2b Breakout: a figure whose data needs width spans B+C in a row of its own, label in A.
-//      Only Figure 2 (long tail, heaping at whole hours, the cut point) qualifies.
+//      Every piece of evidence sits in C beside the paragraph that reads it.
 //   3  A row's elements hang from one line: the cap height of every first line, whatever its
 //      size (title, text, small), sits on the same hang line.
 //   4  Rows are separated by one empty line; a row is as tall as its tallest element, in whole lines.
@@ -135,8 +134,8 @@
 #grid(
   columns: (col-a, col-b, col-c),
   column-gutter: gut,
-  //           title  facts→DV  DV   IV  Fig2  grp  desc→test  test
-  row-gutter: (u,     2 * u,    u,   u,  u,    u,   2 * u,     u),
+  //           title  facts→DV  DV   IV   grp  desc→test  test
+  row-gutter: (u,     2 * u,    u,   u,   u,   2 * u,     u),
 
   // ---- header: the title is the one large thing on the page (rule 1) ----
   meta[Report 1 \ Group 6],
@@ -156,7 +155,21 @@
         [#lorem(47)],
         fig([Figure 1 Felt lonely in the past week], "fig1_lonely.svg", 5)),
   ..row(keys([Independent], `netustm`, [minutes per day], [N #n.net_n], [#n.net_missing missing]),
-        [#lorem(55)],
+        [#lorem(46)],
+        fig([Figure 2 Minutes online, #g1[above the mean]], "fig2_internet.svg", 4)),
+
+  // ---- 2 Grouping: the group bar chart and the boundary note ----
+  ..row([2 Grouping \ #keys(`net_group`, [cut #n.cut min])],
+        [#lorem(12) #g1[above the mean (1)] #lorem(18)],
+        evidence({
+          [Figure 3 Groups, N #n.group_n, mode #n.group_mode]
+          image(out + "fig3_groups.svg", width: col-c, height: 2 * u)
+          meta[#n.on_cut on the mean (would go to 0) \ #n.net_missing without an answer: in neither group]
+        })),
+
+  // ---- 3 Descriptives: Table 1 beside its reading ----
+  ..row([3 Descriptives \ #keys([Table 1], [Figures 1–3])],
+        [#lorem(68)],
         small-table(
           [Table 1], [Loneliness], [Minutes], rule,
           [Mean],     n.lonely_mean,   n.net_mean,
@@ -167,19 +180,6 @@
           [Range],    n.lonely_range,  n.net_range,
           [IQR],      n.lonely_iqr,    n.net_iqr, rule,
         )),
-  // the breakout (rule 2b): Figure 2 across B and C, its label in A
-  meta[Figure 2],
-  grid.cell(colspan: 2, fig([Minutes online per day, `netustm`, N #n.net_n, grey at or below the mean, #g1[red above it], white lines every 50 people], "fig2_internet.svg", 4, width: col-b + gut + col-c)),
-
-  // ---- 2 Grouping ----
-  ..row([2 Grouping \ #keys(`net_group`, [cut #n.cut min])],
-        [#lorem(10) #g1[above the mean (1)] #lorem(13)],
-        evidence(meta[#n.on_cut on the mean (would go to 0) \ #n.net_missing without an answer: in neither group])),
-
-  // ---- 3 Descriptives ----
-  ..row([3 Descriptives \ #keys([Table 1], [Figures 1–3])],
-        [#lorem(21)],
-        fig([Figure 3 Groups, N #n.group_n, mode #n.group_mode], "fig3_groups.svg", 2)),
 
   // ---- 4 Test ----
   ..row([4 Test \ #keys([Welch], [p #n.p])],
