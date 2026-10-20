@@ -75,8 +75,10 @@ The one-page report is `Report/report.typ` ([Typst](https://typst.app)). It read
 numbers straight from the script's `figures/` folder, so run the script first, then from the repo root:
 
 ```sh
-typst compile --root . --font-path <folder with the ABC Areal fonts> Report/report.typ
+typst compile --root . --font-path Report/fonts Report/report.typ
 ```
 
-The report is set in ABC Areal and ABC Areal Mono. They are licensed fonts and are not in the repo:
-install them locally (the PDF embeds them). Without them, Typst and R fall back to system fonts.
+The report is set in ABC Areal and ABC Areal Mono. The font files are in `Report/fonts/` and both
+the script (for the text inside the figures) and the report read them from there, so nothing needs
+installing: compile with `--font-path Report/fonts`. If the folder is empty, both fall back to system
+fonts. `Report/report.pdf` is the compiled result as of the last commit, for reference.

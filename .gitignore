@@ -2,9 +2,8 @@
 .Rproj.user/
 .Rproj.user
 
-# licensed fonts (ABC Areal): install locally, never commit
+# fonts live in Report/fonts only (private group repo); stray copies elsewhere are ignored
 *.ttf
 *.otf
-*.woff
-*.woff2
-Report/fonts/
+!Report/fonts/*.ttf
+!Report/fonts/*.otf

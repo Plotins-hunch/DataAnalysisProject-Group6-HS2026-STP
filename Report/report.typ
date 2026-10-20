@@ -2,9 +2,10 @@
 //
 // Build: run Working/Group6_InternetAndLoneliness/Exploration_00.R first (it writes the figures and
 // every number used here to its figures/ folder), then from the repo root:
-//   typst compile --root . --font-path <folder with the ABC Areal fonts> Report/report.typ
-// Fonts: ABC Areal for text, ABC Areal Mono for variable names and labels. They are licensed and not
-// in the repo; without them Typst falls back to Arial and Courier New.
+//   typst compile --root . --font-path Report/fonts Report/report.typ
+// Fonts: ABC Areal for text, ABC Areal Mono for variable names and labels, read from Report/fonts.
+// If that folder is empty Typst falls back to Arial and Courier New. Report/report.pdf is the
+// compiled result as of the last commit.
 // Text: each #lorem(n) is a placeholder. Replace it with about n words so the row keeps its height
 // (about 9 words per line). What each section must say: Report/WRITING_NOTES.md.
 
