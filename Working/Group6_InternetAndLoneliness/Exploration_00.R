@@ -307,14 +307,16 @@ span <- function(n) (n * 16 * X + (n - 1) * 3 * X) / 72   # width of n columns, 
 line <- 3 * X / 72                                # one line, inches
 fs   <- 0.75 * X / 0.519                          # plot text size (font x-height = 0.519 em)
 lw   <- (X / 10) / .pt                            # hairline in ggplot units
-black <- "#000000"; grey <- "#8c8c8c"             # grey = group 0, black = group 1
-# plot text uses ABC Areal Mono if it is installed (licensed, not shared), else the system mono
-fam <- "mono"
+# one colour, one meaning: red = group 1 (above the mean) and the cut point; grey = group 0;
+# everything else is ink. red stays darker than grey when printed without colour.
+ink <- "#1a1a1a"; grey <- "#9a9a9a"; red <- "#b2182b"
+# plot text uses ABC Areal if it is installed (licensed, not shared), else the system sans
+fam <- "sans"
 if (requireNamespace("systemfonts", quietly = TRUE) &&
-    "ABC Areal Mono Variable" %in% systemfonts::system_fonts()$family) fam <- "ABC Areal Mono Variable"
+    "ABC Areal Variable" %in% systemfonts::system_fonts()$family) fam <- "ABC Areal Variable"
 
 theme_report <- theme_void(base_size = fs, base_family = fam) +
-  theme(axis.text   = element_text(colour = black, size = fs),
+  theme(axis.text   = element_text(colour = grey, size = fs),   # axes recede, data stands forward
         axis.text.x = element_text(margin = margin(t = 2)),
         axis.text.y = element_text(margin = margin(r = 3), hjust = 1),
         legend.position = "none",
@@ -331,17 +333,15 @@ save_fig <- function(p, file, cols, lines) {
 
 # part 3.d - Figure 1: DV histogram, one bar per answer (binwidth 1), share and count on top
 fig1 <- ggplot(filter(ess, !is.na(lonely)), aes(lonely)) +
-  geom_histogram(binwidth = 1, boundary = 0.5, fill = black) +
+  geom_histogram(binwidth = 1, boundary = 0.5, fill = ink) +
   white_lines(c(250, 500, 750)) +                 # white lines through the bars replace a grid
-  geom_text(stat = "bin", binwidth = 1, boundary = 0.5, vjust = -0.25, lineheight = 0.9,
-            family = fam, size = fs / .pt,
-            aes(label = after_stat(paste0(round(100 * count / sum(count)), "%\n",
-                                          formatC(count, big.mark = ",", format = "d"))))) +
-  annotate("point", x = desc["mean", "lonely"], y = -140, shape = 17, size = 1.2) +
-  note(x = desc["mean", "lonely"] + 0.12, y = -140, hjust = 0,
+  geom_text(stat = "bin", binwidth = 1, boundary = 0.5, vjust = -0.5, family = fam, size = fs / .pt,
+            colour = ink, aes(label = after_stat(paste0(round(100 * count / sum(count)), "%")))) +
+  annotate("point", x = desc["mean", "lonely"], y = -140, shape = 17, size = 1.2, colour = ink) +
+  note(x = desc["mean", "lonely"] + 0.12, y = -140, hjust = 0, colour = ink,
        label = sprintf("mean %.2f", desc["mean", "lonely"])) +
   scale_x_continuous(breaks = 1:4, labels = c("None", "Some", "Most", "All")) +
-  scale_y_continuous(limits = c(-230, 1480), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(-230, 1250), expand = c(0, 0)) +
   theme_report + theme(axis.text.y = element_blank())
 fig1
 
@@ -351,11 +351,11 @@ x_minutes <- scale_x_continuous(breaks = seq(0, 1080, 120), labels = c(0, paste0
                                 limits = c(0, 1080), expand = expansion(add = c(5, 10)))
 fig2_top <- ggplot(filter(ess, !is.na(net_min)), aes(net_min, fill = net_group)) +
   geom_histogram(binwidth = 10, boundary = 0, closed = "left") +
-  scale_fill_manual(values = c(grey, black)) +
+  scale_fill_manual(values = c(grey, red)) +
   white_lines(c(50, 100, 150)) +
-  annotate("segment", x = cut_point, xend = cut_point, y = 0, yend = 195, linewidth = 1.5 * lw) +
-  note(x = cut_point + 25, y = 190, hjust = 0, label = sprintf("mean = cut point, %.1f min", cut_point)) +
-  note(x = 1075, y = 185, hjust = 1, label = sprintf("1  above mean: %d", group_counts$n[2])) +
+  annotate("segment", x = cut_point, xend = cut_point, y = 0, yend = 195, linewidth = 1.5 * lw, colour = red) +
+  note(x = cut_point + 25, y = 190, hjust = 0, colour = red, label = sprintf("mean = cut point, %.1f min", cut_point)) +
+  note(x = 1075, y = 185, hjust = 1, colour = red, label = sprintf("1  above mean: %d", group_counts$n[2])) +
   note(x = 1075, y = 140, hjust = 1, colour = grey, label = sprintf("0  at or below: %d", group_counts$n[1])) +
   x_minutes +
   scale_y_continuous(breaks = c(50, 100, 150), limits = c(0, 205), expand = c(0, 0)) +
@@ -365,8 +365,8 @@ fig2_top <- ggplot(filter(ess, !is.na(net_min)), aes(net_min, fill = net_group))
 # part 3.f - Figure 3: bar chart of the grouping variable, count and share
 fig3 <- ggplot(group_counts, aes(n, net_group, fill = net_group)) +
   geom_col(width = 0.62) +
-  geom_text(aes(label = sprintf("%d (%.0f%%)", n, 100 * share)), hjust = -0.1, family = fam, size = fs / .pt) +
-  scale_fill_manual(values = c(grey, black)) +
+  geom_text(aes(label = sprintf("%d (%.0f%%)", n, 100 * share)), hjust = -0.1, family = fam, size = fs / .pt, colour = ink) +
+  scale_fill_manual(values = c(grey, red)) +
   scale_y_discrete(labels = c("0  At or below", "1  Above")) +
   scale_x_continuous(limits = c(0, 1180), expand = c(0, 0)) +
   theme_report + theme(axis.text.x = element_blank())
@@ -432,8 +432,8 @@ fig4 <- ggplot(group_means, aes(m, net_group, colour = net_group)) +
            linewidth = lw, linetype = "22", colour = grey) +
   geom_segment(aes(x = lo, xend = hi, yend = net_group), linewidth = 3 * lw) +
   geom_point(size = 1.8) +
-  geom_text(aes(x = hi, label = sprintf("%.2f", m)), hjust = -0.3, family = fam, size = fs / .pt, colour = black) +
-  scale_colour_manual(values = c(grey, black)) +
+  geom_text(aes(x = hi, label = sprintf("%.2f", m)), hjust = -0.3, family = fam, size = fs / .pt) +
+  scale_colour_manual(values = c(grey, red)) +
   scale_y_discrete(labels = c("0", "1")) +
   scale_x_continuous(limits = c(1.2, 1.45), breaks = c(1.2, 1.3, 1.4)) +
   theme_report
@@ -460,12 +460,12 @@ bands
 # so no trend is hidden inside the two groups
 
 fig2_bottom <- ggplot(bands) +
-  annotate("segment", x = cut_point, xend = cut_point, y = 1.05, yend = 1.6, linewidth = 1.5 * lw) +
+  annotate("segment", x = cut_point, xend = cut_point, y = 1.05, yend = 1.6, linewidth = 1.5 * lw, colour = red) +
   annotate("segment", x = 0, xend = 1080, y = desc["mean", "lonely"], yend = desc["mean", "lonely"],
            linewidth = lw, linetype = "22", colour = grey) +
   geom_segment(aes(x = mid, xend = mid, y = m - 1.96 * se, yend = m + 1.96 * se, colour = side), linewidth = 1.5 * lw) +
   geom_segment(aes(x = from + 4, xend = to - 4, y = m, yend = m, colour = side), linewidth = 3 * lw) +
-  scale_colour_manual(values = c(grey, black)) +
+  scale_colour_manual(values = c(grey, red)) +
   x_minutes +
   scale_y_continuous(breaks = c(1.2, 1.4), limits = c(1.05, 1.6), expand = c(0, 0)) +
   theme_report

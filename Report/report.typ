@@ -8,11 +8,16 @@
 //   column   = 16X = 72pt                  6 columns
 //   margins  = 12X left, 10X top
 //   module   = 3 lines + 1 empty line; 14 module rows = 55 lines
-//   type     title x-height 2X (17.34pt) · body X (8.67pt) · small ¾X (6.50pt)
-//   faces    ABC Areal for the text you read; ABC Areal Mono for the data: variable names,
-//            captions, Table 1, side notes and the text inside every plot (same x-height,
-//            so both sit on one grid). The fonts are licensed and stay out of the repo:
-//            install them locally, or compile with --font-path pointing at them.
+//   type     ONE family, ABC Areal, in ONE weight (regular). Hierarchy comes from size,
+//            position, italic and grey only:
+//              title     x-height 2X (17.34pt), regular
+//              text      x-height X (8.67pt); section headings and labels in italic
+//              small     x-height ¾X (6.50pt): captions, table, side notes, plot text
+//            ABC Areal Mono is kept for one job only: variable names (`fltlnl`), because
+//            they are code. Both share the 0.519 x-height, so both sit on one grid.
+//            The fonts are licensed and stay out of the repo (install locally).
+//   colour   ONE colour, ONE meaning: red = group 1 (above the mean) and the cut point,
+//            in the figures and in the text; grey = group 0 and supporting information.
 //   rules    X/10 = 0.45pt
 //   figures  whole columns wide, whole lines tall (the R script uses the same numbers)
 //
@@ -81,51 +86,53 @@
 #show raw: set text(font: mono, size: 1.25em)   // variable names in mono at the size around them (raw defaults to 0.8em)
 
 #let at(c, l, n, body) = place(dx: cx(c), dy: ly(l), block(width: span(n), { set block(spacing: 0pt); body }))
-#let small(body) = text(font: mono, size: small-size, body)   // the data voice
-#let label(id) = text(weight: "bold", id)
+#let small(body) = text(size: small-size, number-width: "tabular", body)   // captions, table, notes
+#let label(id) = emph(id)                          // labels: italic, never bold
 #let meta(body) = text(fill: luma(42%), body)
+#let red = rgb("#b2182b")                                     // same red as the figures
+#let g1(body) = text(fill: red, body)                         // names group 1 in the text
 #let side(m, body) = at(5, mtop(m), 2, small(meta(body)))
 #let fig(m, lines, caption, file, c: 5, cols: 2) = at(c, mtop(m), cols, {
   block(height: u, small(caption))
   image(out + file, width: span(cols), height: lines * u)
 })
 #let sec(m, heading: none, sub: none, body) = {
-  if heading != none { at(1, mtop(m), 1, text(weight: "bold", heading)) }
+  if heading != none { at(1, mtop(m), 1, emph(heading)) }
   if sub != none { at(1, mtop(m) + (if heading != none { 1 } else { 0 }), 1, meta(sub)) }
   at(2, mtop(m), 3, body)
 }
 
 // ---------- module 1: header ----------
 #at(1, mtop(1), 1, meta[Report 1 \ Group 6 \ HS2026])
-#at(2, mtop(1), 5, text(size: title-size, weight: "bold", top-edge: 2 * u - base-drop, bottom-edge: -base-drop)[Internet use and loneliness in Switzerland])
+#at(2, mtop(1), 5, text(size: title-size, top-edge: 2 * u - base-drop, bottom-edge: -base-drop)[Internet use and loneliness in Switzerland])
 #at(2, mtop(1) + 2, 5, meta[Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi])
 
 // ---------- module 2: question and answer ----------
 #at(1, mtop(2), 1, meta[Question])
 #at(2, mtop(2), 5, [Is people's internet use associated with their feeling of loneliness?])
 #at(1, mtop(2) + 1, 1, meta[Answer])
-#at(2, mtop(2) + 1, 5, [*#lorem(26)*])
+#at(2, mtop(2) + 1, 5, [#lorem(12) #g1[above the mean] #lorem(12)])
 
 // ---------- modules 3–6: 1 Variables ----------
 #sec(3, heading: [1 Variables], sub: [Dependent])[#lorem(56)]
-#fig(3, 6, [#label[Fig. 1]  Felt lonely, `fltlnl`, N #n.lonely_n], "fig1_lonely.png")
+#fig(3, 6, [#label[Figure 1]  Felt lonely, `fltlnl`, N #n.lonely_n], "fig1_lonely.png")
 
 #sec(5, sub: [Independent])[#lorem(56)]
 #side(5)[Asked only if online most days: 168 not asked, 4 don't know. Kept missing, not 0 min.]
 
 // ---------- modules 7–8: Figure 2 breakout ----------
-#fig(7, 6, [#label[Fig. 2]  Minutes online per day, `netustm`, N #n.net_n. #meta[Below: loneliness per band, 95% CI]], "fig2_internet.png", c: 2, cols: 5)
+#fig(7, 6, [#label[Figure 2]  Minutes online per day, `netustm`, N #(n.net_n); #g1[red: above the mean]. #meta[Below: mean loneliness per band, 95% CI.]], "fig2_internet.png", c: 2, cols: 5)
 
 // ---------- module 9: 2 Grouping ----------
-#sec(9, heading: [2 Grouping])[#lorem(24)]
-#fig(9, 2, [#label[Fig. 3]  `net_group`, N #n.group_n, mode #n.group_mode], "fig3_groups.png")
+#sec(9, heading: [2 Grouping])[#lorem(10) #g1[above the mean (1)] #lorem(10)]
+#fig(9, 2, [#label[Figure 3]  Groups, `net_group`, N #n.group_n, mode #n.group_mode], "fig3_groups.png")
 
 // ---------- modules 10–11: 3 Descriptives, 4 Test; Table 1 in the margin ----------
 #sec(10, heading: [3 Descriptives])[#lorem(24)]
 #sec(11, heading: [4 Test])[#lorem(24)]
 #let r = table.hline(stroke: hair)
 #at(5, mtop(10), 2, small(table(columns: (span(2) / 3,) * 3, stroke: none, inset: 0pt, align: (left, right, right),
-  [#label[Table 1]], [Lonely], [Min/day],
+  [#label[Table 1]], [Loneliness], [Minutes],
   r,
   [Valid N],  n.lonely_n,      n.net_n,
   [Mean],     n.lonely_mean,   n.net_mean,
@@ -140,5 +147,5 @@
 
 // ---------- modules 12–14: 5 Interpretation; Figure 4 and the test result in the margin ----------
 #sec(12, heading: [5 Interpretation])[#lorem(76)]
-#fig(13, 2, [#label[Fig. 4]  Mean loneliness, 95% CI], "fig4_means.png")
-#side(14)[#label[Welch t-test] \ 1 − 0: #n.diff, 95% CI #n.diff_lo to #n.diff_hi \ t #n.t, df #n.df, p #n.p]
+#fig(13, 2, [#label[Figure 4]  Mean loneliness, 95% CI], "fig4_means.png")
+#side(14)[#label[Welch t-test] \ #g1[1] − 0: #n.diff, 95% CI #n.diff_lo to #n.diff_hi \ t #n.t, df #n.df, p #n.p]
