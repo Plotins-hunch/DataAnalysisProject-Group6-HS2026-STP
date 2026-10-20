@@ -339,15 +339,15 @@ fig1 <- ggplot(filter(ess, !is.na(lonely)), aes(lonely)) +
   white_lines(c(250, 500, 750)) +                 # white lines through the bars replace a grid
   geom_text(stat = "bin", binwidth = 1, boundary = 0.5, vjust = -0.5, family = fam, size = fs / .pt,
             colour = ink, aes(label = after_stat(paste0(round(100 * count / sum(count)), "%")))) +
-  annotate("point", x = desc["mean", "lonely"], y = -150, shape = 17, size = 1.2, colour = ink) +
-  note(x = desc["mean", "lonely"] + 0.1, y = -150, hjust = 0, colour = ink,
+  annotate("point", x = desc["mean", "lonely"], y = -200, shape = 17, size = 1.2, colour = ink) +
+  note(x = desc["mean", "lonely"] + 0.1, y = -200, hjust = 0, colour = ink,
        label = sprintf("mean %.2f", desc["mean", "lonely"])) +
   scale_x_continuous(breaks = 1:4, labels = c("None", "Some", "Most", "All"),
                      limits = c(0.5, 4.5), expand = c(0, 0)) +
-  scale_y_continuous(limits = c(-260, 1250), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(-360, 1420), expand = c(0, 0)) +   # room for labels at 4 lines tall
   theme_report
 fig1
-save_fig(fig1, "fig1_lonely.png", lines = 6)
+save_fig(fig1, "fig1_lonely.png", lines = 4)
 
 # part 3.e - Figure 2: IV histogram in 10-minute bins, bars coloured by group, the mean
 # (= cut point) marked, groups labelled directly instead of a legend
@@ -355,15 +355,15 @@ fig2 <- ggplot(filter(ess, !is.na(net_min)), aes(net_min, fill = net_group)) +
   geom_histogram(binwidth = 10, boundary = 0, closed = "left") +
   scale_fill_manual(values = c(grey, red)) +
   white_lines(c(50, 100, 150)) +
-  annotate("segment", x = cut_point, xend = cut_point, y = 0, yend = 230, linewidth = 1.5 * lw, colour = red) +
-  note(x = cut_point + 20, y = 220, hjust = 0, colour = red, label = sprintf("mean = cut point %.1f min", cut_point)) +
-  note(x = 1080, y = 170, hjust = 1, colour = red, label = sprintf("1 above the mean %d", group_counts$n[2])) +
-  note(x = 1080, y = 140, hjust = 1, colour = grey, label = sprintf("0 at or below %d", group_counts$n[1])) +
+  annotate("segment", x = cut_point, xend = cut_point, y = 0, yend = 265, linewidth = 1.5 * lw, colour = red) +
+  note(x = cut_point + 20, y = 245, hjust = 0, colour = red, label = sprintf("mean = cut point %.1f min", cut_point)) +
+  note(x = 1080, y = 175, hjust = 1, colour = red, label = sprintf("1 above the mean %d", group_counts$n[2])) +
+  note(x = 1080, y = 120, hjust = 1, colour = grey, label = sprintf("0 at or below %d", group_counts$n[1])) +
   x_minutes +
-  scale_y_continuous(limits = c(0, 235), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0, 270), expand = c(0, 0)) +
   theme_report
 fig2
-save_fig(fig2, "fig2_internet.png", lines = 6)
+save_fig(fig2, "fig2_internet.png", lines = 4)
 
 # part 3.f - Figure 3: bar chart of the grouping variable, count and share
 fig3 <- ggplot(group_counts, aes(n, net_group, fill = net_group)) +
@@ -480,6 +480,7 @@ save_fig(fig5, "fig5_bands.png", lines = 3)
 # so no number is typed by hand
 f <- function(x, d = 0) formatC(x, format = "f", digits = d, big.mark = ",")
 report_numbers <- data.frame(rbind(
+  c("n_total",    f(nrow(ess))),                   c("cut",        f(cut_point, 1)),
   c("lonely_n",   f(desc["valid_n", "lonely"])),   c("net_n",      f(desc["valid_n", "net_min"])),
   c("lonely_mean", f(desc["mean", "lonely"], 2)),  c("net_mean",   f(desc["mean", "net_min"], 1)),
   c("lonely_median", f(desc["median", "lonely"])), c("net_median", f(desc["median", "net_min"])),

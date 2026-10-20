@@ -80,21 +80,25 @@
   columns: (col-a, col-b, col-c),
   column-gutter: gut,
   row-gutter: u,
-  // header
+  // header: title and course | names
   ..row(meta[Report 1 \ Group 6 \ HS2026],
-        [Internet use and loneliness in Switzerland \ #meta[Gabriele Pizzi, Marlo (Clara) Roth, Ole Handschug, Joshua Silalahi]],
-        []),
-  // question and answer
-  ..row(meta[Question \ \ Answer],                 // each label on the line it labels (rule 3)
-        [Is people's internet use associated with their feeling of loneliness? \ #lorem(6) #g1[above the mean] #lorem(6)],
-        []),
+        [Internet use and loneliness in Switzerland \ #meta[Data Analysis for Public Policy, ETH Zürich]],
+        evidence(meta[Gabriele Pizzi \ Marlo (Clara) Roth \ Ole Handschug \ Joshua Silalahi])),
+  // fact sheet: each label on the line it labels (rule 3); the result's evidence beside it
+  grid.cell(colspan: 2, grid(columns: (col-a, col-b), column-gutter: gut,
+    meta[Question], [Is people's internet use associated with their feeling of loneliness?],
+    meta[Data],     [European Social Survey Round 11, Switzerland, N #n.n_total],
+    meta[Method],   [Internet use split at its mean (#n.cut min); Welch t-test of loneliness between the groups],
+    meta[Answer],   [#lorem(6) #g1[above the mean] #lorem(6)],
+  )),
+  fig([Figure 4 Mean loneliness, 95% CI; dashed: all], "fig4_means.png", 2),
   // 1 Variables
   ..row([1 Variables \ #meta[Dependent]],
-        [#lorem(58)],
-        fig([Figure 1 Felt lonely, `fltlnl`, N #n.lonely_n], "fig1_lonely.png", 6)),
+        [#lorem(50)],
+        fig([Figure 1 Felt lonely, `fltlnl`, N #n.lonely_n], "fig1_lonely.png", 4)),
   ..row(meta[Independent],
-        [#lorem(58)],
-        fig([Figure 2 Minutes online per day, `netustm`, N #n.net_n], "fig2_internet.png", 6)),
+        [#lorem(50)],
+        fig([Figure 2 Minutes online per day, `netustm`, N #n.net_n], "fig2_internet.png", 4)),
   // 2 Grouping
   ..row([2 Grouping],
         [#lorem(10) #g1[above the mean (1)] #lorem(12)],
@@ -114,12 +118,12 @@
           [Range],    n.lonely_range,  n.net_range,
           [IQR],      n.lonely_iqr,    n.net_iqr,
         ))),
-  // 4 Test
+  // 4 Test: the test result as the evidence
   ..row([4 Test],
-        [#lorem(40)],
-        fig([Figure 4 Mean loneliness, 95% CI; dashed: all. Welch t-test, #g1[1] − 0: #n.diff, 95% CI #n.diff_lo to #n.diff_hi, t #n.t, df #n.df, p #n.p], "fig4_means.png", 2)),
+        [#lorem(32)],
+        evidence[Welch t-test, #g1[1] − 0 \ difference #n.diff, 95% CI #n.diff_lo to #n.diff_hi \ t #n.t, df #n.df, p #n.p]),
   // 5 Interpretation
   ..row([5 Interpretation],
-        [#lorem(76)],
+        [#lorem(68)],
         fig([Figure 5 Mean loneliness per band of internet time, 95% CI; dashed: all], "fig5_bands.png", 3)),
 )
