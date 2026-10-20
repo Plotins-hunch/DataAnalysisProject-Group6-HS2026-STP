@@ -16,19 +16,25 @@ How to write the body text of `report.typ` so it works with the figures.
 
 | Section | Words | Evidence beside it |
 |---|---|---|
-| Answer (fact sheet) | ~16 | — |
+| Findings | ~34 | the data (ESS 11, N) |
 | 1 Variables, dependent | ~56 | Figure 1 |
 | 1 Variables, independent | ~58 | Figure 2, missing-answers note |
 | 2 Grouping | ~30 | Figure 3, boundary note |
-| 3 Descriptives | ~64 | Table 1 |
+| 3 Descriptives | ~56 | Table 1 |
 | 4 Test | ~26 | group N and SD |
 | 5 Interpretation | ~60 | Figure 4 (and Figure 5 above it) |
 
 ## What each section must say, and what to mention about its figure
 
-### Answer
-One plain sentence: no measurable difference in loneliness between heavier and lighter internet
-users. No numbers (they are in Figure 4).
+### Findings (the page's abstract)
+Two sentences, no numbers (they are in Figure 4):
+1. The result in plain language: people who spend more time online than average are no lonelier
+   than those who spend less.
+2. What it means and the main caveat: this holds for regular internet users in Switzerland, and a
+   split at the mean is a crude test; Report 2 will use the minutes in full.
+
+Zero redundancy with section 5: Findings states the result once; Interpretation does not repeat
+it but shows *why* it holds (Figure 4, Figure 5) and what limits it.
 
 ### 1 Variables: dependent, `fltlnl` (Figure 1)
 The brief requires: why this item, why it captures loneliness, at least one limitation.

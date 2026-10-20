@@ -35,7 +35,7 @@
 //   table, a caption or another figure already carries is left out of the plot.
 // HIERARCHY of information, expressed only by position, ink and size:
 //   1  the question, as the title                   top of the page, display size
-//   2  the answer                                   under it, ink
+//   2  the findings, two sentences                  under it, ink; the data beside them in C
 // ZERO REDUNDANCY   every fact is printed once, where it is used: the cut point in Grouping,
 //   the missing count with the IV, the test result under Figure 4, nothing as a pointer.
 //   3  section headings 1–5 (the rubric's parts)    column A, ink
@@ -152,12 +152,11 @@
   tag[Report 1 \ Group 6],
   grid.cell(colspan: 2, { set par(leading: 3 * u - title-size); text(size: title-size, top-edge: hang + cap * title-size, bottom-edge: -(3 * u - hang - cap * title-size))[Is internet use associated \ with loneliness?] }),
 
-  // ---- fact sheet: the title is the question; here only what nothing else says ----
-  grid.cell(colspan: 2, grid(columns: (col-a, col-b), column-gutter: gut,
-    tag[Data],     meta[European Social Survey Round 11, Switzerland, N #n.n_total],
-    tag[Answer],   [#lorem(8) #g1[above the mean] #lorem(8)],
-  )),
-  [],
+  // ---- findings: the first row, built like every other row (label | text | evidence) ----
+  // two sentences: the result in plain language, then its meaning and main caveat
+  ..row(tag[Findings],
+        [#lorem(14) #g1[above the mean] #lorem(18)],
+        evidence(meta[European Social Survey Round 11 \ Switzerland, 2023 \ N #n.n_total respondents])),
 
   // ---- 1 Variables ----
   ..row([1 Variables \ #keys([Dependent], `fltlnl`, [scale 1–4], [N #n.lonely_n])],
@@ -178,7 +177,7 @@
 
   // ---- 3 Descriptives: Table 1 beside its reading ----
   ..row([3 Descriptives],
-        [#lorem(64)],
+        [#lorem(56)],
         small-table(
           [Table 1], [Loneliness], [Minutes], rule,
           [Mean],     n.lonely_mean,   n.net_mean,
