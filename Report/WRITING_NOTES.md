@@ -11,6 +11,9 @@ How to write the body text of `report.typ` so it works with the figures.
 - **Name the figure when you lean on it**: "(Figure 2)". One mention per figure is enough.
 - **Red always means group 1, above the mean.** When the text names that group, wrap it in
   `#g1[...]` so it turns red and links to the figures.
+- **Call things what they are.** Both variables are self-reports: write "self-reported loneliness"
+  (not "loneliness") and "self-reported time online" at least at first mention in each section,
+  and never imply we measured how lonely people *are* or how long they are *actually* online.
 - **Full sentences, no bullet points** (brief, section 6).
 - **Keep to each section's word budget**, or the page overflows. Re-compile after every section.
 

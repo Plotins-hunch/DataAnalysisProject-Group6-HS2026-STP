@@ -36,6 +36,8 @@
 // HIERARCHY of information, expressed only by position, ink and size:
 //   1  the question, as the title                   top of the page, display size
 //   2  the findings, two sentences                  under it, ink; the data beside them in C
+// TRANSPARENCY   both measures are self-reports and are named so everywhere: in keys,
+//   captions, the title and the text ("self-reported loneliness", "self-reported minutes").
 // ZERO REDUNDANCY   every fact is printed once, where it is used: the cut point in Grouping,
 //   the missing count with the IV, the test result under Figure 4, nothing as a pointer.
 //   3  section headings 1–5 (the rubric's parts)    column A, ink
@@ -150,7 +152,7 @@
 
   // ---- header: the title is the one large thing on the page (rule 1) ----
   tag[Report 1 \ Group 6],
-  grid.cell(colspan: 2, { set par(leading: 3 * u - title-size); text(size: title-size, top-edge: hang + cap * title-size, bottom-edge: -(3 * u - hang - cap * title-size))[Is internet use associated \ with loneliness?] }),
+  grid.cell(colspan: 2, { set par(leading: 3 * u - title-size); text(size: title-size, top-edge: hang + cap * title-size, bottom-edge: -(3 * u - hang - cap * title-size))[Is internet use linked \ to self-reported loneliness?] }),
 
   // ---- findings: the first row, built like every other row (label | text | evidence) ----
   // two sentences: the result in plain language, then its meaning and main caveat
@@ -159,12 +161,12 @@
         evidence(meta[European Social Survey Round 11 \ Switzerland, 2023 \ N #n.n_total respondents])),
 
   // ---- 1 Variables ----
-  ..row([1 Variables \ #keys([Dependent], `fltlnl`, [scale 1–4], [N #n.lonely_n])],
+  ..row([1 Variables \ #keys([Dependent], `fltlnl`, [self-reported], [scale 1–4], [N #n.lonely_n])],
         [#lorem(56)],
-        fig([Figure 1 Felt lonely in the past week], "fig1_lonely.svg", 5)),
-  ..row(keys([Independent], `netustm`, [min per day], [N #n.net_n], [#n.net_missing missing]),
+        fig([Figure 1 Self-reported loneliness, past week], "fig1_lonely.svg", 5)),
+  ..row(keys([Independent], `netustm`, [self-reported], [min per day], [N #n.net_n], [#n.net_missing missing]),
         [#lorem(58)],
-        fig([Figure 2 Time online, #g1[red above the mean]], "fig2_internet.svg", 5)),
+        fig([Figure 2 Self-reported minutes online per day], "fig2_internet.svg", 5)),
 
   // ---- 2 Grouping: the group bar chart and the boundary note ----
   ..row([2 Grouping \ #keys(`net_group`, [cut #n.cut min])],
@@ -179,7 +181,7 @@
   ..row([3 Descriptives],
         [#lorem(56)],
         small-table(
-          [Table 1], [Loneliness], [Minutes], rule,
+          [Table 1], `fltlnl`, `netustm`, rule,
           [Mean],     n.lonely_mean,   n.net_mean,
           [Median],   n.lonely_median, n.net_median,
           [Mode],     n.lonely_mode,   n.net_mode,
@@ -196,10 +198,10 @@
 
   // ---- the one breakout (rule 2b): Figure 5, the question itself, across B and C ----
   tag[Figure 5],
-  grid.cell(colspan: 2, fig([Every respondent, loneliness (1–4, jittered) by minutes online, #g1[red above the mean]], "fig5_scatter.svg", 5, width: col-b + gut + col-c)),
+  grid.cell(colspan: 2, fig([Every respondent, self-reported loneliness (1–4, jittered) by self-reported minutes online, #g1[red above the mean]], "fig5_scatter.svg", 5, width: col-b + gut + col-c)),
 
   // ---- 5 Interpretation: the result beside its reading ----
   ..row([5 Interpretation],
         [#lorem(60)],
-        fig([Figure 4 Mean loneliness, 95% CI \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 4)),
+        fig([Figure 4 Mean self-reported loneliness, 95% CI \ Welch #g1[1] − 0: #n.diff (#n.diff_lo to #n.diff_hi) \ t #n.t, df #n.df, p #n.p], "fig4_means.svg", 4)),
 )
