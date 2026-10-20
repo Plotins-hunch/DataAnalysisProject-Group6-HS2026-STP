@@ -297,8 +297,14 @@ group_mode
 # result: valid N 1212; at or below mean 717 (59%), above mean 495 (41%); mode = at or below mean
 
 # part 3.c - settings shared by all figures
-# every figure below is built the same way: the data, one geom, the scales, theme_report, save.
-# two arguments come back in every figure:
+#
+# how a ggplot figure is written, in every figure below:
+#   ggplot(data, aes(x, y))   start a plot: which data, and which column goes on which axis
+#                             (aes = "aesthetics"; it can also map a column to fill or colour)
+#   + geom_...()              add a layer of marks: geom_histogram, geom_col (bars), geom_text ...
+#   + scale_...()             settings of an axis or a colour scale: limits, breaks, labels
+#   + theme_report            the look (fonts, no grid, no legend), defined once below
+# each layer is added with "+". two arguments come back in every figure:
 #   expand = c(0, 0)                   removes the padding ggplot adds around the data
 #   family = font, size = text_size    the text inside the plot
 library(svglite)                  # the figures are SVG; install.packages("svglite") once if needed
@@ -313,53 +319,58 @@ text_size    <- 2.5               # text inside the plots, about 7 pt
 red <- "#b2182b"; grey <- "#a6a6a6"; dark <- "#5c5c5c"; text_grey <- "#666666"
 group_colours <- c(grey, red)     # in the order of the factor levels: 0 at or below, 1 above
 
-# font: the report's font if it is installed, otherwise the system sans-serif
+# font: the report's font if it is installed on this computer, otherwise the system sans-serif
 font <- if ("ABC Areal Variable" %in% systemfonts::system_fonts()$family) "ABC Areal Variable" else "sans"
 
-# theme: no grid, no legend, no y-axis; values are written on the data
+# theme: no grid, no legend, no y-axis; the values are written on the data instead.
+# theme_void() is an empty look; theme() switches single elements back on or sets them
 theme_report <- theme_void(base_family = font) +
   theme(axis.text.x = element_text(colour = text_grey, size = 7),
         legend.position = "none",
         plot.margin = margin(4, 0, 0, 0))
 
-# saving: width in inches, height in lines of the report
-dir.create("figures", showWarnings = FALSE)
+# saving: save_fig(plot, file name, width in inches, height in lines of the report).
+# function(...) { } defines our own command; ggsave() writes a plot to a file
+dir.create("figures", showWarnings = FALSE)                # the folder the figures go to
 save_fig <- function(p, file, width, lines) {
   path <- file.path("figures", file)
   ggsave(path, p, width = width, height = lines * line_height)
-  # the report knows the font as "ABC Areal"
+  # the report knows the font as "ABC Areal": replace the name inside the saved file
   writeLines(gsub("ABC Areal Variable", "ABC Areal", readLines(path), fixed = TRUE), path)
 }
 
-# the respondents each figure can use
+# the respondents each figure can use: filter() keeps the rows where the condition is true,
+# here the rows with a real answer (not NA)
 lonely_data  <- filter(ess, !is.na(lonely))
 minutes_data <- filter(ess, !is.na(net_min))
 both_data    <- filter(ess, !is.na(lonely), !is.na(net_min))
 
 # part 3.d - Figure 1: histogram of the DV, one bar per answer, share of respondents above each bar
+# first the labels: count() counts the rows per answer, mutate() adds a column with the share
+# as text ("75%"). %>% passes the result of one step into the next.
 lonely_shares <- lonely_data %>%
   count(lonely) %>%
   mutate(share = paste0(round(100 * n / sum(n)), "%"))
 
 fig1 <- ggplot(lonely_data, aes(lonely)) +
-  geom_histogram(binwidth = 1, fill = dark) +
+  geom_histogram(binwidth = 1, fill = dark) +                                      # one bar per answer 1-4
   geom_vline(xintercept = c(1.5, 2.5, 3.5), colour = "white", linewidth = 1.5) +   # white gaps between the bars
   geom_text(data = lonely_shares, aes(lonely, n, label = share), vjust = -0.7, family = font, size = text_size) +
-  scale_x_continuous(breaks = 1:4, labels = c("None", "Some", "Most", "All")) +
-  scale_y_continuous(limits = c(0, 1300), expand = c(0, 0)) +
+  scale_x_continuous(breaks = 1:4, labels = c("None", "Some", "Most", "All")) +    # answer words under the bars
+  scale_y_continuous(limits = c(0, 1300), expand = c(0, 0)) +                      # room above the tallest bar
   theme_report
 fig1
 save_fig(fig1, "fig1_lonely.svg", figure_width, lines = 6)
 
 # part 3.e - Figure 2: histogram of the IV in 10-minute bins, bars coloured by group, cut point marked
-fig2 <- ggplot(minutes_data, aes(net_min, fill = net_group)) +
-  geom_histogram(binwidth = 10, boundary = 0) +
+fig2 <- ggplot(minutes_data, aes(net_min, fill = net_group)) +                     # fill = colour by group
+  geom_histogram(binwidth = 10, boundary = 0) +                                    # bins 0-10, 10-20, ... minutes
   geom_hline(yintercept = c(50, 100, 150), colour = "white", linewidth = 0.3) +   # one white line per 50 people
-  geom_vline(xintercept = cut_point, colour = red, linewidth = 0.2) +
-  annotate("text", x = cut_point + 25, y = 200, label = "mean (cut)", hjust = 0,
+  geom_vline(xintercept = cut_point, colour = red, linewidth = 0.2) +              # the mean = the cut point
+  annotate("text", x = cut_point + 25, y = 200, label = "mean (cut)", hjust = 0,   # a label next to that line
            colour = red, family = font, size = text_size) +
   scale_fill_manual(values = group_colours) +
-  scale_x_continuous(breaks = c(240, 480, 720, 960), labels = c("4h", "8h", "12h", "16h"),
+  scale_x_continuous(breaks = c(240, 480, 720, 960), labels = c("4h", "8h", "12h", "16h"),   # minutes shown as hours
                      limits = c(0, 1080), expand = c(0, 0)) +
   scale_y_continuous(limits = c(0, 220), expand = c(0, 0)) +
   theme_report
@@ -367,17 +378,18 @@ fig2
 save_fig(fig2, "fig2_internet.svg", figure_width, lines = 6)
 
 # part 3.f - Figure 3: bar chart of the grouping variable, count and share written after each bar
+# the label of each bar, e.g. "1 above  495 (41%)", added as a column to group_counts
 group_counts <- group_counts %>%
   mutate(label = paste0(c("0 at or below", "1 above"), "  ", n, " (", round(100 * share), "%)"))
 
-fig3 <- ggplot(group_counts, aes(n, net_group, fill = net_group)) +
-  geom_col(width = 0.7) +
+fig3 <- ggplot(group_counts, aes(n, net_group, fill = net_group)) +                # count on x, group on y
+  geom_col(width = 0.7) +                                                          # one bar per group
   geom_text(aes(label = label, colour = net_group), hjust = -0.1, family = font, size = text_size) +
   scale_fill_manual(values = group_colours) +
-  scale_colour_manual(values = c(text_grey, red)) +
-  scale_x_continuous(limits = c(0, 2200), expand = c(0, 0)) +   # room for the labels
-  scale_y_discrete(expand = expansion(add = 0.7)) +             # room above and below the bars
-  theme_report + theme(axis.text.x = element_blank())
+  scale_colour_manual(values = c(text_grey, red)) +                                # label colours
+  scale_x_continuous(limits = c(0, 2200), expand = c(0, 0)) +                      # room for the labels
+  scale_y_discrete(expand = expansion(add = 0.7)) +                                # room above and below the bars
+  theme_report + theme(axis.text.x = element_blank())                              # no numbers under the bars
 fig3
 save_fig(fig3, "fig3_groups.svg", figure_width, lines = 3)
 
@@ -427,18 +439,21 @@ t.test(ess$lonely ~ ess$net_group)
 
 # part 4.b - Figure 4: mean loneliness in each group with its 95% confidence interval
 tt <- t.test(ess$lonely ~ ess$net_group)        # the same test, kept as an object for the figure and step 6
+
+# one row per group with its N, mean and sd; then the confidence interval of the mean:
+# mean +/- t * sd / sqrt(n), where qt(0.975, n - 1) is the t value for 95%
 group_means <- both_data %>%
   group_by(net_group) %>%
   summarise(n = n(), m = mean(lonely), s = sd(lonely)) %>%
-  mutate(lo = m - qt(0.975, n - 1) * s / sqrt(n),      # 95% confidence interval of the mean
+  mutate(lo = m - qt(0.975, n - 1) * s / sqrt(n),
          hi = m + qt(0.975, n - 1) * s / sqrt(n))
 group_means
 
-fig4 <- ggplot(group_means, aes(m, net_group, colour = net_group)) +
-  geom_pointrange(aes(xmin = lo, xmax = hi), linewidth = 0.4, size = 0.3) +
-  geom_text(aes(x = hi, label = sprintf("%.2f", m)), hjust = -0.3, family = font, size = text_size) +
+fig4 <- ggplot(group_means, aes(m, net_group, colour = net_group)) +              # mean on x, group on y
+  geom_pointrange(aes(xmin = lo, xmax = hi), linewidth = 0.4, size = 0.3) +        # a dot at the mean, a line from lo to hi
+  geom_text(aes(x = hi, label = sprintf("%.2f", m)), hjust = -0.3, family = font, size = text_size) +  # mean with 2 decimals
   scale_colour_manual(values = group_colours) +
-  scale_x_continuous(limits = c(1.2, 1.45), breaks = c(1.25, 1.3, 1.35, 1.4), expand = c(0, 0)) +
+  scale_x_continuous(limits = c(1.2, 1.45), breaks = c(1.25, 1.3, 1.35, 1.4), expand = c(0, 0)) +  # zoomed in on 1.2-1.45
   theme_report
 fig4
 save_fig(fig4, "fig4_means.svg", figure_width, lines = 5)
@@ -451,12 +466,12 @@ save_fig(fig4, "fig4_means.svg", figure_width, lines = 5)
 # at random (jitter) so the points do not hide each other; set.seed() makes that the same every run.
 set.seed(6)
 fig5 <- ggplot(both_data, aes(net_min, lonely, colour = net_group)) +
-  geom_jitter(width = 0, height = 0.22, size = 0.7, alpha = 0.55, stroke = 0) +
-  geom_vline(xintercept = cut_point, colour = red, linewidth = 0.2) +
+  geom_jitter(width = 0, height = 0.22, size = 0.7, alpha = 0.55, stroke = 0) +    # one small, half-transparent dot per person
+  geom_vline(xintercept = cut_point, colour = red, linewidth = 0.2) +              # the cut point
   scale_colour_manual(values = group_colours) +
-  scale_x_continuous(breaks = seq(120, 960, 120), labels = paste0(seq(2, 16, 2), "h"),
+  scale_x_continuous(breaks = seq(120, 960, 120), labels = paste0(seq(2, 16, 2), "h"),   # every 2 hours
                      limits = c(0, 1080), expand = c(0, 0)) +
-  scale_y_continuous(breaks = 1:4, limits = c(0.6, 4.4), position = "right", expand = c(0, 0)) +
+  scale_y_continuous(breaks = 1:4, limits = c(0.6, 4.4), position = "right", expand = c(0, 0)) +   # scale 1-4 on the right
   theme_report + theme(axis.text.y = element_text(colour = text_grey, size = 7, margin = margin(l = 4)))
 fig5
 save_fig(fig5, "fig5_scatter.svg", wide_width, lines = 5)
@@ -468,8 +483,10 @@ save_fig(fig5, "fig5_scatter.svg", wide_width, lines = 5)
 # every number printed in the report, written to one file that the report reads,
 # so no number is typed by hand. each name below is used in Report/report.typ as n.name
 
-fmt  <- function(x, digits = 0) formatC(x, format = "f", digits = digits, big.mark = ",")   # 1234.5 -> "1,234.5"
-stat <- function(name, variable, digits = 0) fmt(desc[name, variable], digits)              # one cell of desc
+# two small helpers: fmt() turns a number into text with a thousands separator and a fixed
+# number of decimals (1234.5 -> "1,234.5"); stat() picks one cell of the desc table and formats it
+fmt  <- function(x, digits = 0) formatC(x, format = "f", digits = digits, big.mark = ",")
+stat <- function(name, variable, digits = 0) fmt(desc[name, variable], digits)
 
 sample_numbers <- c(
   n_total     = fmt(nrow(ess)),
@@ -508,6 +525,7 @@ test_numbers <- c(
   p       = sprintf("%.2f", tt$p.value)
 )
 
+# join the four parts and write them as a two-column table: name, value
 numbers <- c(sample_numbers, table1_numbers, group_numbers, test_numbers)
 write.csv(data.frame(name = names(numbers), value = numbers),
           "figures/report_numbers.csv", row.names = FALSE)
